@@ -12,7 +12,7 @@ import java.net.Socket
 import java.sql.Timestamp
 
 @Entity
-data class Scan(@PrimaryKey(autoGenerate = true) val scanId : Long, val startedAt: Long)
+data class Scan(@PrimaryKey(autoGenerate = true) val scanId: Long, val startedAt: Long)
 
 @Entity
 data class Device(
@@ -37,9 +37,9 @@ data class Device(
     }
 
     suspend fun scanPorts() = withContext(Dispatchers.Main) {
-        Port.commonPorts.map {
+        PortDescription.commonPorts.map {
             async {
-                it to this@Device.isPortOpen(it)
+                it to this@Device.isPortOpen(it.port)
             }
         }
     }
@@ -85,11 +85,19 @@ data class Port(
     @PrimaryKey(autoGenerate = true) val portId: Long, val port: Int,
     val protocol: Protocol,
     val deviceId: Long
-) {
-    companion object {
-        val commonPorts = listOf(80, 21, 22, 8080, 443)
-    }
-}
+)
 
 @Entity(primaryKeys = ["name", "mac"])
 data class MacVendor(val name: String, val mac: String)
+
+data class PortDescription(val port: Int, val protocol: Protocol, val serviceName: String) {
+    companion object {
+        val commonPorts = listOf(
+            PortDescription(80, Protocol.TCP, "HTTP"),
+            PortDescription(21, Protocol.TCP, "FTP"),
+            PortDescription(22, Protocol.TCP, "SFTP"),
+            PortDescription(8080, Protocol.TCP, "HTTP-Proxy"),
+            PortDescription(443, Protocol.TCP, "HTTPS")
+        )
+    }
+}

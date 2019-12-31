@@ -1,6 +1,8 @@
 package de.csicar.ning
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -24,7 +26,7 @@ import kotlinx.coroutines.*
  */
 class DeviceInfoFragment : Fragment() {
     lateinit var viewModel: ScanViewModel
-    lateinit var adapter : DeviceInfoRecyclerViewAdapter
+    lateinit var adapter: DeviceInfoRecyclerViewAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,9 +41,28 @@ class DeviceInfoFragment : Fragment() {
                 adapter.updateData(it)
             })
         })
-        activity?.toolbar?.findViewById<TextView>(R.id.title_detail)?.text = arguments?.getString("deviceIp")
+        activity?.toolbar?.findViewById<TextView>(R.id.title_detail)?.text =
+            arguments?.getString("deviceIp")
         // Set the adapter
-        adapter = DeviceInfoRecyclerViewAdapter(listOf())
+        adapter = DeviceInfoRecyclerViewAdapter(listOf()) { port ->
+            viewModel.viewModelScope.launch {
+                val device = withContext(Dispatchers.IO) { viewModel.deviceDao.getByIdNow(port.deviceId) }
+                when (port.port) {
+                    8080 ->
+                        Intent(Intent.ACTION_VIEW).apply {
+                            data = Uri.parse("http://${device.ip}:${port.port}")
+                        }.also {
+                            startActivity(it)
+                        }
+                    22 ->
+                        Intent(Intent.ACTION_VIEW).apply {
+                            data = Uri.parse("ssh://${device.ip}:${port.port}")
+                        }.also {
+                            startActivity(it)
+                        }
+                }
+            }
+        }
         if (view is RecyclerView) {
             view.layoutManager = LinearLayoutManager(context)
             view.adapter = adapter

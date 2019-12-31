@@ -20,7 +20,7 @@ class DeviceRecyclerViewAdapter(
 
     init {
         mOnClickListener = View.OnClickListener { v ->
-            val item = v.tag as Device
+            val item = v.tag as DeviceWithName
             mListener?.onListFragmentInteraction(item, v)
         }
     }

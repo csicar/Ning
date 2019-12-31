@@ -14,7 +14,8 @@ import kotlinx.android.synthetic.main.fragment_deviceinfo.view.*
  * TODO: Replace the implementation with code for your data type.
  */
 class DeviceInfoRecyclerViewAdapter(
-    private var mValues: List<Port>
+    private var mValues: List<Port>,
+    private val mListener: (Port) -> Unit
 ) : RecyclerView.Adapter<DeviceInfoRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -30,22 +31,25 @@ class DeviceInfoRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
-        holder.mIdView.text = item.port.toString()
-        holder.mContentView.text = item.protocol.toString()
+        holder.portNumberTextView.text = item.port.toString()
+        holder.protocolTextView.text = item.protocol.toString()
+        holder.serviceTextView.text = "SSH"
 
         with(holder.mView) {
             tag = item
+            setOnClickListener { mListener(item) }
         }
     }
 
     override fun getItemCount(): Int = mValues.size
 
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-        val mIdView: TextView = mView.ipTextView
-        val mContentView: TextView = mView.macTextView
+        val portNumberTextView: TextView = mView.portNumberTextView
+        val protocolTextView: TextView = mView.protocolTextView
+        val serviceTextView: TextView = mView.serviceNameTextView
 
         override fun toString(): String {
-            return super.toString() + " '" + mContentView.text + "'"
+            return super.toString() + " '" + protocolTextView.text + "'"
         }
     }
 }

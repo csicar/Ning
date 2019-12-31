@@ -23,8 +23,8 @@ interface NetworkDao {
 
 @Dao
 interface DeviceDao {
-    @Query("Select * FROM DeviceWithName WHERE networkId = :networkId")
-    fun getAll(networkId: Long): LiveData<List<DeviceWithName>>
+    @Query("Select * FROM DeviceWithName")
+    fun getAll(): LiveData<List<DeviceWithName>>
 
 
     @Query("SELECT * FROM Device")
@@ -41,6 +41,9 @@ interface DeviceDao {
 
     @Query("SELECT * FROM DEVICE WHERE deviceId = :id")
     fun getById(id: Long): LiveData<Device>
+
+    @Query("SELECT * FROM DEVICE WHERE deviceId = :id")
+    fun getByIdNow(id: Long): Device
 
     @Query("SELECT * FROM Device WHERE ip = :ip AND networkId IN (SELECT networkId FROM Network WHERE scanId = :scanId)")
     fun getByAddress(ip: Inet4Address, scanId: Long): Device?

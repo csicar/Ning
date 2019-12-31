@@ -28,10 +28,13 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
         <Spinner
             android:id="@+id/interface_selection"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            tools:layout_editor_absoluteX="91dp"
+            tools:layout_editor_absoluteY="16dp" />
     </androidx.appcompat.widget.Toolbar>
 
 

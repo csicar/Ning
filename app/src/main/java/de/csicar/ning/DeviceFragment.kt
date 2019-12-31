@@ -47,7 +47,7 @@ class DeviceFragment : Fragment() {
             adapter = viewAdapter
         }
 
-        viewModel.deviceDao.getAll(networkId).observe(this@DeviceFragment, Observer {
+        viewModel.deviceDao.getAll().observe(this@DeviceFragment, Observer {
             viewAdapter.updateData(it)
         })
 
@@ -69,6 +69,6 @@ class DeviceFragment : Fragment() {
     }
 
     interface OnListFragmentInteractionListener {
-        fun onListFragmentInteraction(item: Device?, view: View)
+        fun onListFragmentInteraction(item: DeviceWithName?, view: View)
     }
 }

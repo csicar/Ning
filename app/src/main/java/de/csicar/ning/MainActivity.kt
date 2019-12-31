@@ -47,7 +47,7 @@ class MainActivity : AppCompatActivity(), DeviceFragment.OnListFragmentInteracti
     }
 
 
-    override fun onListFragmentInteraction(item: Device?, view: View) {
+    override fun onListFragmentInteraction(item: DeviceWithName?, view: View) {
         val bundle = bundleOf("deviceId" to item?.deviceId, "deviceIp" to item?.ip)
         nav_host_fragment.findNavController().navigate(R.id.deviceInfoFragment, bundle)
     }
