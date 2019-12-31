@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity(), NetworkFragment.OnListFragmentInteract
             .setupWithNavController(navController, appBarConfiguration)
 
         viewModel = ViewModelProviders.of(this).get(ScanViewModel::class.java)
-
     }
 
 

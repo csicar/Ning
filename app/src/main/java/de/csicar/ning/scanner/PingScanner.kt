@@ -6,6 +6,8 @@ import de.csicar.ning.Device
 import de.csicar.ning.Network
 import de.csicar.ning.ScanViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.net.Inet4Address
 import java.net.NetworkInterface
@@ -31,21 +33,23 @@ fun getLocalIpAddress(scanId: Long): List<Network> {
 
 suspend fun pingIpAddresses(viewModel: ScanViewModel, network: Network) =
     withContext(Dispatchers.IO) {
-        val scanId = viewModel.scanId.value!!
-        network.enumerateAddresses().map {
-            it to it.isReachable(500)
-        }.forEach {
-            if (it.second) {
-                val ipAddress = it.first
-                Log.d("asd", "IP: $ipAddress is reachable.")
+        network.enumerateAddresses().asSequence().chunked(10).forEach { ipAddresses ->
+            launch {
+                ipAddresses.forEach { ipAddress ->
+                    Log.d("asd", "Try $ipAddress")
+                    val isReachable = ipAddress.isReachable(500)
+                    if (isReachable) {
+                        Log.d("asd", "IP: $ipAddress is reachable.")
 
-                viewModel.deviceDao.insert(
-                    Device(
-                        0, network.networkId,
-                        ipAddress, null, viewModel.getHwFromArp(ipAddress)
-                    )
-                )
-                viewModel.fetchArpTable()
+                        viewModel.deviceDao.insert(
+                            Device(
+                                0, network.networkId,
+                                ipAddress, null, viewModel.getHwFromArp(ipAddress)
+                            )
+                        )
+                        viewModel.fetchArpTable()
+                    }
+                }
             }
         }
     }

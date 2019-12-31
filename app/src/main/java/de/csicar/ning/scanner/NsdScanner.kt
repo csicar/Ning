@@ -45,7 +45,6 @@ class NsdScanner(val viewModel: ScanViewModel) {
             val host = serviceInfo.host
             if (host !is Inet4Address) return
 
-            Log.d("asd", "resolved: $serviceInfo")
             val network = viewModel.networkDao.getAllNow(viewModel.currentScanId).find {
                 it.containsAddress(host)
             }
@@ -55,7 +54,7 @@ class NsdScanner(val viewModel: ScanViewModel) {
                     Device(0, network.networkId, host, serviceInfo.serviceName, null)
                 )
             viewModel.deviceDao.updateServiceName(deviceId, serviceInfo.serviceName)
-            Log.d("asd", "service resolved $serviceInfo $deviceId $network")
+            Log.d("asd", "NSD: ${serviceInfo.host} has name ${serviceInfo.serviceName}")
         }
     }
 
@@ -73,15 +72,12 @@ class NsdScanner(val viewModel: ScanViewModel) {
         }
 
         override fun onDiscoveryStarted(serviceType: String?) {
-            Log.d("asd", "discovery started $serviceType")
         }
 
         override fun onDiscoveryStopped(serviceType: String?) {
-            Log.d("asd", "discovery stopped $serviceType")
         }
 
         override fun onServiceLost(serviceInfo: NsdServiceInfo?) {
-            Log.d("asd", "service lost $serviceInfo")
         }
 
     }

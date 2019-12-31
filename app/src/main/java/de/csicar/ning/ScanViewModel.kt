@@ -25,6 +25,10 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         MutableLiveData<Long>()
     }
 
+    val networkId by lazy {
+        MutableLiveData<Long>()
+    }
+
     val currentScanId get() = scanId.value!!
 
     val arpTable by lazy {
@@ -49,6 +53,9 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
                 NsdScanner(this@ScanViewModel).scan()
             }
         }
+        withContext(Dispatchers.Main) {
+            this@ScanViewModel.networkId.value = networkId
+        }
         network
     }
 
@@ -57,13 +64,8 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
             getArpTableFromFile().forEach { arpEntry ->
                 if (arpEntry.ip is Inet4Address) {
                     withContext(Dispatchers.IO) {
-                        Log.d("asd", "find device in: ${scanDao.getAllNow()}")
                         val device = deviceDao.getByAddress(arpEntry.ip, currentScanId)
                         if (device != null) {
-                            Log.d(
-                                "asd",
-                                "found MAC-Address for ${device.ip}: ${arpEntry.hwAddress}"
-                            )
                             deviceDao.updateHwAddress(device.deviceId, arpEntry.hwAddress)
                         }
                     }
