@@ -7,10 +7,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import androidx.room.Room
-import de.csicar.ning.scanner.ArpEntry
-import de.csicar.ning.scanner.MacAddress
-import de.csicar.ning.scanner.getArpTableFromFile
-import de.csicar.ning.scanner.pingIpAddresses
+import de.csicar.ning.scanner.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -18,14 +15,7 @@ import java.net.Inet4Address
 import java.sql.Timestamp
 
 class ScanViewModel(application: Application) : AndroidViewModel(application) {
-    val db = Room
-        .databaseBuilder(
-            application.applicationContext,
-            AppDatabase::class.java, "ning-db"
-        )
-        .createFromAsset("mac_devices.db")
-        .fallbackToDestructiveMigration()
-        .build()
+    val db = AppDatabase.createInstance(application)
     val deviceDao = db.deviceDao()
     val networkDao = db.networkDao()
     val portDao = db.portDao()
@@ -37,40 +27,49 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
 
     val currentScanId get() = scanId.value!!
 
-    //val currentScan get() = scanDao.getById(scanId)
-
     val arpTable by lazy {
         MutableLiveData<List<ArpEntry>>().also {
             fetchArpTable()
         }
     }
 
-    suspend fun startScan() = withContext(Dispatchers.Main) {
-        scanId.value = scanDao.insert(Scan(0, 0))
-        pingIpAddresses(this@ScanViewModel)
+    suspend fun startScan(interfaceName: String) = withContext(Dispatchers.IO) {
+        val newScanId = scanDao.insert(Scan(0, 0))
+        withContext(Dispatchers.Main) {
+            scanId.value = newScanId
+        }
+        val networkData = getLocalIpAddress(newScanId).find { it.interfaceName == interfaceName }!!
+        val networkId = networkDao.insert(networkData)
+        val network = networkDao.getByIdNow(networkId)
+        viewModelScope.launch {
+            launch {
+                pingIpAddresses(this@ScanViewModel, network)
+            }
+            launch {
+                NsdScanner(this@ScanViewModel).scan()
+            }
+        }
+        network
     }
 
-    fun fetchArpTable() {
+    fun fetchArpTable() =
         viewModelScope.launch {
-            getArpTableFromFile().forEach {
-                if (it.ip is Inet4Address) {
+            getArpTableFromFile().forEach { arpEntry ->
+                if (arpEntry.ip is Inet4Address) {
                     withContext(Dispatchers.IO) {
-                        val device = deviceDao.getByAddress(it.ip, currentScanId)
+                        Log.d("asd", "find device in: ${scanDao.getAllNow()}")
+                        val device = deviceDao.getByAddress(arpEntry.ip, currentScanId)
                         if (device != null) {
-                            deviceDao.update(
-                                Device(
-                                    device.deviceId,
-                                    device.networkId,
-                                    device.ip,
-                                    it.hwAddress
-                                )
+                            Log.d(
+                                "asd",
+                                "found MAC-Address for ${device.ip}: ${arpEntry.hwAddress}"
                             )
+                            deviceDao.updateHwAddress(device.deviceId, arpEntry.hwAddress)
                         }
                     }
                 }
             }
         }
-    }
 
     fun getHwFromArp(ipAddress: Inet4Address): MacAddress? =
         arpTable.value?.find { it.ip == ipAddress }?.hwAddress

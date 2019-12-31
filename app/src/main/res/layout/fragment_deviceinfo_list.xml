@@ -10,4 +10,4 @@
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
     tools:context=".DeviceInfoFragment"
-    tools:listitem="@layout/fragment_deviceinfo" />
+    tools:listitem="@layout/fragment_port_item" />

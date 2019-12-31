@@ -6,7 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_deviceinfo.view.*
+import kotlinx.android.synthetic.main.fragment_port_item.view.*
 
 /**
  * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
@@ -20,7 +20,7 @@ class DeviceInfoRecyclerViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.fragment_deviceinfo, parent, false)
+            .inflate(R.layout.fragment_port_item, parent, false)
         return ViewHolder(view)
     }
 

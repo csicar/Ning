@@ -13,22 +13,29 @@ interface NetworkDao {
     @Query("Select * FROM network WHERE scanId = :scanId")
     fun getAll(scanId: Long): LiveData<List<Network>>
 
+
+    @Query("Select * FROM network WHERE scanId = :scanId")
+    fun getAllNow(scanId: Long): List<Network>
+
     @Insert
     fun insert(network: Network): Long
 
     @Insert
     fun insertAll(vararg networks: Network)
 
+    @Query("SELECT * FROM network WHERE networkId = :networkId")
+    fun getByIdNow(networkId: Long): Network
+
 }
 
 @Dao
 interface DeviceDao {
-    @Query("Select * FROM DeviceWithName")
-    fun getAll(): LiveData<List<DeviceWithName>>
+    @Query("Select * FROM DeviceWithName WHERE networkId = :networkId")
+    fun getAll(networkId: Long): LiveData<List<DeviceWithName>>
 
 
-    @Query("SELECT * FROM Device")
-    fun getAllNow(): List<Device>
+    @Query("SELECT * FROM Device WHERE networkId = :networkId")
+    fun getAllNow(networkId: Long): List<Device>
 
     @Insert
     fun insertAll(vararg devices: Device)
@@ -47,6 +54,12 @@ interface DeviceDao {
 
     @Query("SELECT * FROM Device WHERE ip = :ip AND networkId IN (SELECT networkId FROM Network WHERE scanId = :scanId)")
     fun getByAddress(ip: Inet4Address, scanId: Long): Device?
+
+    @Query("UPDATE Device SET hwAddress = :hwAddress WHERE deviceId = :deviceId")
+    fun updateHwAddress(deviceId: Long, hwAddress: MacAddress)
+
+    @Query("UPDATE Device SET deviceName = :deviceName WHERE deviceId = :deviceId")
+    fun updateServiceName(deviceId: Long, deviceName: String?)
 }
 
 @Dao
@@ -66,6 +79,9 @@ interface ScanDao {
     @Query("Select * FROM SCAN")
     fun getAll(): LiveData<List<Scan>>
 
+    @Query("Select * FROM SCAN")
+    fun getAllNow(): List<Scan>
+
     @Query("SELECT * FROM SCAN WHERE scanId = :scanId")
     fun getById(scanId: Long) : LiveData<Scan?>
 
@@ -75,5 +91,4 @@ interface ScanDao {
 interface MacVendorsDao {
     @Query("SELECT * FROM macvendor WHERE mac = :mac")
     fun getFromMac(mac: MacAddress): MacVendor
-
 }

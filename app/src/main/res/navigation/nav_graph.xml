@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/deviceFragment"
-        android:name="de.csicar.ning.DeviceFragment"
+        android:name="de.csicar.ning.NetworkFragment"
         android:label="Network"
-        tools:layout="@layout/fragment_device_list">
+        tools:layout="@layout/fragment_network_list">
         <action
             android:id="@+id/action_deviceFragment_to_deviceInfoFragment"
             app:destination="@id/deviceInfoFragment" />

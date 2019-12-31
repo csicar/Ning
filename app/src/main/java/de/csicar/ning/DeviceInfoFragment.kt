@@ -41,8 +41,9 @@ class DeviceInfoFragment : Fragment() {
                 adapter.updateData(it)
             })
         })
-        activity?.toolbar?.findViewById<TextView>(R.id.title_detail)?.text =
+        activity!!.toolbar!!.findViewById<TextView>(R.id.title_detail)!!.text =
             arguments?.getString("deviceIp")
+
         // Set the adapter
         adapter = DeviceInfoRecyclerViewAdapter(listOf()) { port ->
             viewModel.viewModelScope.launch {
@@ -77,7 +78,7 @@ class DeviceInfoFragment : Fragment() {
                     launch {
                         val (port, isOpen) = it.await()
                         if (isOpen) {
-                            viewModel.portDao.insert(Port(0, port, Protocol.TCP, device.deviceId))
+                            viewModel.portDao.insert(Port(0, port.port, Protocol.TCP, device.deviceId))
                         }
                     }
                 }

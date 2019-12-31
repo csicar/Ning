@@ -1,13 +1,15 @@
 package de.csicar.ning
 
+import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.recyclerview.widget.DiffUtil
 
 
-import de.csicar.ning.DeviceFragment.OnListFragmentInteractionListener
+import de.csicar.ning.NetworkFragment.OnListFragmentInteractionListener
 
 import kotlinx.android.synthetic.main.fragment_device.view.*
 
@@ -36,6 +38,7 @@ class DeviceRecyclerViewAdapter(
         holder.ipTextView.text = item.ip.toString()
         holder.macTextView.text = item.hwAddress?.address
         holder.vendorTextView.text = item.vendorName
+        holder.deviceNameTextView.text = item.deviceName
 
         with(holder.mView) {
             tag = item
@@ -43,9 +46,11 @@ class DeviceRecyclerViewAdapter(
         }
     }
 
-    fun updateData(value : List<DeviceWithName>) {
-        this.mValues = value
-        this.notifyDataSetChanged()
+    fun updateData(newValue: List<DeviceWithName>) {
+        val diffUtil = DiffUtil.calculateDiff(DiffCalculator(mValues, newValue))
+        this.mValues = newValue
+        diffUtil.dispatchUpdatesTo(this)
+        //this.notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int = mValues.size
@@ -54,9 +59,26 @@ class DeviceRecyclerViewAdapter(
         val ipTextView: TextView = mView.ipTextView
         val macTextView: TextView = mView.macTextView
         val vendorTextView: TextView = mView.vendorTextView
+        val deviceNameTextView: TextView = mView.deviceNameTextView
 
         override fun toString(): String {
             return super.toString() + " '" + macTextView.text + "'"
         }
+    }
+
+    class DiffCalculator(
+        private val old: List<DeviceWithName>,
+        private val new: List<DeviceWithName>
+    ) : DiffUtil.Callback() {
+        override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+            old[oldItemPosition].deviceId == new[newItemPosition].deviceId
+
+        override fun getOldListSize() = old.size
+
+        override fun getNewListSize() = new.size
+
+        override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
+            old[oldItemPosition] === new[newItemPosition]
+
     }
 }

@@ -12,6 +12,6 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
-        tools:context=".DeviceFragment"
+        tools:context=".NetworkFragment"
         tools:listitem="@layout/fragment_device" />
 </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

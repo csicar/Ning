@@ -1,16 +1,14 @@
 package de.csicar.ning
 
-import androidx.room.Database
-import androidx.room.RoomDatabase
-import androidx.room.TypeConverter
-import androidx.room.TypeConverters
+import android.app.Application
+import androidx.room.*
 import de.csicar.ning.scanner.MacAddress
 import java.net.Inet4Address
 
 @Database(
     entities = [Network::class, Device::class, Port::class, MacVendor::class, Scan::class],
     views = [DeviceWithName::class],
-    version = 17
+    version = 19
 )
 @TypeConverters(Converter::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -18,6 +16,19 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun deviceDao(): DeviceDao
     abstract fun portDao(): PortDao
     abstract fun scanDao(): ScanDao
+
+    companion object {
+        fun createInstance(application: Application): AppDatabase {
+            return Room
+                .databaseBuilder(
+                    application.applicationContext,
+                    AppDatabase::class.java, "ning-db"
+                )
+                .createFromAsset("mac_devices.db")
+                .fallbackToDestructiveMigration()
+                .build()
+        }
+    }
 }
 
 class Converter {

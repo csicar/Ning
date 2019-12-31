@@ -6,9 +6,8 @@ import de.csicar.ning.scanner.MacAddress
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.withContext
-import java.net.ConnectException
-import java.net.Inet4Address
-import java.net.Socket
+import java.io.IOException
+import java.net.*
 import java.sql.Timestamp
 
 @Entity
@@ -16,25 +15,26 @@ data class Scan(@PrimaryKey(autoGenerate = true) val scanId: Long, val startedAt
 
 @Entity
 data class Device(
-    @PrimaryKey(autoGenerate = true) val deviceId: Long, val networkId: Long,
+    @PrimaryKey(autoGenerate = true) val deviceId: Long,
+    val networkId: Long,
     val ip: Inet4Address,
+    val deviceName: String?,
     val hwAddress: MacAddress?
 ) {
-    suspend fun isPortOpen(port: Int): Boolean {
-        return withContext(Dispatchers.IO) {
-            var socket: Socket? = null
-            try {
-                Log.d("asd", "trying socket: $ip : $port")
-                socket = Socket(ip, port)
-                return@withContext true
-            } catch (ex: ConnectException) {
-                Log.d("asd", "Got connection error: $ex")
-                return@withContext false
-            } finally {
-                socket?.close()
-            }
+    suspend fun isPortOpen(port: Int) = withContext(Dispatchers.IO) {
+        var socket: Socket? = null
+        try {
+            Log.d("asd", "trying socket: $ip : $port")
+            socket = Socket(ip, port)
+            return@withContext true
+        } catch (ex: ConnectException) {
+            Log.d("asd", "Got connection error: $ex")
+            return@withContext false
+        } finally {
+            socket?.close()
         }
     }
+
 
     suspend fun scanPorts() = withContext(Dispatchers.Main) {
         PortDescription.commonPorts.map {
@@ -45,33 +45,40 @@ data class Device(
     }
 }
 
-@DatabaseView("SELECT Device.deviceId, Device.networkId, Device.ip, Device.hwAddress, MacVendor.name as vendorName FROM Device LEFT JOIN MacVendor ON MacVendor.mac = substr(Device.hwAddress, 0, 9)")
+@DatabaseView("SELECT Device.deviceId, Device.networkId, Device.ip, Device.hwAddress, Device.deviceName, MacVendor.name as vendorName FROM Device LEFT JOIN MacVendor ON MacVendor.mac = substr(Device.hwAddress, 0, 9)")
 data class DeviceWithName(
     val deviceId: Long, val networkId: Long, val ip: Inet4Address, val hwAddress: MacAddress?
+    , val deviceName: String?
     , val vendorName: String?
 )
 
 @Entity
 data class Network(
-    @PrimaryKey(autoGenerate = true) val networkId: Long, val baseIp: Inet4Address,
-    val mask: Short, val scanId: Long
+    @PrimaryKey(autoGenerate = true) val networkId: Long,
+    val baseIp: Inet4Address,
+    val mask: Short,
+    val scanId: Long,
+    val interfaceName: String
 ) {
     companion object {
-        fun from(ip: Inet4Address, mask: Short, scanId: Long): Network {
+        fun from(ip: Inet4Address, mask: Short, scanId: Long, interfaceName: String): Network {
             Log.d("asd", ip.maskWith(mask).toString())
-            return Network(0, ip.maskWith(mask), mask, scanId)
+            return Network(0, ip.maskWith(mask), mask, scanId, interfaceName)
         }
     }
 
     fun enumerateAddresses(): Sequence<Inet4Address> {
         val maxOfMask = 2.shl(32 - mask.toInt() - 1)
-        Log.d("asd", "${maxOfMask.toString()} mask: $mask")
         return generateSequence(0) {
             val next = it + 1
             if (next < maxOfMask) next else null
         }
             .map { baseIp.hashCode() + it }
             .map { inet4AddressFromInt("", it) }
+    }
+
+    fun containsAddress(host: Inet4Address): Boolean {
+        return this.baseIp.maskWith(mask) == host.maskWith(mask)
     }
 
 }
@@ -90,14 +97,23 @@ data class Port(
 @Entity(primaryKeys = ["name", "mac"])
 data class MacVendor(val name: String, val mac: String)
 
-data class PortDescription(val port: Int, val protocol: Protocol, val serviceName: String) {
+@Entity
+data class PortDescription(
+    @PrimaryKey
+    val portId: Long,
+    val port: Int,
+    val protocol: Protocol,
+    val serviceName: String,
+    val serviceDescription: String
+) {
     companion object {
         val commonPorts = listOf(
-            PortDescription(80, Protocol.TCP, "HTTP"),
-            PortDescription(21, Protocol.TCP, "FTP"),
-            PortDescription(22, Protocol.TCP, "SFTP"),
-            PortDescription(8080, Protocol.TCP, "HTTP-Proxy"),
-            PortDescription(443, Protocol.TCP, "HTTPS")
+            PortDescription(0, 80, Protocol.TCP, "HTTP", "Hypertext Transport Protocol"),
+            PortDescription(0,21, Protocol.TCP, "FTP", "File Transfer Protocol"),
+            PortDescription(0,22, Protocol.TCP, "SFTP", "Secure FTP"),
+            PortDescription(0,548, Protocol.TCP, "AFP", "AFP over TCP"),
+            PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy"),
+            PortDescription(0,443, Protocol.TCP, "HTTPS", "Secure HTTP")
         )
     }
 }

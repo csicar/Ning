@@ -30,7 +30,7 @@
     <ImageView
         android:id="@+id/device_icon"
         android:layout_width="wrap_content"
-        android:layout_height="64dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
@@ -51,4 +51,13 @@
         app:layout_constraintStart_toStartOf="@+id/macTextView"
         app:layout_constraintTop_toBottomOf="@+id/macTextView"
         tools:text="Intel Corp Inc." />
+
+    <TextView
+        android:id="@+id/deviceNameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+        app:layout_constraintBottom_toBottomOf="@+id/device_icon"
+        app:layout_constraintStart_toStartOf="@+id/ipTextView" />
 </androidx.constraintlayout.widget.ConstraintLayout>

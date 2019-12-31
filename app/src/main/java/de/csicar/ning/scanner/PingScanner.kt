@@ -1,6 +1,7 @@
 package de.csicar.ning.scanner
 
 import android.net.wifi.WifiInfo
+import android.util.Log
 import de.csicar.ning.Device
 import de.csicar.ning.Network
 import de.csicar.ning.ScanViewModel
@@ -13,11 +14,10 @@ import java.net.SocketException
 fun getLocalIpAddress(scanId: Long): List<Network> {
     return try {
         NetworkInterface.getNetworkInterfaces().asSequence().flatMap { networkInterface ->
-            if (networkInterface.name != "wlan0")  return@flatMap emptySequence<Network>()
             networkInterface.interfaceAddresses.asSequence().map {
                 val addr = it.address
                 if (!addr.isLoopbackAddress && addr is Inet4Address) {
-                    Network.from(addr, it.networkPrefixLength, scanId)
+                    Network.from(addr, it.networkPrefixLength, scanId, networkInterface.displayName)
                 } else {
                     null
                 }
@@ -29,23 +29,23 @@ fun getLocalIpAddress(scanId: Long): List<Network> {
     }
 }
 
-suspend fun pingIpAddresses(viewModel: ScanViewModel) = withContext(Dispatchers.IO) {
-    val scanId = viewModel.scanId.value!!
-    val ipVal = getLocalIpAddress(scanId)
-    ipVal.map { network ->
-        val networkId = viewModel.networkDao.insert(Network(0, network.baseIp, network.mask, scanId))
+suspend fun pingIpAddresses(viewModel: ScanViewModel, network: Network) =
+    withContext(Dispatchers.IO) {
+        val scanId = viewModel.scanId.value!!
         network.enumerateAddresses().map {
             it to it.isReachable(500)
         }.forEach {
             if (it.second) {
                 val ipAddress = it.first
+                Log.d("asd", "IP: $ipAddress is reachable.")
+
                 viewModel.deviceDao.insert(
-                    Device(0, networkId,
-                        ipAddress, viewModel.getHwFromArp(ipAddress))
+                    Device(
+                        0, network.networkId,
+                        ipAddress, null, viewModel.getHwFromArp(ipAddress)
+                    )
                 )
                 viewModel.fetchArpTable()
-
             }
         }
     }
-}
