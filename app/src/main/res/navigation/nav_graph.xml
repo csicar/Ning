@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/deviceFragment">
+
+    <fragment
+        android:id="@+id/deviceFragment"
+        android:name="de.csicar.ning.DeviceFragment"
+        android:label="Network"
+        tools:layout="@layout/fragment_device_list">
+        <action
+            android:id="@+id/action_deviceFragment_to_deviceInfoFragment"
+            app:destination="@id/deviceInfoFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/deviceInfoFragment"
+        android:name="de.csicar.ning.DeviceInfoFragment"
+        android:label="Device"
+        tools:layout="@layout/fragment_deviceinfo_list" />
+</navigation>
