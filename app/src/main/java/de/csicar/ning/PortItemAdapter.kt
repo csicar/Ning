@@ -13,10 +13,10 @@ import kotlinx.android.synthetic.main.fragment_port_item.view.*
  * specified [OnListFragmentInteractionListener].
  * TODO: Replace the implementation with code for your data type.
  */
-class DeviceInfoRecyclerViewAdapter(
+class PortItemAdapter(
     private var mValues: List<Port>,
     private val mListener: (Port) -> Unit
-) : RecyclerView.Adapter<DeviceInfoRecyclerViewAdapter.ViewHolder>() {
+) : RecyclerView.Adapter<PortItemAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -33,7 +33,7 @@ class DeviceInfoRecyclerViewAdapter(
         val item = mValues[position]
         holder.portNumberTextView.text = item.port.toString()
         holder.protocolTextView.text = item.protocol.toString()
-        holder.serviceTextView.text = "SSH"
+        holder.serviceTextView.text = item.description?.serviceName
 
         with(holder.mView) {
             tag = item

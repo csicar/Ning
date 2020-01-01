@@ -8,15 +8,18 @@
     <fragment
         android:id="@+id/deviceFragment"
         android:name="de.csicar.ning.NetworkFragment"
-        android:label="Network"
+        android:label="Network {interface_name}"
         tools:layout="@layout/fragment_network_list">
         <action
             android:id="@+id/action_deviceFragment_to_deviceInfoFragment"
             app:destination="@id/deviceInfoFragment" />
+        <argument
+            android:name="interface_name"
+            android:defaultValue="wlan0" />
     </fragment>
     <fragment
         android:id="@+id/deviceInfoFragment"
         android:name="de.csicar.ning.DeviceInfoFragment"
-        android:label="Device"
+        android:label="Device {deviceIp}"
         tools:layout="@layout/fragment_deviceinfo_list" />
 </navigation>

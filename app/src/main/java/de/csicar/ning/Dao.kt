@@ -30,7 +30,7 @@ interface NetworkDao {
 
 @Dao
 interface DeviceDao {
-    @Query("Select * FROM DeviceWithName WHERE networkId = :networkId")
+    @Query("Select * FROM DeviceWithName WHERE networkId = :networkId ORDER BY ip ASC")
     fun getAll(networkId: Long): LiveData<List<DeviceWithName>>
 
 

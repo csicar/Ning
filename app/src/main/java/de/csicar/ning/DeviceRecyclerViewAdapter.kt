@@ -15,7 +15,8 @@ import kotlinx.android.synthetic.main.fragment_device.view.*
 
 class DeviceRecyclerViewAdapter(
     private var mValues: List<DeviceWithName>,
-    private val mListener: OnListFragmentInteractionListener?
+    private val mListener: OnListFragmentInteractionListener?,
+    private val onDataChanged: ((List<DeviceWithName>) -> Unit)? = null
 ) : RecyclerView.Adapter<DeviceRecyclerViewAdapter.ViewHolder>() {
 
     private val mOnClickListener: View.OnClickListener
@@ -50,6 +51,7 @@ class DeviceRecyclerViewAdapter(
         val diffUtil = DiffUtil.calculateDiff(DiffCalculator(mValues, newValue))
         this.mValues = newValue
         diffUtil.dispatchUpdatesTo(this)
+        onDataChanged?.let { it(newValue) }
         //this.notifyDataSetChanged()
     }
 

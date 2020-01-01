@@ -92,7 +92,9 @@ data class Port(
     @PrimaryKey(autoGenerate = true) val portId: Long, val port: Int,
     val protocol: Protocol,
     val deviceId: Long
-)
+) {
+    val description get() = PortDescription.commonPorts.find { it.port == port }
+}
 
 @Entity(primaryKeys = ["name", "mac"])
 data class MacVendor(val name: String, val mac: String)
