@@ -6,15 +6,16 @@
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="match_parent"
         android:id="@+id/swipeDownViewImage"
-        android:layout_height="match_parent">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        tools:visibility="visible">
 
         <TextView
             android:id="@+id/textView"
             android:layout_width="wrap_content"
             android:layout_height="0dp"
-            android:text="Swipe down to scan the network"
+            android:text="@string/swipe_down_to_scan_the_network"
             app:layout_constraintBottom_toBottomOf="@+id/group2"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -33,7 +34,7 @@
             android:id="@+id/group2"
             android:layout_width="wrap_content"
             android:layout_height="100dp"
-            app:constraint_referenced_ids="swipeDownView,textView"
+            app:constraint_referenced_ids="textView"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -44,17 +45,34 @@
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipeDownView"
         android:layout_width="match_parent"
+        android:layout_margin="0dp"
         android:layout_height="match_parent">
 
-        <androidx.recyclerview.widget.RecyclerView xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/devicesList"
-            android:name="de.csicar.ning.deviceFragment"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp"
-            app:layoutManager="LinearLayoutManager"
-            tools:context=".NetworkFragment"
-            tools:listitem="@layout/fragment_device" />
+            android:layout_margin="0dp"
+            android:orientation="vertical">
+
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-7dp"
+                android:layout_marginBottom="-7dp"
+                android:max="1000"
+                tools:progress="300" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/devicesList"
+                android:name="de.csicar.ning.deviceFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layoutManager="LinearLayoutManager"
+                tools:context=".NetworkFragment"
+                tools:listitem="@layout/fragment_device" />
+        </LinearLayout>
+
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 </RelativeLayout>

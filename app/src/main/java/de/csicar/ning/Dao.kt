@@ -26,6 +26,10 @@ interface NetworkDao {
     @Query("SELECT * FROM network WHERE networkId = :networkId")
     fun getByIdNow(networkId: Long): Network
 
+
+    @Query("SELECT * FROM network WHERE networkId = :networkId")
+    fun getById(networkId: Long): LiveData<Network>
+
 }
 
 @Dao
@@ -46,8 +50,8 @@ interface DeviceDao {
     @Update
     fun update(device: Device)
 
-    @Query("SELECT * FROM DEVICE WHERE deviceId = :id")
-    fun getById(id: Long): LiveData<Device>
+    @Query("SELECT * FROM DeviceWithName WHERE deviceId = :id")
+    fun getById(id: Long): LiveData<DeviceWithName>
 
     @Query("SELECT * FROM DEVICE WHERE deviceId = :id")
     fun getByIdNow(id: Long): Device

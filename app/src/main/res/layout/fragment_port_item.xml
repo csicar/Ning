@@ -15,6 +15,8 @@
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
         android:textAppearance="?attr/textAppearanceListItem"
+        android:textColor="@color/colorAccent"
+        android:textAlignment="textEnd"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"

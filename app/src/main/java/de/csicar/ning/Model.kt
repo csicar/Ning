@@ -50,7 +50,10 @@ data class DeviceWithName(
     val deviceId: Long, val networkId: Long, val ip: Inet4Address, val hwAddress: MacAddress?
     , val deviceName: String?
     , val vendorName: String?
-)
+) {
+    @Ignore
+    val asDevice = Device(deviceId, networkId, ip, deviceName, hwAddress)
+}
 
 @Entity
 data class Network(
@@ -68,10 +71,9 @@ data class Network(
     }
 
     fun enumerateAddresses(): Sequence<Inet4Address> {
-        val maxOfMask = 2.shl(32 - mask.toInt() - 1)
         return generateSequence(0) {
             val next = it + 1
-            if (next < maxOfMask) next else null
+            if (next < networkSize) next else null
         }
             .map { baseIp.hashCode() + it }
             .map { inet4AddressFromInt("", it) }
@@ -80,6 +82,8 @@ data class Network(
     fun containsAddress(host: Inet4Address): Boolean {
         return this.baseIp.maskWith(mask) == host.maskWith(mask)
     }
+
+    val networkSize get() = 2.shl(32 - mask.toInt() - 1)
 
 }
 
@@ -111,11 +115,11 @@ data class PortDescription(
     companion object {
         val commonPorts = listOf(
             PortDescription(0, 80, Protocol.TCP, "HTTP", "Hypertext Transport Protocol"),
-            PortDescription(0,21, Protocol.TCP, "FTP", "File Transfer Protocol"),
-            PortDescription(0,22, Protocol.TCP, "SFTP", "Secure FTP"),
-            PortDescription(0,548, Protocol.TCP, "AFP", "AFP over TCP"),
+            PortDescription(0, 21, Protocol.TCP, "FTP", "File Transfer Protocol"),
+            PortDescription(0, 22, Protocol.TCP, "SFTP", "Secure FTP"),
+            PortDescription(0, 548, Protocol.TCP, "AFP", "AFP over TCP"),
             PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy"),
-            PortDescription(0,443, Protocol.TCP, "HTTPS", "Secure HTTP")
+            PortDescription(0, 443, Protocol.TCP, "HTTPS", "Secure HTTP")
         )
     }
 }

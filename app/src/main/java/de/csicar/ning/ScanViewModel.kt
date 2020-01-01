@@ -1,18 +1,15 @@
 package de.csicar.ning
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.room.Room
 import de.csicar.ning.scanner.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.net.Inet4Address
-import java.sql.Timestamp
 
 class ScanViewModel(application: Application) : AndroidViewModel(application) {
     val db = AppDatabase.createInstance(application)
@@ -20,6 +17,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     val networkDao = db.networkDao()
     val portDao = db.portDao()
     val scanDao = db.scanDao()
+    val scanProgress by lazy { MutableLiveData<ScanProgress>() }
 
     val scanId by lazy {
         MutableLiveData<Long>()
@@ -45,6 +43,9 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         val networkData = getLocalIpAddress(newScanId).find { it.interfaceName == interfaceName }!!
         val networkId = networkDao.insert(networkData)
         val network = networkDao.getByIdNow(networkId)
+        withContext(Dispatchers.Main) {
+            scanProgress.value = ScanProgress.ScanRunning(0.0)
+        }
         viewModelScope.launch {
             launch {
                 pingIpAddresses(this@ScanViewModel, network)
@@ -75,5 +76,18 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getHwFromArp(ipAddress: Inet4Address): MacAddress? =
         arpTable.value?.find { it.ip == ipAddress }?.hwAddress
+
+    sealed class ScanProgress {
+        object ScanNotStarted : ScanProgress()
+        data class ScanRunning(val progress: Double) : ScanProgress()
+        object ScanFinished : ScanProgress()
+
+        operator fun plus(progress: Double) =
+            when(this) {
+                is ScanNotStarted -> ScanRunning(progress)
+                is ScanRunning -> ScanRunning(this.progress + progress)
+                is ScanFinished -> ScanFinished
+            }
+    }
 }
 

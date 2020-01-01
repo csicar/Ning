@@ -36,7 +36,6 @@ suspend fun pingIpAddresses(viewModel: ScanViewModel, network: Network) =
         network.enumerateAddresses().asSequence().chunked(10).forEach { ipAddresses ->
             launch {
                 ipAddresses.forEach { ipAddress ->
-                    Log.d("asd", "Try $ipAddress")
                     val isReachable = ipAddress.isReachable(500)
                     if (isReachable) {
                         Log.d("asd", "IP: $ipAddress is reachable.")
@@ -47,7 +46,12 @@ suspend fun pingIpAddresses(viewModel: ScanViewModel, network: Network) =
                                 ipAddress, null, viewModel.getHwFromArp(ipAddress)
                             )
                         )
+
                         viewModel.fetchArpTable()
+                    }
+                    withContext(Dispatchers.Main) {
+                        viewModel.scanProgress.value = (viewModel.scanProgress.value
+                            ?: ScanViewModel.ScanProgress.ScanNotStarted) + 1.0 / network.networkSize
                     }
                 }
             }

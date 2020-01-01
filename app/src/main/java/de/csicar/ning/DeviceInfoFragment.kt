@@ -3,7 +3,6 @@ package de.csicar.ning
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +13,6 @@ import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.viewModelScope
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.*
 
 /**
@@ -33,12 +31,17 @@ class DeviceInfoFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_deviceinfo_list, container, false)
         viewModel = ViewModelProviders.of(activity!!).get(ScanViewModel::class.java)
         viewModel.deviceDao.getById(arguments?.getLong("deviceId")!!).observe(this, Observer {
-            fetchInfo(it)
+            fetchInfo(it.asDevice)
             //activity!!.toolbar.findViewById<TextView>(R.id.title_detail).text = "${it.ip} ${it.deviceName}"
 
             viewModel.portDao.getAllForDevice(it.deviceId).observe(this, Observer {
                 adapter.updateData(it)
             })
+
+            view.findViewById<TextView>(R.id.deviceIpTextView).text = it.ip.hostAddress
+            view.findViewById<TextView>(R.id.deviceNameTextView).text = it.deviceName
+            view.findViewById<TextView>(R.id.deviceHwAddressTextView).text = it.hwAddress?.address
+            view.findViewById<TextView>(R.id.deviceVendorTextView).text = it.vendorName
         })
 
 
@@ -64,7 +67,6 @@ class DeviceInfoFragment : Fragment() {
             }
         }
         view.findViewById<RecyclerView>(R.id.list).also {
-
             it.layoutManager = LinearLayoutManager(context)
             it.adapter = adapter
         }

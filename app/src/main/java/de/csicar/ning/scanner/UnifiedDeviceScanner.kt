@@ -1,5 +1,9 @@
 package de.csicar.ning.scanner
 
-class UnifiedDeviceScanner() {
+import de.csicar.ning.ScanViewModel
 
+class UnifiedDeviceScanner(viewModel: ScanViewModel) {
+    fun scanForDevices() {
+
+    }
 }
