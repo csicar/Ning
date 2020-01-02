@@ -49,10 +49,13 @@ class NetworkFragment : Fragment() {
         }
 
         val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
-        viewModel.scanProgress.observe(this, Observer { it ->
+        viewModel.scanProgress.observe(this, Observer {
             when (it) {
                 is ScanViewModel.ScanProgress.ScanFinished -> progressBar.visibility = View.GONE
-                is ScanViewModel.ScanProgress.ScanRunning -> progressBar.progress = (it.progress * 1000.0).roundToInt()
+                is ScanViewModel.ScanProgress.ScanRunning -> {
+                    progressBar.progress = (it.progress * 1000.0).roundToInt()
+                    if (it.progress > 0.9) swipeRefreshLayout.isRefreshing = false
+                }
                 is ScanViewModel.ScanProgress.ScanNotStarted -> progressBar.visibility = View.GONE
             }
         })
@@ -79,7 +82,6 @@ class NetworkFragment : Fragment() {
             this@NetworkFragment.network.value = network
             setupObserver()
         }
-        swipeRefreshLayout.isRefreshing = false
     }
 
     private fun setupObserver() {

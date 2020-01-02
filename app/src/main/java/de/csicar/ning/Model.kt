@@ -1,14 +1,12 @@
 package de.csicar.ning
 
 import android.util.Log
-import androidx.room.*
+import androidx.room.DatabaseView
+import androidx.room.Entity
+import androidx.room.Ignore
+import androidx.room.PrimaryKey
 import de.csicar.ning.scanner.MacAddress
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.withContext
-import java.io.IOException
-import java.net.*
-import java.sql.Timestamp
+import java.net.Inet4Address
 
 @Entity
 data class Scan(@PrimaryKey(autoGenerate = true) val scanId: Long, val startedAt: Long)
@@ -21,28 +19,8 @@ data class Device(
     val deviceName: String?,
     val hwAddress: MacAddress?
 ) {
-    suspend fun isPortOpen(port: Int) = withContext(Dispatchers.IO) {
-        var socket: Socket? = null
-        try {
-            Log.d("asd", "trying socket: $ip : $port")
-            socket = Socket(ip, port)
-            return@withContext true
-        } catch (ex: ConnectException) {
-            Log.d("asd", "Got connection error: $ex")
-            return@withContext false
-        } finally {
-            socket?.close()
-        }
-    }
 
 
-    suspend fun scanPorts() = withContext(Dispatchers.Main) {
-        PortDescription.commonPorts.map {
-            async {
-                it to this@Device.isPortOpen(it.port)
-            }
-        }
-    }
 }
 
 @DatabaseView("SELECT Device.deviceId, Device.networkId, Device.ip, Device.hwAddress, Device.deviceName, MacVendor.name as vendorName FROM Device LEFT JOIN MacVendor ON MacVendor.mac = substr(Device.hwAddress, 0, 9)")
@@ -114,12 +92,13 @@ data class PortDescription(
 ) {
     companion object {
         val commonPorts = listOf(
-            PortDescription(0, 80, Protocol.TCP, "HTTP", "Hypertext Transport Protocol"),
             PortDescription(0, 21, Protocol.TCP, "FTP", "File Transfer Protocol"),
             PortDescription(0, 22, Protocol.TCP, "SFTP", "Secure FTP"),
+            PortDescription(0, 80, Protocol.TCP, "HTTP", "Hypertext Transport Protocol"),
+            PortDescription(0, 53, Protocol.UDP, "DNS", "DNS Server"),
+            PortDescription(0, 443, Protocol.TCP, "HTTPS", "Secure HTTP"),
             PortDescription(0, 548, Protocol.TCP, "AFP", "AFP over TCP"),
-            PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy"),
-            PortDescription(0, 443, Protocol.TCP, "HTTPS", "Secure HTTP")
+            PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy")
         )
     }
 }

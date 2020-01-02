@@ -21,5 +21,12 @@
         android:id="@+id/deviceInfoFragment"
         android:name="de.csicar.ning.DeviceInfoFragment"
         android:label="Device {deviceIp}"
-        tools:layout="@layout/fragment_deviceinfo_list" />
+        tools:layout="@layout/fragment_deviceinfo_list" >
+        <argument
+            android:name="deviceip"
+            app:argType="string" />
+        <argument
+            android:name="deviceid"
+            app:argType="long" />
+    </fragment>
 </navigation>

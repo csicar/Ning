@@ -52,8 +52,7 @@
                         <TextView
                             android:id="@+id/deviceNameTextView"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="TextView" />
+                            android:layout_height="wrap_content" />
 
                     </TableRow>
 
@@ -71,8 +70,7 @@
                         <TextView
                             android:id="@+id/deviceIpTextView"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="TextView" />
+                            android:layout_height="wrap_content" />
 
                     </TableRow>
 
@@ -84,14 +82,13 @@
                             android:id="@+id/textView8"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Device IP"
+                            android:text="Device MAC"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
                         <TextView
                             android:id="@+id/deviceHwAddressTextView"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="TextView" />
+                            android:layout_height="wrap_content" />
 
                     </TableRow>
 
@@ -103,14 +100,13 @@
                             android:id="@+id/textView9"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Device IP"
+                            android:text="Vendor Name"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
                         <TextView
                             android:id="@+id/deviceVendorTextView"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="TextView" />
+                            android:layout_height="wrap_content" />
 
                     </TableRow>
 

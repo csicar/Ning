@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.viewModelScope
+import de.csicar.ning.scanner.PortScanner
 import kotlinx.coroutines.*
 
 /**
@@ -76,15 +77,15 @@ class DeviceInfoFragment : Fragment() {
     fun fetchInfo(device: Device) {
         viewModel.viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                device.scanPorts().forEach {
+                PortScanner(device.ip).scanPorts().forEach {
                     launch {
-                        val (port, isOpen) = it.await()
-                        if (isOpen) {
-                            viewModel.portDao.insert(
+                        val result = it.await()
+                        if (result.isOpen) {
+                            viewModel.portDao.upsert(
                                 Port(
                                     0,
-                                    port.port,
-                                    Protocol.TCP,
+                                    result.port,
+                                    result.protocol,
                                     device.deviceId
                                 )
                             )
