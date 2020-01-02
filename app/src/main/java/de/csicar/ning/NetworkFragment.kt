@@ -1,13 +1,14 @@
 package de.csicar.ning
 
 import android.content.Context
-import android.opengl.Visibility
+import android.graphics.Rect
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
+import androidx.core.view.marginTop
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,6 +29,7 @@ class NetworkFragment : Fragment() {
     }
     lateinit var viewAdapter: DeviceRecyclerViewAdapter
     lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    lateinit var emptyListInfo : View
 
     private lateinit var argumentInterfaceName : String
 
@@ -36,7 +38,7 @@ class NetworkFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_network_list, container, false)
-        val emptyListInfo = view.findViewById<View>(R.id.swipeDownViewImage)
+        emptyListInfo = view.findViewById<View>(R.id.swipeDownViewImage)
         swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeDownView)
         argumentInterfaceName = arguments?.getString("interface_name")!!
 
@@ -72,7 +74,6 @@ class NetworkFragment : Fragment() {
         }
 
         viewModel.devices.observe(this, Observer {
-            Log.d("asd", "got new data ${it.size} $it")
             viewAdapter.updateData(it)
         })
 

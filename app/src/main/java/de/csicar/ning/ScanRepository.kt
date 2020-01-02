@@ -3,14 +3,8 @@ package de.csicar.ning
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
-import de.csicar.ning.scanner.ArpScanner
-import de.csicar.ning.scanner.InterfaceScanner
-import de.csicar.ning.scanner.NsdScanner
-import de.csicar.ning.scanner.PingScanner
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.joinAll
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import de.csicar.ning.scanner.*
+import kotlinx.coroutines.*
 import java.net.Inet4Address
 
 class ScanRepository(
@@ -23,7 +17,11 @@ class ScanRepository(
         MutableLiveData<Long>()
     }
 
-    suspend fun startScan(interfaceName: String, scanProgress: MutableLiveData<ScanProgress>, currentNetwork: MutableLiveData<Long>) =
+    suspend fun startScan(
+        interfaceName: String,
+        scanProgress: MutableLiveData<ScanProgress>,
+        currentNetwork: MutableLiveData<Long>
+    ) =
         withContext(Dispatchers.IO) {
             val newScanId = scanDao.insert(Scan(0, 0))
 
@@ -49,20 +47,24 @@ class ScanRepository(
                     if (newResult.isReachable) {
                         Log.d("asd", "isReachable ${newResult.ipAddress}")
                         deviceDao.insertIfNew(networkId, newResult.ipAddress)
-                        //this@withContext.launch { fetchHwAddressesFromArpTable() }
                     }
-                    this@withContext.launch {
-                        withContext(Dispatchers.Main) {
-                            scanProgress.value = scanProgress.value + newResult.progressIncrease
-                        }
-                    }
+                    scanProgress.postValue(scanProgress.value + newResult.progressIncrease)
                 }.pingIpAddresses()
-
             }, launch {
                 NsdScanner(application) { newResult ->
                     deviceDao.upsertName(networkId, newResult.ipAddress, newResult.name)
-                    //this@withContext.launch { fetchHwAddressesFromArpTable() }
                 }.scan()
+            }, launch {
+                delay(1000)
+                ArpScanner.getArpTableFromFile().forEach {
+                    val ip = it.key
+                    if (ip is Inet4Address) {
+                        deviceDao.upsertHwAddress(scanId.value ?: return@forEach, ip, it.value.hwAddress)
+                    }
+                }
+            }, launch {
+                val userDevice = LocalMacScanner.asDevice(network) ?: return@launch
+                deviceDao.upsert(userDevice)
             }).joinAll()
             //this@withContext.launch { fetchHwAddressesFromArpTable() }
             withContext(Dispatchers.Main) {
@@ -70,13 +72,6 @@ class ScanRepository(
             }
             network
         }
-
-    private suspend fun fetchHwAddressesFromArpTable() {
-        ArpScanner.getArpTableFromFile().forEach {
-            if (it.ip !is Inet4Address) return@forEach
-            deviceDao.upsertHwAddress(scanId.value ?: return, it.ip, it.hwAddress)
-        }
-    }
 
     sealed class ScanProgress {
         object ScanNotStarted : ScanProgress()
@@ -97,5 +92,5 @@ class ScanRepository(
     }
 }
 
-operator fun ScanRepository.ScanProgress?.plus(progress: Double) : ScanRepository.ScanProgress =
+operator fun ScanRepository.ScanProgress?.plus(progress: Double): ScanRepository.ScanProgress =
     this?.plus(progress) ?: ScanRepository.ScanProgress.ScanRunning(progress)

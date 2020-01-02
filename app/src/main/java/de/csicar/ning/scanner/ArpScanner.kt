@@ -14,7 +14,6 @@ data class MacAddress(val address: String) {
 }
 
 object ArpScanner {
-
     suspend fun getArpTableFromFile() = withContext(Dispatchers.IO) {
         val arpFile = File("/proc/net/arp").inputStream()
         val arpString = arpFile.bufferedReader().use { it.readText() }
@@ -27,6 +26,6 @@ object ArpScanner {
                 ArpEntry(InetAddress.getByName(it[0]), MacAddress(it[3]))
             }
             .filter { !it.hwAddress.isBroadcast }
-            .toList()
+            .associateBy { it.ip }
     }
 }

@@ -42,6 +42,17 @@ interface DeviceDao {
     fun insert(device: Device): Long
 
     @Transaction
+    fun upsert(device: Device): Long {
+        val existingDevice = getByAddressInNetwork(device.ip, device.networkId)
+        return if (existingDevice == null) {
+            insert(device)
+        } else {
+            update(device.copy(deviceId = existingDevice.deviceId))
+            existingDevice.deviceId
+        }
+    }
+
+    @Transaction
     fun upsertName(networkId: Long, ip: Inet4Address, name: String) {
         val existingDevice = getByAddressInNetwork(ip, networkId)
         if(existingDevice == null) {
@@ -52,10 +63,10 @@ interface DeviceDao {
     }
 
     @Transaction
-    fun upsertHwAddress(scanId: Long, ip: Inet4Address, hwAddress: MacAddress) {
-        val existingDevice = getByAddress(ip, scanId)
+    fun upsertHwAddress(networkId: Long, ip: Inet4Address, hwAddress: MacAddress) {
+        val existingDevice = getByAddressInNetwork(ip, networkId)
         if(existingDevice == null) {
-            //TODO("insert new device. need to find out IP-Range of network")
+            insert(Device(0, networkId, ip, null, hwAddress))
         } else {
             updateHwAddress(existingDevice.deviceId, hwAddress)
         }

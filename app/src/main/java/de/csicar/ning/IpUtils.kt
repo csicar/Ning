@@ -2,6 +2,7 @@ package de.csicar.ning
 
 import java.net.Inet4Address
 
+fun Int.toInet4Address(host: String = "") = inet4AddressFromInt(host, this)
 fun inet4AddressFromInt(host: String, ip: Int): Inet4Address {
     return Inet4Address.getByAddress(
         host, byteArrayOf(
