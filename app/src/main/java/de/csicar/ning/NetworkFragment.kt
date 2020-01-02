@@ -23,7 +23,6 @@ import kotlin.math.roundToInt
  */
 class NetworkFragment : Fragment() {
     private var listener: OnListFragmentInteractionListener? = null
-    private val network by lazy { MutableLiveData<Network>() }
     private val viewModel by lazy {
         ViewModelProviders.of(activity!!).get(ScanViewModel::class.java)
     }
@@ -45,18 +44,20 @@ class NetworkFragment : Fragment() {
         // Set the adapter
         viewAdapter = DeviceRecyclerViewAdapter(listOf(), listener) { list ->
             emptyListInfo.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
-
         }
 
         val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
         viewModel.scanProgress.observe(this, Observer {
             when (it) {
-                is ScanViewModel.ScanProgress.ScanFinished -> progressBar.visibility = View.GONE
-                is ScanViewModel.ScanProgress.ScanRunning -> {
-                    progressBar.progress = (it.progress * 1000.0).roundToInt()
-                    if (it.progress > 0.9) swipeRefreshLayout.isRefreshing = false
+                is ScanRepository.ScanProgress.ScanFinished -> {
+                    progressBar.visibility = View.INVISIBLE
+                    swipeRefreshLayout.isRefreshing = false
                 }
-                is ScanViewModel.ScanProgress.ScanNotStarted -> progressBar.visibility = View.GONE
+                is ScanRepository.ScanProgress.ScanRunning -> {
+                    progressBar.visibility = View.VISIBLE
+                    progressBar.progress = (it.progress * 1000.0).roundToInt()
+                }
+                is ScanRepository.ScanProgress.ScanNotStarted -> progressBar.visibility = View.INVISIBLE
             }
         })
 
@@ -70,25 +71,18 @@ class NetworkFragment : Fragment() {
             runScan()
         }
 
+        viewModel.devices.observe(this, Observer {
+            Log.d("asd", "got new data ${it.size} $it")
+            viewAdapter.updateData(it)
+        })
 
-        setupObserver()
         return view
     }
 
     private fun runScan() {
         viewModel.viewModelScope.launch {
-
-            val network = viewModel.startScan(argumentInterfaceName)
-            this@NetworkFragment.network.value = network
-            setupObserver()
+         viewModel.startScan(argumentInterfaceName)
         }
-    }
-
-    private fun setupObserver() {
-        val networkId = viewModel.networkId.value ?: return
-        viewModel.deviceDao.getAll(networkId).observe(this@NetworkFragment, Observer {
-            viewAdapter.updateData(it)
-        })
     }
 
     override fun onAttach(context: Context) {

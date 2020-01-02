@@ -43,7 +43,6 @@ data class Network(
 ) {
     companion object {
         fun from(ip: Inet4Address, mask: Short, scanId: Long, interfaceName: String): Network {
-            Log.d("asd", ip.maskWith(mask).toString())
             return Network(0, ip.maskWith(mask), mask, scanId, interfaceName)
         }
     }
@@ -98,7 +97,8 @@ data class PortDescription(
             PortDescription(0, 53, Protocol.UDP, "DNS", "DNS Server"),
             PortDescription(0, 443, Protocol.TCP, "HTTPS", "Secure HTTP"),
             PortDescription(0, 548, Protocol.TCP, "AFP", "AFP over TCP"),
-            PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy")
+            PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy"),
+            PortDescription(0, 62078, Protocol.TCP, "iPhone-Sync", "lockdown iOS Service")
         )
     }
 }

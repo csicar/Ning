@@ -39,10 +39,27 @@ interface DeviceDao {
     fun getAllNow(networkId: Long): List<Device>
 
     @Insert
-    fun insertAll(vararg devices: Device)
-
-    @Insert
     fun insert(device: Device): Long
+
+    @Transaction
+    fun upsertName(networkId: Long, ip: Inet4Address, name: String) {
+        val existingDevice = getByAddressInNetwork(ip, networkId)
+        if(existingDevice == null) {
+            insert(Device(0, networkId, ip, name, null))
+        } else {
+            updateServiceName(existingDevice.deviceId, name)
+        }
+    }
+
+    @Transaction
+    fun upsertHwAddress(scanId: Long, ip: Inet4Address, hwAddress: MacAddress) {
+        val existingDevice = getByAddress(ip, scanId)
+        if(existingDevice == null) {
+            //TODO("insert new device. need to find out IP-Range of network")
+        } else {
+            updateHwAddress(existingDevice.deviceId, hwAddress)
+        }
+    }
 
     @Update
     fun update(device: Device)
@@ -53,6 +70,9 @@ interface DeviceDao {
     @Query("SELECT * FROM DEVICE WHERE deviceId = :id")
     fun getByIdNow(id: Long): Device
 
+    @Query("SELECT * FROM Device WHERE ip = :ip AND networkId = :networkId")
+    fun getByAddressInNetwork(ip: Inet4Address, networkId: Long) : Device?
+
     @Query("SELECT * FROM Device WHERE ip = :ip AND networkId IN (SELECT networkId FROM Network WHERE scanId = :scanId)")
     fun getByAddress(ip: Inet4Address, scanId: Long): Device?
 
@@ -61,6 +81,13 @@ interface DeviceDao {
 
     @Query("UPDATE Device SET deviceName = :deviceName WHERE deviceId = :deviceId")
     fun updateServiceName(deviceId: Long, deviceName: String?)
+
+    @Transaction
+    fun insertIfNew(networkId: Long, ip: Inet4Address): Long {
+        val existingAddress = getByAddressInNetwork(ip, networkId)
+            ?: return insert(Device(0, networkId, ip, null, null))
+        return existingAddress.deviceId
+    }
 }
 
 @Dao

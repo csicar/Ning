@@ -36,7 +36,7 @@ class DeviceRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
-        holder.ipTextView.text = item.ip.toString()
+        holder.ipTextView.text = item.ip.hostAddress
         holder.macTextView.text = item.hwAddress?.address
         holder.vendorTextView.text = item.vendorName
         holder.deviceNameTextView.text = item.deviceName
