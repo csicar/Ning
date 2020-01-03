@@ -65,7 +65,7 @@
                 android:max="1000"
                 tools:progress="300" />
 
-            <androidx.recyclerview.widget.RecyclerView
+            <de.csicar.ning.ui.RecyclerViewCommon
                 android:id="@+id/devicesList"
                 android:name="de.csicar.ning.deviceFragment"
                 android:layout_width="match_parent"

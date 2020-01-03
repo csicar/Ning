@@ -57,23 +57,26 @@ class ScanRepository(
                     deviceDao.upsertName(networkId, newResult.ipAddress, newResult.name)
                 }.scan()
             }, launch {
-                delay(1000)
-                ArpScanner.getArpTableFromFile().forEach {
-                    val ip = it.key
-                    if (ip is Inet4Address) {
-                        deviceDao.upsertHwAddress(scanId.value ?: return@forEach, ip, it.value.hwAddress)
-                    }
-                }
+                updateFromArp()
             }, launch {
                 val userDevice = LocalMacScanner.asDevice(network) ?: return@launch
                 deviceDao.upsert(userDevice)
             }).joinAll()
-            //this@withContext.launch { fetchHwAddressesFromArpTable() }
+            updateFromArp()
             withContext(Dispatchers.Main) {
                 scanProgress.value = ScanProgress.ScanFinished
             }
             network
         }
+
+    private suspend fun updateFromArp() {
+        ArpScanner.getArpTableFromFile().forEach {
+            val ip = it.key
+            if (ip is Inet4Address) {
+                deviceDao.upsertHwAddress(scanId.value ?: return@forEach, ip, it.value.hwAddress)
+            }
+        }
+    }
 
     sealed class ScanProgress {
         object ScanNotStarted : ScanProgress()

@@ -4,18 +4,15 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.fragment.app.Fragment
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.Observer
-import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.viewModelScope
 import de.csicar.ning.scanner.PortScanner
-import de.csicar.ning.ui.UsefulRecyclerView
+import de.csicar.ning.ui.RecyclerViewCommon
 import kotlinx.android.synthetic.main.fragment_port_item.view.*
 import kotlinx.coroutines.*
 
@@ -33,7 +30,7 @@ class DeviceInfoFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_deviceinfo_list, container, false)
         viewModel = ViewModelProviders.of(activity!!).get(ScanViewModel::class.java)
-        val recyclerView = view.findViewById<UsefulRecyclerView>(R.id.list)
+        val recyclerView = view.findViewById<RecyclerViewCommon>(R.id.list)
         val argumentDeviceId = arguments?.getLong("deviceId")!!
 
         viewModel.deviceDao.getById(argumentDeviceId).observe(this, Observer {
@@ -48,10 +45,9 @@ class DeviceInfoFragment : Fragment() {
 
 
         recyclerView.setHandler(context!!, this, object :
-            UsefulRecyclerView.Handler<Port>(ports) {
-            override fun getLayout() = R.layout.fragment_port_item
+            RecyclerViewCommon.Handler<Port>(R.layout.fragment_port_item, ports) {
             override fun shareIdentity(a: Port, b: Port) = a.port == b.port
-            override fun areContentTheSame(a: Port, b: Port) = a == b
+            override fun areContentsTheSame(a: Port, b: Port) = a == b
             override fun onClickListener(view: View, value: Port) {
                 viewModel.viewModelScope.launch(context = Dispatchers.IO) {
                     val ip = viewModel.deviceDao.getByIdNow(value.deviceId).ip

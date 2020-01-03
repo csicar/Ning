@@ -1,19 +1,17 @@
 package de.csicar.ning
 
 import android.content.Context
-import android.graphics.Rect
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageView
 import android.widget.ProgressBar
-import androidx.core.view.marginTop
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import de.csicar.ning.ui.RecyclerViewCommon
+import kotlinx.android.synthetic.main.fragment_device.view.*
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -27,11 +25,10 @@ class NetworkFragment : Fragment() {
     private val viewModel by lazy {
         ViewModelProviders.of(activity!!).get(ScanViewModel::class.java)
     }
-    lateinit var viewAdapter: DeviceRecyclerViewAdapter
     lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    lateinit var emptyListInfo : View
+    lateinit var emptyListInfo: View
 
-    private lateinit var argumentInterfaceName : String
+    private lateinit var argumentInterfaceName: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,14 +36,13 @@ class NetworkFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_network_list, container, false)
         emptyListInfo = view.findViewById<View>(R.id.swipeDownViewImage)
-        swipeRefreshLayout = view.findViewById<SwipeRefreshLayout>(R.id.swipeDownView)
+        swipeRefreshLayout = view.findViewById(R.id.swipeDownView)
         argumentInterfaceName = arguments?.getString("interface_name")!!
 
 
-        // Set the adapter
-        viewAdapter = DeviceRecyclerViewAdapter(listOf(), listener) { list ->
-            emptyListInfo.visibility = if (list.isEmpty()) View.VISIBLE else View.GONE
-        }
+        viewModel.devices.observe(this, Observer {
+            emptyListInfo.visibility = if (it.isEmpty()) View.VISIBLE else View.GONE
+        })
 
         val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
         viewModel.scanProgress.observe(this, Observer {
@@ -59,30 +55,52 @@ class NetworkFragment : Fragment() {
                     progressBar.visibility = View.VISIBLE
                     progressBar.progress = (it.progress * 1000.0).roundToInt()
                 }
-                is ScanRepository.ScanProgress.ScanNotStarted -> progressBar.visibility = View.INVISIBLE
+                is ScanRepository.ScanProgress.ScanNotStarted -> progressBar.visibility =
+                    View.INVISIBLE
             }
         })
 
-        val devicesList = view.findViewById<RecyclerView>(R.id.devicesList)
-        with(devicesList) {
-            layoutManager = LinearLayoutManager(view.context)
-            adapter = viewAdapter
-        }
+        val devicesList = view.findViewById<RecyclerViewCommon>(R.id.devicesList)
+        devicesList.setHandler(
+            context!!,
+            this,
+            object : RecyclerViewCommon.Handler<DeviceWithName>(
+                R.layout.fragment_device,
+                viewModel.devices
+            ) {
+                override fun bindItem(view: View): (DeviceWithName) -> Unit {
+                    val ipTextView: TextView = view.ipTextView
+                    val macTextView: TextView = view.macTextView
+                    val vendorTextView: TextView = view.vendorTextView
+                    val deviceNameTextView: TextView = view.deviceNameTextView
+                    return { item ->
+                        ipTextView.text = item.ip.hostAddress
+                        macTextView.text = item.hwAddress?.address
+                        vendorTextView.text = item.vendorName
+                        deviceNameTextView.text = item.deviceName
+                    }
+                }
+
+                override fun onClickListener(view: View, value: DeviceWithName) {
+                    listener?.onListFragmentInteraction(value, view)
+                }
+
+                override fun shareIdentity(a: DeviceWithName, b: DeviceWithName) =
+                    a.deviceId == b.deviceId
+
+                override fun areContentsTheSame(a: DeviceWithName, b: DeviceWithName) = a == b
+
+            })
 
         swipeRefreshLayout.setOnRefreshListener {
             runScan()
         }
 
-        viewModel.devices.observe(this, Observer {
-            viewAdapter.updateData(it)
-        })
-
         return view
     }
-
     private fun runScan() {
         viewModel.viewModelScope.launch {
-         viewModel.startScan(argumentInterfaceName)
+            viewModel.startScan(argumentInterfaceName)
         }
     }
 

@@ -126,7 +126,7 @@
             android:text="Open Ports:"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
-        <de.csicar.ning.ui.UsefulRecyclerView
+        <de.csicar.ning.ui.RecyclerViewCommon
             android:id="@+id/list"
             android:name="de.csicar.ning.DeviceInfoFragment"
             android:layout_width="match_parent"

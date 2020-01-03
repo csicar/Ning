@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
-class UsefulRecyclerView : RecyclerView {
+class RecyclerViewCommon : RecyclerView {
     constructor(ctx: Context) : super(ctx)
     constructor(ctx: Context, attrs: AttributeSet) : super(ctx, attrs)
     constructor(ctx: Context, attrs: AttributeSet, defStyleAttr: Int) : super(
@@ -21,14 +21,12 @@ class UsefulRecyclerView : RecyclerView {
         defStyleAttr
     )
 
-    abstract class Handler<T>(val data: LiveData<List<T>>) {
+    abstract class Handler<T>(val layout: Int, val data: LiveData<List<T>>) {
         abstract fun bindItem(view: View): (value: T) -> Unit
-        abstract fun getLayout(): Int
-        open fun onClickListener(view: View, value :T) {}
+        open fun onClickListener(view: View, value: T) {}
 
         open fun shareIdentity(a: T, b: T) = false
-        open fun areContentTheSame(a: T, b: T) = a === b
-
+        open fun areContentsTheSame(a: T, b: T) = a === b
     }
 
     fun <T> setHandler(context: Context, owner: LifecycleOwner, handler: Handler<T>) {
@@ -49,7 +47,7 @@ class UsefulRecyclerView : RecyclerView {
         RecyclerView.Adapter<UsefulViewHolder<T>>() {
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsefulViewHolder<T> {
             val view = LayoutInflater.from(parent.context)
-                .inflate(handler.getLayout(), parent, false)
+                .inflate(handler.layout, parent, false)
             return UsefulViewHolder(view, handler.bindItem(view))
         }
 
@@ -79,7 +77,7 @@ class UsefulRecyclerView : RecyclerView {
         override fun getNewListSize() = new.size
 
         override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int) =
-            handler.areContentTheSame(old[oldItemPosition], new[newItemPosition])
+            handler.areContentsTheSame(old[oldItemPosition], new[newItemPosition])
 
     }
 }
