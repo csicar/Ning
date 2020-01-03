@@ -11,9 +11,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.lifecycle.Observer
+import androidx.lifecycle.Transformations
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.viewModelScope
 import de.csicar.ning.scanner.PortScanner
+import de.csicar.ning.ui.UsefulRecyclerView
+import kotlinx.android.synthetic.main.fragment_port_item.view.*
 import kotlinx.coroutines.*
 
 /**
@@ -23,7 +26,6 @@ import kotlinx.coroutines.*
  */
 class DeviceInfoFragment : Fragment() {
     lateinit var viewModel: ScanViewModel
-    lateinit var adapter: PortItemAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,46 +33,52 @@ class DeviceInfoFragment : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_deviceinfo_list, container, false)
         viewModel = ViewModelProviders.of(activity!!).get(ScanViewModel::class.java)
-        viewModel.deviceDao.getById(arguments?.getLong("deviceId")!!).observe(this, Observer {
+        val recyclerView = view.findViewById<UsefulRecyclerView>(R.id.list)
+        val argumentDeviceId = arguments?.getLong("deviceId")!!
+
+        viewModel.deviceDao.getById(argumentDeviceId).observe(this, Observer {
             fetchInfo(it.asDevice)
-            //activity!!.toolbar.findViewById<TextView>(R.id.title_detail).text = "${it.ip} ${it.deviceName}"
-
-            viewModel.portDao.getAllForDevice(it.deviceId).observe(this, Observer {
-                adapter.updateData(it)
-            })
-
             view.findViewById<TextView>(R.id.deviceIpTextView).text = it.ip.hostAddress
             view.findViewById<TextView>(R.id.deviceNameTextView).text = it.deviceName
             view.findViewById<TextView>(R.id.deviceHwAddressTextView).text = it.hwAddress?.address
             view.findViewById<TextView>(R.id.deviceVendorTextView).text = it.vendorName
         })
 
+        val ports = viewModel.portDao.getAllForDevice(argumentDeviceId)
 
-        // Set the adapter
-        adapter = PortItemAdapter(listOf()) { port ->
-            viewModel.viewModelScope.launch {
-                val device =
-                    withContext(Dispatchers.IO) { viewModel.deviceDao.getByIdNow(port.deviceId) }
-                when (port.port) {
-                    8080 ->
+
+        recyclerView.setHandler(context!!, this, object :
+            UsefulRecyclerView.Handler<Port>(ports) {
+            override fun getLayout() = R.layout.fragment_port_item
+            override fun shareIdentity(a: Port, b: Port) = a.port == b.port
+            override fun areContentTheSame(a: Port, b: Port) = a == b
+            override fun onClickListener(view: View, value: Port) {
+                viewModel.viewModelScope.launch(context = Dispatchers.IO) {
+                    val ip = viewModel.deviceDao.getByIdNow(value.deviceId).ip
+                    withContext(Dispatchers.Main) {
                         Intent(Intent.ACTION_VIEW).apply {
-                            data = Uri.parse("http://${device.ip}:${port.port}")
+                            data = Uri.parse("http://${ip}:${value.port}")
                         }.also {
                             startActivity(it)
                         }
-                    22 ->
-                        Intent(Intent.ACTION_VIEW).apply {
-                            data = Uri.parse("ssh://${device.ip}:${port.port}")
-                        }.also {
-                            startActivity(it)
-                        }
+                    }
                 }
             }
-        }
-        view.findViewById<RecyclerView>(R.id.list).also {
-            it.layoutManager = LinearLayoutManager(context)
-            it.adapter = adapter
-        }
+
+            override fun bindItem(view: View): (value: Port) -> Unit {
+                val portNumberTextView: TextView = view.portNumberTextView
+                val protocolTextView: TextView = view.protocolTextView
+                val serviceTextView: TextView = view.serviceNameTextView
+
+                return { item ->
+                    portNumberTextView.text = item.port.toString()
+                    protocolTextView.text = item.protocol.toString()
+                    serviceTextView.text = item.description?.serviceName
+
+                }
+            }
+
+        })
         return view
     }
 

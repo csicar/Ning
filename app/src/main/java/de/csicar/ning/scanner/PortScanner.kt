@@ -6,12 +6,13 @@ import de.csicar.ning.PortDescription
 import de.csicar.ning.Protocol
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.InterruptedIOException
 import java.net.*
 
-class PortScanner(val ip: InetAddress){
+class PortScanner(val ip: InetAddress) {
 
     suspend fun isUdpPortOpen(port: Int) = withContext(Dispatchers.IO) {
         try {
@@ -41,6 +42,9 @@ class PortScanner(val ip: InetAddress){
         } catch (ex: ConnectException) {
             Log.d("asd", "Got connection error: $ex")
             return@withContext false
+        } catch (ex: NoRouteToHostException) {
+            Log.d("asd", "No Route to Host: $ex")
+            return@withContext  false
         } finally {
             socket?.close()
         }

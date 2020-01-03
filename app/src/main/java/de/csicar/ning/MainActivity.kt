@@ -2,10 +2,12 @@ package de.csicar.ning
 
 import android.os.Bundle
 import android.util.Log
+import android.view.SubMenu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.os.bundleOf
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
@@ -32,7 +34,16 @@ class MainActivity : AppCompatActivity(), NetworkFragment.OnListFragmentInteract
         toolbar
             .setupWithNavController(navController, appBarConfiguration)
 
+
         viewModel = ViewModelProviders.of(this).get(ScanViewModel::class.java)
+
+        viewModel.currentNetworks.observe(this, Observer {
+            val interfaceMenu = drawer_navigation.menu
+            interfaceMenu.clear()
+            it.forEach {
+                interfaceMenu.add(it.interfaceName)
+            }
+        })
     }
 
 

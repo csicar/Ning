@@ -126,8 +126,7 @@
             android:text="Open Ports:"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
-        <androidx.recyclerview.widget.RecyclerView xmlns:app="http://schemas.android.com/apk/res-auto"
-            xmlns:tools="http://schemas.android.com/tools"
+        <de.csicar.ning.ui.UsefulRecyclerView
             android:id="@+id/list"
             android:name="de.csicar.ning.DeviceInfoFragment"
             android:layout_width="match_parent"
@@ -137,6 +136,6 @@
             android:nestedScrollingEnabled="false"
             app:layoutManager="LinearLayoutManager"
             tools:context=".DeviceInfoFragment"
-            tools:listitem="@layout/fragment_port_item" />
+            tools:listitem="@layout/fragment_port_item"/>
     </LinearLayout>
 </androidx.core.widget.NestedScrollView>
