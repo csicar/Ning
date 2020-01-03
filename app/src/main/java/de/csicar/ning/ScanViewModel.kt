@@ -32,6 +32,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         networkDao.getAll(it)
     }
 
+    fun fetchAvailableInterfaces() = networkScanRepository.fetchAvailableInterfaces()
 
     suspend fun startScan(interfaceName: String): Network {
         val network = networkScanRepository.startScan(interfaceName, scanProgress, currentNetworkId)

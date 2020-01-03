@@ -17,6 +17,8 @@ class ScanRepository(
         MutableLiveData<Long>()
     }
 
+    fun fetchAvailableInterfaces() = InterfaceScanner.getNetworkInterfaces()
+
     suspend fun startScan(
         interfaceName: String,
         scanProgress: MutableLiveData<ScanProgress>,

@@ -6,6 +6,7 @@ import android.view.SubMenu
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.internal.view.SupportMenuItem.SHOW_AS_ACTION_ALWAYS
 import androidx.core.os.bundleOf
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -37,13 +38,20 @@ class MainActivity : AppCompatActivity(), NetworkFragment.OnListFragmentInteract
 
         viewModel = ViewModelProviders.of(this).get(ScanViewModel::class.java)
 
-        viewModel.currentNetworks.observe(this, Observer {
-            val interfaceMenu = drawer_navigation.menu
-            interfaceMenu.clear()
-            it.forEach {
-                interfaceMenu.add(it.interfaceName)
+        val interfaceMenu = drawer_navigation.menu.addSubMenu("Interfaces")
+        viewModel.fetchAvailableInterfaces().forEach { nic ->
+            interfaceMenu.add("${nic.interfaceName} - ${nic.address.hostAddress}/${nic.prefix}").also {
+                it.setOnMenuItemClickListener {
+                    Log.d("asd", "open for interface $nic")
+                    val bundle = bundleOf("interface_name" to nic.interfaceName)
+                    nav_host_fragment.findNavController().navigate(R.id.deviceFragment, bundle)
+                    true
+                }
+                it.setCheckable(true)
+                it.setEnabled(true)
+                it.setShowAsAction(SHOW_AS_ACTION_ALWAYS)
             }
-        })
+        }
     }
 
 
