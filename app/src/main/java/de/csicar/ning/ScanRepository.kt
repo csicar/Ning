@@ -35,7 +35,8 @@ class ScanRepository(
                     networkData.address,
                     networkData.prefix,
                     newScanId,
-                    networkData.interfaceName
+                    networkData.interfaceName,
+                    null, null //TODO get ssid and bssid from WifiScanner
                 )
             )
             withContext(Dispatchers.Main) {
@@ -63,6 +64,8 @@ class ScanRepository(
                 deviceDao.upsert(userDevice)
             }).joinAll()
             updateFromArp()
+            delay(500)
+            updateFromArp()
             withContext(Dispatchers.Main) {
                 scanProgress.value = ScanProgress.ScanFinished
             }
@@ -70,7 +73,7 @@ class ScanRepository(
         }
 
     private suspend fun updateFromArp() {
-        ArpScanner.getArpTableFromFile().forEach {
+        ArpScanner.getFromAllSources().forEach {
             val ip = it.key
             if (ip is Inet4Address) {
                 deviceDao.upsertHwAddress(scanId.value ?: return@forEach, ip, it.value.hwAddress)

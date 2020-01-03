@@ -1,5 +1,6 @@
 package de.csicar.ning.scanner
 
+import android.util.Log
 import de.csicar.ning.Network
 import java.net.Inet4Address
 import java.net.NetworkInterface

@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
+import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -73,11 +75,13 @@ class NetworkFragment : Fragment() {
                     val macTextView: TextView = view.macTextView
                     val vendorTextView: TextView = view.vendorTextView
                     val deviceNameTextView: TextView = view.deviceNameTextView
+                    val deviceIcon: ImageView = view.device_icon
                     return { item ->
                         ipTextView.text = item.ip.hostAddress
                         macTextView.text = item.hwAddress?.address
                         vendorTextView.text = item.vendorName
                         deviceNameTextView.text = item.deviceName
+                        deviceIcon.setImageResource(item.icon)
                     }
                 }
 
