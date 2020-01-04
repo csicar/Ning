@@ -3,4 +3,5 @@
 
     <item android:title="Network Scanner" />
     <group android:id="@+id/networks_submenu" android:title="Interfaces"></group>
+
 </menu>
