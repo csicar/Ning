@@ -53,22 +53,22 @@ interface DeviceDao {
     }
 
     @Transaction
-    fun upsertName(networkId: Long, ip: Inet4Address, name: String) {
+    fun upsertName(networkId: Long, ip: Inet4Address, name: String, allowNew: Boolean = true) {
         val existingDevice = getByAddressInNetwork(ip, networkId)
-        if(existingDevice == null) {
-            insert(Device(0, networkId, ip, name, null))
-        } else {
+        if (existingDevice != null) {
             updateServiceName(existingDevice.deviceId, name)
+        } else if (allowNew) {
+            insert(Device(0, networkId, ip, name, null))
         }
     }
 
     @Transaction
-    fun upsertHwAddress(networkId: Long, ip: Inet4Address, hwAddress: MacAddress) {
+    fun upsertHwAddress(networkId: Long, ip: Inet4Address, hwAddress: MacAddress, allowNew: Boolean) {
         val existingDevice = getByAddressInNetwork(ip, networkId)
-        if(existingDevice == null) {
-            insert(Device(0, networkId, ip, null, hwAddress))
-        } else {
+        if(existingDevice != null) {
             updateHwAddress(existingDevice.deviceId, hwAddress)
+        } else if(allowNew) {
+            insert(Device(0, networkId, ip, null, hwAddress))
         }
     }
 
@@ -82,7 +82,7 @@ interface DeviceDao {
     fun getByIdNow(id: Long): Device
 
     @Query("SELECT * FROM Device WHERE ip = :ip AND networkId = :networkId")
-    fun getByAddressInNetwork(ip: Inet4Address, networkId: Long) : Device?
+    fun getByAddressInNetwork(ip: Inet4Address, networkId: Long): Device?
 
     @Query("SELECT * FROM Device WHERE ip = :ip AND networkId IN (SELECT networkId FROM Network WHERE scanId = :scanId)")
     fun getByAddress(ip: Inet4Address, scanId: Long): Device?
@@ -107,7 +107,7 @@ interface PortDao {
     fun insert(port: Port): Long
 
     @Transaction
-    suspend fun upsert(port: Port) : Long{
+    suspend fun upsert(port: Port): Long {
         val portFromDB = getPortFromNumber(port.deviceId, port.port) ?: return insert(port)
 
         update(Port(portFromDB.portId, port.port, port.protocol, port.deviceId))
@@ -137,7 +137,7 @@ interface ScanDao {
     fun getAllNow(): List<Scan>
 
     @Query("SELECT * FROM SCAN WHERE scanId = :scanId")
-    fun getById(scanId: Long) : LiveData<Scan?>
+    fun getById(scanId: Long): LiveData<Scan?>
 
 }
 
