@@ -37,7 +37,7 @@ class DeviceInfoFragment : Fragment() {
             fetchInfo(it.asDevice)
             view.findViewById<TextView>(R.id.deviceIpTextView).text = it.ip.hostAddress
             view.findViewById<TextView>(R.id.deviceNameTextView).text = it.deviceName
-            view.findViewById<TextView>(R.id.deviceHwAddressTextView).text = it.hwAddress?.address
+            view.findViewById<TextView>(R.id.deviceHwAddressTextView).text = it.hwAddress?.getAddress(AppPreferences(this).hideMacDetails)
             view.findViewById<TextView>(R.id.deviceVendorTextView).text = it.vendorName
         })
 

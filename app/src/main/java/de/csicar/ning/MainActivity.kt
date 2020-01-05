@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.internal.view.SupportMenuItem.SHOW_AS_ACTION_ALWAYS
 import androidx.core.os.bundleOf
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.viewModelScope
@@ -39,18 +40,26 @@ class MainActivity : AppCompatActivity(), NetworkFragment.OnListFragmentInteract
         viewModel = ViewModelProviders.of(this).get(ScanViewModel::class.java)
 
         val interfaceMenu = drawer_navigation.menu.addSubMenu("Interfaces")
+
         viewModel.fetchAvailableInterfaces().forEach { nic ->
             interfaceMenu.add("${nic.interfaceName} - ${nic.address.hostAddress}/${nic.prefix}").also {
                 it.setOnMenuItemClickListener {
-                    Log.d("asd", "open for interface $nic")
                     val bundle = bundleOf("interface_name" to nic.interfaceName)
                     nav_host_fragment.findNavController().navigate(R.id.deviceFragment, bundle)
+                    main_drawer_layout.closeDrawers()
                     true
                 }
-                it.setCheckable(true)
-                it.setEnabled(true)
-                it.setShowAsAction(SHOW_AS_ACTION_ALWAYS)
+                it.setIcon(R.drawable.ic_settings_ethernet_white_24dp)
+                it.isCheckable = true
+                it.isEnabled = true
             }
+        }
+        val preferences = drawer_navigation.menu.add("Preferences")
+        preferences.setIcon(R.drawable.ic_settings_white_24dp)
+        preferences.setOnMenuItemClickListener {
+            navController.navigate(R.id.appPreferenceFragment)
+            main_drawer_layout.closeDrawers()
+            true
         }
     }
 

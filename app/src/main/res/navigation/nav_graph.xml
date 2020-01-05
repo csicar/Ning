@@ -29,4 +29,14 @@
             android:name="deviceid"
             app:argType="long" />
     </fragment>
+
+    <fragment
+        android:id="@+id/appPreferenceFragment"
+        android:name="de.csicar.ning.ui.AppPreferenceFragment"
+        android:label="Preferences"
+        >
+
+    </fragment>
+    <action android:id="@+id/action_appPreferenceFragment"
+        app:destination="@id/appPreferenceFragment"/>
 </navigation>

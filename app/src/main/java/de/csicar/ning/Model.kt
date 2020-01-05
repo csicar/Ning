@@ -104,6 +104,7 @@ data class PortDescription(
             PortDescription(0, 443, Protocol.TCP, "HTTPS", "Secure HTTP"),
             PortDescription(0, 548, Protocol.TCP, "AFP", "AFP over TCP"),
             PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy"),
+            PortDescription(0, 8000, Protocol.TCP, "HTTP Alt", "HTTP common alternative"),
             PortDescription(0, 62078, Protocol.TCP, "iPhone-Sync", "lockdown iOS Service")
         )
     }

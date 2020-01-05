@@ -17,6 +17,13 @@ data class ArpEntry(val ip: InetAddress, val hwAddress: MacAddress) {
 }
 
 data class MacAddress(val address: String) {
+    fun getAddress(hideMacDetail: Boolean): String {
+        if (hideMacDetail) {
+            return address.substring(0, "aa:bb:cc".length) + ":XX:XX:XX"
+        }
+        return address
+    }
+
     val isBroadcast get() = address == "00:00:00:00:00:00"
 }
 

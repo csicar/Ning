@@ -48,6 +48,8 @@ dependencies {
 
     implementation "androidx.drawerlayout:drawerlayout:1.0.0"
 
+    implementation "androidx.preference:preference:1.1.0"
+
 
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"

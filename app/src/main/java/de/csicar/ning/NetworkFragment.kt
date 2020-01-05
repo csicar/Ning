@@ -1,6 +1,7 @@
 package de.csicar.ning
 
 import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,9 +12,11 @@ import android.widget.TextView
 import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.*
+import androidx.preference.PreferenceManager
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.csicar.ning.ui.RecyclerViewCommon
 import kotlinx.android.synthetic.main.fragment_device.view.*
+import kotlinx.android.synthetic.main.fragment_deviceinfo_list.*
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -78,7 +81,7 @@ class NetworkFragment : Fragment() {
                     val deviceIcon: ImageView = view.device_icon
                     return { item ->
                         ipTextView.text = item.ip.hostAddress
-                        macTextView.text = item.hwAddress?.address
+                        macTextView.text = item.hwAddress?.getAddress(AppPreferences(this@NetworkFragment).hideMacDetails)
                         vendorTextView.text = item.vendorName
                         deviceNameTextView.text = item.deviceName
                         deviceIcon.setImageResource(item.icon)
@@ -102,6 +105,9 @@ class NetworkFragment : Fragment() {
 
         return view
     }
+
+
+
     private fun runScan() {
         viewModel.viewModelScope.launch {
             viewModel.startScan(argumentInterfaceName)
