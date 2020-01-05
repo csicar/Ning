@@ -13,3 +13,10 @@ Features
 
 
 ![network overview](fastlane/metadata/android/en-US/images/phoneScreenshots/1-network-overview.png)
+
+Build Vendor DB
+---------------
+
+```bash
+go run createMacVendorDB.go
+```

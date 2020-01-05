@@ -50,6 +50,7 @@ class ScanRepository(
                     if (newResult.isReachable) {
                         Log.d("asd", "isReachable ${newResult.ipAddress}")
                         deviceDao.insertIfNew(networkId, newResult.ipAddress)
+                        launch { updateFromArp() }
                     }
                     scanProgress.postValue(scanProgress.value + newResult.progressIncrease)
                 }.pingIpAddresses()
@@ -76,7 +77,7 @@ class ScanRepository(
         ArpScanner.getFromAllSources().forEach {
             val ip = it.key
             if (ip is Inet4Address) {
-                deviceDao.upsertHwAddress(scanId.value ?: return@forEach, ip, it.value.hwAddress)
+                deviceDao.upsertHwAddress(scanId.value ?: return@forEach, ip, it.value.hwAddress, false)
             }
         }
     }
