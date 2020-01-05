@@ -1,0 +1,9 @@
+Scan your local network for connected devices. Inspired by Fing.
+
+The goal is to provide a quick and easy overview over the local network.
+
+Data sources include:
+* Ping devices
+* Network Service Discovery (Bonjour, Avahi)
+* ARP-Tables
+* open TCP and UDP ports
