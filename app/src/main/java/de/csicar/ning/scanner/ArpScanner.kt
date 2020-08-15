@@ -32,11 +32,14 @@ data class MacAddress(val address: String) {
 private val whiteSpacePattern = Pattern.compile("\\s+")
 
 private fun InputStream.readStreamAsTable(): Sequence<List<String>> {
-    return this.bufferedReader().use { it.readText() }.lineSequence().map { it.split(whiteSpacePattern) }
+    return this.bufferedReader().use { it.readText() }.lineSequence()
+        .map { it.split(whiteSpacePattern) }
 }
 
 
 object ArpScanner {
+    
+    private val TAG = ArpScanner.javaClass.name
 
     suspend fun getFromAllSources() = withContext(Dispatchers.Default) {
         listOf(async { getArpTableFromFile() }, async { getArpTableFromIpCommand() })
@@ -48,7 +51,7 @@ object ArpScanner {
 
     }
 
-    private suspend fun getArpTableFromFile() : Sequence<ArpEntry> = withContext(Dispatchers.IO) {
+    private suspend fun getArpTableFromFile(): Sequence<ArpEntry> = withContext(Dispatchers.IO) {
         try {
             File("/proc/net/arp").inputStream().readStreamAsTable()
                 .drop(1)
@@ -56,28 +59,29 @@ object ArpScanner {
                 .map {
                     ArpEntry.from(it[0], it[3])
                 }
-        } catch (exception : FileNotFoundException) {
-            Log.e("arp-scanner", "arp file not found $exception")
+        } catch (exception: FileNotFoundException) {
+            Log.e(TAG, "arp file not found $exception")
             emptySequence<ArpEntry>()
         }
     }
 
-    private suspend fun getArpTableFromIpCommand() : Sequence<ArpEntry> = withContext(Dispatchers.IO) {
-        try {
+    private suspend fun getArpTableFromIpCommand(): Sequence<ArpEntry> =
+        withContext(Dispatchers.IO) {
+            try {
 
-            val execution = Runtime.getRuntime().exec("ip neigh")
-            execution.waitFor()
-            execution.inputStream.readStreamAsTable()
-                .filter { it.size >= 5 }
-                .map {
-                    ArpEntry.from(it[0], it[4])
-                }
-                .onEach { Log.d("arp-scanner", "found entry in 'ip neight': $it") }
-        } catch (exception: IOException) {
-            Log.e("arp-scanner", "io error when running ip neigh $exception")
-            emptySequence<ArpEntry>()
+                val execution = Runtime.getRuntime().exec("ip neigh")
+                execution.waitFor()
+                execution.inputStream.readStreamAsTable()
+                    .filter { it.size >= 5 }
+                    .map {
+                        ArpEntry.from(it[0], it[4])
+                    }
+                    .onEach { Log.d(TAG, "found entry in 'ip neight': $it") }
+            } catch (exception: IOException) {
+                Log.e(TAG, "io error when running ip neigh $exception")
+                emptySequence<ArpEntry>()
+            }
         }
-    }
 }
 
 

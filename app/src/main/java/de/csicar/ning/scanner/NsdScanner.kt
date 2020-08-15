@@ -13,6 +13,9 @@ import kotlinx.coroutines.withContext
 import java.net.Inet4Address
 
 class NsdScanner(application: Application, private val onUpdate : (ScanResult) -> Unit) {
+    companion object {
+        val TAG = NsdScanner::class.java.name
+    }
     val nsdManager =
         application.applicationContext.getSystemService(Context.NSD_SERVICE) as NsdManager
     private val serviceTypes = listOf(
@@ -37,7 +40,7 @@ class NsdScanner(application: Application, private val onUpdate : (ScanResult) -
     inner class NsdResolveListener : NsdManager.ResolveListener {
         override fun onResolveFailed(serviceInfo: NsdServiceInfo?, errorCode: Int) {
             if (errorCode == NsdManager.FAILURE_ALREADY_ACTIVE) return
-            Log.e("asd", "failed $serviceInfo $errorCode")
+            Log.e(TAG, "failed $serviceInfo $errorCode")
         }
 
         override fun onServiceResolved(serviceInfo: NsdServiceInfo?) {
@@ -55,11 +58,11 @@ class NsdScanner(application: Application, private val onUpdate : (ScanResult) -
         }
 
         override fun onStopDiscoveryFailed(serviceType: String?, errorCode: Int) {
-            Log.d("asd", "discovery stop failed $serviceType $errorCode")
+            Log.d(TAG, "discovery stop failed $serviceType $errorCode")
         }
 
         override fun onStartDiscoveryFailed(serviceType: String?, errorCode: Int) {
-            Log.d("asd", "discovery start failed $serviceType $errorCode")
+            Log.d(TAG, "discovery start failed $serviceType $errorCode")
         }
 
         override fun onDiscoveryStarted(serviceType: String?) {

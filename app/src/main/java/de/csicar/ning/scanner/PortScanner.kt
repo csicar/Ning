@@ -11,8 +11,12 @@ import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.InterruptedIOException
 import java.net.*
+import java.util.logging.Logger
 
 class PortScanner(val ip: InetAddress) {
+    companion object {
+        val TAG = PortScanner::class.java.name
+    }
 
     suspend fun isUdpPortOpen(port: Int) = withContext(Dispatchers.IO) {
         try {
@@ -36,14 +40,14 @@ class PortScanner(val ip: InetAddress) {
     suspend fun isTcpPortOpen(port: Int) = withContext(Dispatchers.IO) {
         var socket: Socket? = null
         try {
-            Log.d("asd", "trying socket: $ip : $port")
+            Log.d(TAG, "trying socket: $ip : $port")
             socket = Socket(ip, port)
             return@withContext true
         } catch (ex: ConnectException) {
-            Log.d("asd", "Got connection error: $ex")
+            Log.d(TAG, "Got connection error: $ex")
             return@withContext false
         } catch (ex: NoRouteToHostException) {
-            Log.d("asd", "No Route to Host: $ex")
+            Log.d(TAG, "No Route to Host: $ex")
             return@withContext  false
         } finally {
             socket?.close()

@@ -13,6 +13,9 @@ class ScanRepository(
     private val deviceDao: DeviceDao,
     private val application: Application
 ) {
+    companion object {
+        val TAG = ScanRepository.javaClass.name
+    }
     private val scanId by lazy {
         MutableLiveData<Long>()
     }
@@ -29,7 +32,7 @@ class ScanRepository(
 
 
             val networkData =
-                InterfaceScanner.getNetworkInterfaces().also{Log.d("ads", "NetworkInterfaces: $it")}.find { it.interfaceName == interfaceName }!!
+                InterfaceScanner.getNetworkInterfaces().also{Log.d(TAG, "NetworkInterfaces: $it")}.find { it.interfaceName == interfaceName }!!
             val networkId = networkDao.insert(
                 Network.from(
                     networkData.address,
@@ -48,7 +51,7 @@ class ScanRepository(
             listOf(launch {
                 PingScanner(network) { newResult ->
                     if (newResult.isReachable) {
-                        Log.d("asd", "isReachable ${newResult.ipAddress}")
+                        Log.d(TAG, "isReachable ${newResult.ipAddress}")
                         deviceDao.insertIfNew(networkId, newResult.ipAddress)
                         launch { updateFromArp() }
                     }
