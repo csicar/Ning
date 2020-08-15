@@ -16,7 +16,7 @@ class PingScanner(
             network.enumerateAddresses().chunked(10).map { ipAddresses ->
                 async {
                     ipAddresses.map { ipAddress ->
-                        val isReachable = ipAddress.isReachable(5000)
+                        val isReachable = ipAddress.isReachable(1000)
                         val result = ScanResult(ipAddress, isReachable, 1.0/ network.networkSize)
                         onUpdate(result)
                         result
