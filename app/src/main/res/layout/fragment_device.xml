@@ -4,6 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?android:attr/selectableItemBackgroundBorderless"
+    android:longClickable="true"
     android:orientation="horizontal">
 
     <TextView
@@ -15,7 +19,7 @@
         app:layout_constraintBottom_toBottomOf="@+id/macTextView"
         app:layout_constraintStart_toEndOf="@+id/device_icon"
         app:layout_constraintTop_toTopOf="@+id/device_icon"
-        tools:text="192.168.0.2" />
+        tools:text="192.168.0.234" />
 
     <TextView
         android:id="@+id/macTextView"
@@ -37,16 +41,17 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_laptop_white_48dp" />
+        app:srcCompat="@drawable/ic_laptop_white_48dp"
+        android:contentDescription="@string/device_icon" />
 
     <TextView
         android:id="@+id/vendorTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAlignment="textEnd"
         android:layout_marginTop="8dp"
-
         android:layout_marginBottom="16dp"
+
+        android:textAlignment="textEnd"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/macTextView"
         app:layout_constraintStart_toEndOf="@+id/deviceNameTextView"

@@ -1,7 +1,6 @@
 package de.csicar.ning
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,14 +8,15 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
-import androidx.core.widget.ImageViewCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.*
-import androidx.preference.PreferenceManager
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.viewModelScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import de.csicar.ning.ui.RecyclerViewCommon
+import de.csicar.ning.util.AppPreferences
+import de.csicar.ning.util.CopyUtil
 import kotlinx.android.synthetic.main.fragment_device.view.*
-import kotlinx.android.synthetic.main.fragment_deviceinfo_list.*
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -43,6 +43,8 @@ class NetworkFragment : Fragment() {
         emptyListInfo = view.findViewById<View>(R.id.swipeDownViewImage)
         swipeRefreshLayout = view.findViewById(R.id.swipeDownView)
         argumentInterfaceName = arguments?.getString("interface_name")!!
+        
+        val copyUtil = CopyUtil(view)
 
 
         viewModel.devices.observe(this, Observer {
@@ -79,9 +81,15 @@ class NetworkFragment : Fragment() {
                     val vendorTextView: TextView = view.vendorTextView
                     val deviceNameTextView: TextView = view.deviceNameTextView
                     val deviceIcon: ImageView = view.device_icon
+
+                    copyUtil.makeTextViewCopyable(macTextView)
+
                     return { item ->
                         ipTextView.text = item.ip.hostAddress
-                        macTextView.text = item.hwAddress?.getAddress(AppPreferences(this@NetworkFragment).hideMacDetails)
+                        macTextView.text = item.hwAddress?.getAddress(
+                            AppPreferences(
+                                this@NetworkFragment
+                            ).hideMacDetails)
                         vendorTextView.text = item.vendorName
                         deviceNameTextView.text = item.deviceName
                         deviceIcon.setImageResource(item.icon)
@@ -90,6 +98,10 @@ class NetworkFragment : Fragment() {
 
                 override fun onClickListener(view: View, value: DeviceWithName) {
                     listener?.onListFragmentInteraction(value, view)
+                }
+
+                override fun onLongClickListener(view: View, value: DeviceWithName): Boolean {
+                    return copyUtil.copyText(value.ip.hostAddress)
                 }
 
                 override fun shareIdentity(a: DeviceWithName, b: DeviceWithName) =

@@ -24,6 +24,7 @@ class RecyclerViewCommon : RecyclerView {
     abstract class Handler<T>(val layout: Int, val data: LiveData<List<T>>) {
         abstract fun bindItem(view: View): (value: T) -> Unit
         open fun onClickListener(view: View, value: T) {}
+        open fun onLongClickListener(view: View, value: T) = false
 
         open fun shareIdentity(a: T, b: T) = false
         open fun areContentsTheSame(a: T, b: T) = a === b
@@ -59,6 +60,10 @@ class RecyclerViewCommon : RecyclerView {
             holder.view.tag = value
             holder.view.setOnClickListener {
                 handler.onClickListener(it, it.tag as T)
+            }
+            holder.view.setOnLongClickListener {
+                handler.onLongClickListener(it, it.tag as T)
+
             }
         }
 
