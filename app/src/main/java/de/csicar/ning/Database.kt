@@ -3,6 +3,7 @@ package de.csicar.ning
 import android.app.Application
 import androidx.room.*
 import de.csicar.ning.scanner.MacAddress
+import de.csicar.ning.util.inet4AddressFromInt
 import java.net.Inet4Address
 
 @Database(

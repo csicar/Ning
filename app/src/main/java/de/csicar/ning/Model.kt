@@ -5,6 +5,8 @@ import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
 import de.csicar.ning.scanner.MacAddress
+import de.csicar.ning.util.inet4AddressFromInt
+import de.csicar.ning.util.maskWith
 import java.net.Inet4Address
 
 @Entity
