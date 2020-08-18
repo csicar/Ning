@@ -1,4 +1,4 @@
-package de.csicar.ning
+package de.csicar.ning.util
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -6,10 +6,11 @@ import android.content.res.Resources
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import kotlinx.android.synthetic.main.fragment_deviceinfo_list.*
+import de.csicar.ning.R
 import java.net.Inet4Address
 
-fun Int.toInet4Address(host: String = "") = inet4AddressFromInt(host, this)
+fun Int.toInet4Address(host: String = "") =
+    inet4AddressFromInt(host, this)
 fun inet4AddressFromInt(host: String, ip: Int): Inet4Address {
     return Inet4Address.getByAddress(
         host, byteArrayOf(
