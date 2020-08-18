@@ -39,13 +39,23 @@ class DeviceInfoFragment : Fragment() {
         val argumentDeviceId = arguments?.getLong("deviceId")!!
         val copyUtil = CopyUtil(view)
 
+        val deviceIpTextView = view.findViewById<TextView>(R.id.deviceIpTextView)
+        val deviceNameTextView = view.findViewById<TextView>(R.id.deviceNameTextView)
+        val deviceHwAddressTextView = view.findViewById<TextView>(R.id.deviceHwAddressTextView)
+        val deviceVendorTextView = view.findViewById<TextView>(R.id.deviceVendorTextView)
+
+        copyUtil.makeTextViewCopyable((deviceIpTextView))
+        copyUtil.makeTextViewCopyable(deviceNameTextView)
+        copyUtil.makeTextViewCopyable(deviceHwAddressTextView)
+        copyUtil.makeTextViewCopyable(deviceVendorTextView)
+
         viewModel.deviceDao.getById(argumentDeviceId).observe(this, Observer {
             fetchInfo(it.asDevice)
-            view.findViewById<TextView>(R.id.deviceIpTextView).text = it.ip.hostAddress
-            view.findViewById<TextView>(R.id.deviceNameTextView).text = it.deviceName
-            view.findViewById<TextView>(R.id.deviceHwAddressTextView).text =
+            deviceIpTextView.text = it.ip.hostAddress
+            deviceNameTextView.text = it.deviceName
+            deviceHwAddressTextView.text =
                 it.hwAddress?.getAddress(AppPreferences(this).hideMacDetails)
-            view.findViewById<TextView>(R.id.deviceVendorTextView).text = it.vendorName
+            deviceVendorTextView.text = it.vendorName
         })
 
         val ports = viewModel.portDao.getAllForDevice(argumentDeviceId)
@@ -68,10 +78,13 @@ class DeviceInfoFragment : Fragment() {
             }
 
 
-
-
             override fun onLongClickListener(view: View, value: Port): Boolean {
-                copyUtil.copyText(value.port.toString())
+                viewModel.viewModelScope.launch(context = Dispatchers.IO) {
+                    val ip = viewModel.deviceDao.getByIdNow(value.deviceId).ip
+                    withContext(Dispatchers.Main) {
+                        copyUtil.copyText("${ip.hostAddress}:${value.port}")
+                    }
+                }
                 return true
             }
 
