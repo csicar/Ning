@@ -8,23 +8,38 @@ import java.net.Inet4Address
 
 class PingScanner(
     val network: Network,
+    val ipGuesses: Map<Inet4Address, Int> = mapOf(),
     val onUpdate: (ScanResult) -> Unit
 ) {
 
-    suspend fun pingIpAddresses() :  List<ScanResult> =
+    suspend fun pingIpAddresses(): List<ScanResult> =
         withContext(Dispatchers.IO) {
-            network.enumerateAddresses().chunked(10).map { ipAddresses ->
-                async {
-                    ipAddresses.map { ipAddress ->
-                        val isReachable = ipAddress.isReachable(1000)
-                        val result = ScanResult(ipAddress, isReachable, 1.0/ network.networkSize)
-                        onUpdate(result)
-                        result
+            network.enumerateAddresses()
+                .sortedByDescending {
+                    // most often seen first, then all other addresses
+                    ipGuesses[it] ?: 0
+                }
+                .chunked(10)
+                .map { ipAddresses ->
+                    async {
+                        ipAddresses.map { ipAddress ->
+                            val isReachable = ipAddress.isReachable(1000)
+                            val result =
+                                ScanResult(ipAddress, isReachable, 1.0 / network.networkSize)
+                            onUpdate(result)
+                            result
+                        }
                     }
                 }
-            }.toList().awaitAll().flatten()
+                .toList()
+                .awaitAll()
+                .flatten()
         }
 
-    data class ScanResult(val ipAddress: Inet4Address, val isReachable: Boolean, val progressIncrease: Double)
+    data class ScanResult(
+        val ipAddress: Inet4Address,
+        val isReachable: Boolean,
+        val progressIncrease: Double
+    )
 }
 

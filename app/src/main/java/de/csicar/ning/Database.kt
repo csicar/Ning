@@ -36,7 +36,10 @@ class Converter {
 
     @TypeConverter
     fun toInet4Address(value: Int?): Inet4Address? {
-        return if (value != null) inet4AddressFromInt("", value) else null
+        return if (value != null) inet4AddressFromInt(
+            "",
+            value
+        ) else null
     }
 
     @TypeConverter
