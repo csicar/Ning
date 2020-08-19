@@ -36,6 +36,11 @@ data class DeviceWithName(
     val icon
         get() = when (vendorName) {
             "Espressif Inc." -> R.drawable.ic_memory_white_48dp
+            "ADMTEK INCORPORATED" -> R.drawable.ic_baseline_settings_ethernet_48
+            "LG Electronics (Mobile Communications)" -> R.drawable.ic_baseline_phone_android_48
+            "Nintendo Co.,Ltd" -> R.drawable.ic_baseline_videogame_asset_48
+            "AzureWave Technology Inc." -> R.drawable.ic_baseline_cast_48
+            "Compal Broadband Networks, Inc." -> R.drawable.ic_baseline_router_48
             else -> R.drawable.ic_laptop_white_48dp
         }
 }
@@ -108,14 +113,19 @@ data class PortDescription(
     companion object {
         val commonPorts = listOf(
             PortDescription(0, 21, Protocol.TCP, "FTP", "File Transfer Protocol"),
-            PortDescription(0, 22, Protocol.TCP, "SFTP", "Secure FTP"),
+            PortDescription(0, 22, Protocol.TCP, "SFTP/SSH", "Secure FTP or Secure Shell"),
             PortDescription(0, 80, Protocol.TCP, "HTTP", "Hypertext Transport Protocol"),
             PortDescription(0, 53, Protocol.UDP, "DNS", "DNS Server"),
             PortDescription(0, 443, Protocol.TCP, "HTTPS", "Secure HTTP"),
             PortDescription(0, 548, Protocol.TCP, "AFP", "AFP over TCP"),
-            PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy"),
+            PortDescription(0, 631, Protocol.TCP, "IPP", "Internet Printing Protocol"),
+            PortDescription(0, 989, Protocol.TCP, "FTPS", "FTP over TLS"),
+            PortDescription(0, 1883, Protocol.TCP, "MQTT", "Message Queuing Telemetry Transport"),
+            PortDescription(0, 5000, Protocol.TCP, "UPNP", "Universal Plug and Play"),
             PortDescription(0, 8000, Protocol.TCP, "HTTP Alt", "HTTP common alternative"),
+            PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy"),
             PortDescription(0, 62078, Protocol.TCP, "iPhone-Sync", "lockdown iOS Service")
-        )
+
+            )
     }
 }
