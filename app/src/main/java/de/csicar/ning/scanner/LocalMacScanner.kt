@@ -12,7 +12,7 @@ object LocalMacScanner {
             .filterKeys { network.containsAddress(it) }.entries.firstOrNull()
             ?: return null
 
-        return Device(0, network.networkId, foundMac.key, null, foundMac.value)
+        return Device(0, network.networkId, foundMac.key, "This Device", foundMac.value)
     }
 
     private fun intToMacAddress(value: ByteArray) =
