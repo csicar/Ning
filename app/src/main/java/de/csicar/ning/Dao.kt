@@ -27,6 +27,7 @@ interface NetworkDao {
     @Query("SELECT * FROM network WHERE networkId = :networkId")
     fun getById(networkId: Long): LiveData<Network>
 
+
 }
 
 @Dao
@@ -86,6 +87,10 @@ interface DeviceDao {
 
     @Query("SELECT * FROM Device WHERE ip = :ip AND networkId IN (SELECT networkId FROM Network WHERE scanId = :scanId)")
     fun getByAddress(ip: Inet4Address, scanId: Long): Device?
+
+    @Query("SELECT * FROM device WHERE networkId IN (SELECT networkId FROM Network WHERE ssid=:ssid and bssid= :bssid and baseIp = :baseIp)")
+    fun getDevicesInPreviousScans(ssid: String?, bssid: MacAddress?, baseIp: Inet4Address): List<Device>
+
 
     @Query("UPDATE Device SET hwAddress = :hwAddress WHERE deviceId = :deviceId")
     fun updateHwAddress(deviceId: Long, hwAddress: MacAddress)

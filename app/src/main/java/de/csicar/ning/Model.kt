@@ -33,10 +33,11 @@ data class DeviceWithName(
     @Ignore
     val asDevice = Device(deviceId, networkId, ip, deviceName, hwAddress)
 
-    val icon get() = when(vendorName) {
-        "Espressif Inc." -> R.drawable.ic_memory_white_48dp
-        else -> R.drawable.ic_laptop_white_48dp
-    }
+    val icon
+        get() = when (vendorName) {
+            "Espressif Inc." -> R.drawable.ic_memory_white_48dp
+            else -> R.drawable.ic_laptop_white_48dp
+        }
 }
 
 @Entity
@@ -50,7 +51,14 @@ data class Network(
     val ssid: String?
 ) {
     companion object {
-        fun from(ip: Inet4Address, mask: Short, scanId: Long, interfaceName: String, bssid: MacAddress?, ssid: String?): Network {
+        fun from(
+            ip: Inet4Address,
+            mask: Short,
+            scanId: Long,
+            interfaceName: String,
+            bssid: MacAddress?,
+            ssid: String?
+        ): Network {
             return Network(0, ip.maskWith(mask), mask, scanId, interfaceName, bssid, ssid)
         }
     }
