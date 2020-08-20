@@ -1,0 +1,6 @@
+v1.2.3
+------
+
+* Fix crashing of the app when starting a scan
+* Speedup scan by using data from previous scans
+* Improved device-detection and port scanning
