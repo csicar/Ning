@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Ning</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="swipe_down_to_scan_the_network">Desliza abajo para escanear la red</string>
+    <string name="device_icon">Icono del dispositivo</string>
+</resources>
