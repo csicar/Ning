@@ -39,7 +39,7 @@ class MainActivity : AppCompatActivity(), NetworkFragment.OnListFragmentInteract
 
         viewModel = ViewModelProviders.of(this).get(ScanViewModel::class.java)
 
-        val interfaceMenu = drawer_navigation.menu.addSubMenu("Interfaces")
+        val interfaceMenu = drawer_navigation.menu.addSubMenu(getString(R.string.interfaces_submenu))
 
         viewModel.fetchAvailableInterfaces().forEach { nic ->
             interfaceMenu.add("${nic.interfaceName} - ${nic.address.hostAddress}/${nic.prefix}").also {
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), NetworkFragment.OnListFragmentInteract
                 it.isEnabled = true
             }
         }
-        val preferences = drawer_navigation.menu.add("Preferences")
+        val preferences = drawer_navigation.menu.add(getString(R.string.preferences_submenu))
         preferences.setIcon(R.drawable.ic_settings_white_24dp)
         preferences.setOnMenuItemClickListener {
             navController.navigate(R.id.appPreferenceFragment)

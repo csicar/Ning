@@ -7,6 +7,7 @@ import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.google.android.material.snackbar.Snackbar
+import de.csicar.ning.R
 
 class CopyUtil(val rootView: View) {
 
@@ -21,9 +22,12 @@ class CopyUtil(val rootView: View) {
         val clipboard = rootView.context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText(text, text)
         clipboard?.setPrimaryClip(clip)
-        val snackbar = Snackbar.make(rootView, "Copied \"$text\" to the Clipboard", Snackbar.LENGTH_LONG)
+        val snackbar = Snackbar.make(rootView, getMessageForText(text), Snackbar.LENGTH_LONG)
         snackbar.show()
         return true
     }
+
+    private fun getMessageForText(text: String): String =  rootView.context.getString(R.string.snackbar_copy_message).replace("{{text-to-copy}}", text)
+
 }
 

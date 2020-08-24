@@ -6,4 +6,14 @@
     <string name="swipe_down_to_scan_the_network">Swipe down to scan the network</string>
     <string name="hideMacDetails" translatable="false">hideMacDetails</string>
     <string name="device_icon">Device Icon</string>
+    <string name="interfaces_submenu">Interfaces</string>
+    <string name="preferences_submenu">Preferences</string>
+    <string name="snackbar_copy_message">Copied "{{text-to-copy}}" to the Clipboard</string>
+    <string name="title_network_overview">Network {interface_name}</string>
+    <string name="title_device_detail">Device {deviceIp}</string>
+    <string name="title_card_device_info">Device Information</string>
+    <string name="field_name_device_ip">Device IP</string>
+    <string name="field_name_device_mac">Device MAC</string>
+    <string name="field_name_vendor_name">Vendor Name</string>
+    <string name="title_open_ports">Open Ports:</string>
 </resources>

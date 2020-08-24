@@ -26,7 +26,7 @@
                     android:id="@+id/textView3"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Device Information"
+                    android:text="@string/title_card_device_info"
                     android:textAppearance="@style/TextAppearance.AppCompat.Large"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
@@ -64,7 +64,7 @@
                             android:id="@+id/textView6"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Device IP"
+                            android:text="@string/field_name_device_ip"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
                         <TextView
@@ -82,7 +82,7 @@
                             android:id="@+id/textView8"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Device MAC"
+                            android:text="@string/field_name_device_mac"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
                         <TextView
@@ -100,7 +100,7 @@
                             android:id="@+id/textView9"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Vendor Name"
+                            android:text="@string/field_name_vendor_name"
                             android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
                         <TextView
@@ -123,7 +123,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="8dp"
-            android:text="Open Ports:"
+            android:text="@string/title_open_ports"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
         <de.csicar.ning.ui.RecyclerViewCommon

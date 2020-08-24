@@ -8,7 +8,7 @@
     <fragment
         android:id="@+id/deviceFragment"
         android:name="de.csicar.ning.NetworkFragment"
-        android:label="Network {interface_name}"
+        android:label="@string/title_network_overview"
         tools:layout="@layout/fragment_network_list">
         <action
             android:id="@+id/action_deviceFragment_to_deviceInfoFragment"
@@ -20,7 +20,7 @@
     <fragment
         android:id="@+id/deviceInfoFragment"
         android:name="de.csicar.ning.DeviceInfoFragment"
-        android:label="Device {deviceIp}"
+        android:label="@string/title_device_detail"
         tools:layout="@layout/fragment_deviceinfo_list" >
         <argument
             android:name="deviceip"
@@ -33,7 +33,7 @@
     <fragment
         android:id="@+id/appPreferenceFragment"
         android:name="de.csicar.ning.ui.AppPreferenceFragment"
-        android:label="Preferences"
+        android:label="@string/preferences_submenu"
         >
 
     </fragment>
