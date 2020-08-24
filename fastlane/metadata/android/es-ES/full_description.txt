@@ -1,0 +1,9 @@
+Escanea los dispositios conectados en red local. Inspirado en Fing.
+
+El objetivo es proporcionar una descripción general rápida y sencilla de la red local.
+
+Incluye en la fuente de datos:
+* Ping de dipositivos
+* Network Service Discovery (Bonjour, Avahi)
+* Tablas ARP
+* puertos TCP y UDP abiertos
