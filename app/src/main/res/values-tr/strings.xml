@@ -13,5 +13,5 @@
     <string name="field_name_device_ip">Cihaz IP</string>
     <string name="field_name_device_mac">Cihaz MAC</string>
     <string name="field_name_vendor_name">Sağlayıcı Adı</string>
-    <string name="title_open_ports">Açık Port'lar:</string>
+    <string name="title_open_ports">Açık Port\'lar:</string>
 </resources>
