@@ -1,8 +1,6 @@
 <resources>
     <string name="app_name">Ning</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment" translatable="false">Esenlikler dilerim boş sayfa</string>
     <string name="swipe_down_to_scan_the_network">Ağı taramak için aşağı kaydırın</string>
     <string name="hideMacDetails" translatable="false">MAC ayrıntılarını gizle</string>
     <string name="device_icon">Cihaz Simgesi</string>
