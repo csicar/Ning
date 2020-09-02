@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Ning</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment" translatable="false">Esenlikler dilerim boş sayfa</string>
+    <string name="swipe_down_to_scan_the_network">Ağı taramak için aşağı kaydırın</string>
+    <string name="hideMacDetails" translatable="false">MAC ayrıntılarını gizle</string>
+    <string name="device_icon">Cihaz Simgesi</string>
+    <string name="interfaces_submenu">Arayüzler</string>
+    <string name="preferences_submenu">Tercihler</string>
+    <string name="snackbar_copy_message">"{{text-to-copy}}" panoya kopyalandı</string>
+    <string name="title_network_overview">{interface_name} Ağı</string>
+    <string name="title_device_detail">{deviceIp} Cihazı</string>
+    <string name="title_card_device_info">Cihaz Bilgisi</string>
+    <string name="field_name_device_ip">Cihaz IP</string>
+    <string name="field_name_device_mac">Cihaz MAC</string>
+    <string name="field_name_vendor_name">Sağlayıcı Adı</string>
+    <string name="title_open_ports">Açık Port'lar:</string>
+</resources>
