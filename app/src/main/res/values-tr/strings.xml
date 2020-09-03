@@ -2,7 +2,6 @@
     <string name="app_name">Ning</string>
 
     <string name="swipe_down_to_scan_the_network">Ağı taramak için aşağı kaydırın</string>
-    <string name="hideMacDetails" translatable="false">MAC ayrıntılarını gizle</string>
     <string name="device_icon">Cihaz Simgesi</string>
     <string name="interfaces_submenu">Arayüzler</string>
     <string name="preferences_submenu">Tercihler</string>
