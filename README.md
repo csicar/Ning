@@ -7,6 +7,8 @@ Scan local network for active devices.
      alt="Get it on F-Droid"
      height="80">](https://f-droid.org/packages/de.csicar.ning/)
 
+![CI Status](https://gitlab.com/csicar/Ning/badges/master/pipeline.svg)
+
 Features
 --------
 * Ping scan
