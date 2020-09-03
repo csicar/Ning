@@ -16,6 +16,7 @@ build:
   stage: build
   script:
   - ./gradlew assembleDebug
+  - find . -name "*.apk"
   artifacts:
     paths:
     - app/build/outputs/apk/app-debug.apk
