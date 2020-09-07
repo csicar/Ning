@@ -1,0 +1,5 @@
+- Add adaptive icon
+- Add spanish translations (@sguinetti)
+- Add turkish translations (@berkaygunduzz)
+- Add portugese translations (@aevw)
+- Fix layouting (pull down, menu bar, drawer)
