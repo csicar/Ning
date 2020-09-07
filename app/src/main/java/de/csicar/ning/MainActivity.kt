@@ -16,26 +16,31 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.FragmentNavigator
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.launch
+import androidx.navigation.ui.navigateUp
 
 
 class MainActivity : AppCompatActivity(), NetworkFragment.OnListFragmentInteractionListener {
+    private lateinit var appBarConfiguration: AppBarConfiguration
     lateinit var viewModel: ScanViewModel
+    override fun onSupportNavigateUp(): Boolean {
+        return findNavController(R.id.nav_host_fragment).navigateUp(appBarConfiguration)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val navController = findNavController(R.id.nav_host_fragment)
-        val appBarConfiguration = AppBarConfiguration.Builder(navController.graph)
-            .setDrawerLayout(null)
-            .setFallbackOnNavigateUpListener { false }
+        drawer_navigation.setupWithNavController(navController)
+        setSupportActionBar(toolbar)
+        appBarConfiguration = AppBarConfiguration.Builder(setOf(R.id.deviceFragment, R.id.appPreferenceFragment))
+            .setDrawerLayout(main_drawer_layout)
             .build()
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        toolbar
-            .setupWithNavController(navController, appBarConfiguration)
-
+        setupActionBarWithNavController(navController, appBarConfiguration)
 
         viewModel = ViewModelProviders.of(this).get(ScanViewModel::class.java)
 
