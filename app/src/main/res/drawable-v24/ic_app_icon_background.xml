@@ -1,0 +1,46 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+  <group android:scaleX="2.25"
+      android:scaleY="2.25">
+    <path
+        android:pathData="M7,43c-1.1046,0 -2,-0.8954 -2,-2v-34c0,-1.1046 0.8954,-2 2,-2h34c1.1046,0 2,0.8954 2,2v34c0,1.1046 -0.8954,2 -2,2z"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="1"
+        android:fillColor="#008577"
+        android:fillType="nonZero"
+        android:strokeColor="#00000000"
+        android:strokeLineCap="butt"/>
+    <path
+        android:pathData="M22.2449,32.837c-0.4467,-0.4467 -0.7234,-1.0632 -0.7234,-1.7428c0,-0.0041 0,-0.0082 0,-0.0122l-11.052,-11.052v-0l0,0c4.5942,-4.5881 10.9412,-6.347 16.8824,-5.2953l0.8535,0.8535l0.0076,-0.017l0.0799,-0.1784c0.1107,-0.1661 0.2891,-0.2829 0.5043,-0.2829l0,-0c0.1691,0 0.3229,0.0692 0.4344,0.1807l1.2565,1.2565l0.1726,-0.9083c2.5031,0.9287 4.8587,2.3801 6.8698,4.3913l5.4695,5.4695v15.5006c0,1.1046 -0.8954,2 -2,2h-8.5921z"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="1"
+        android:fillType="nonZero"
+        android:strokeColor="#00000000"
+        android:strokeLineCap="butt">
+      <aapt:attr name="android:fillColor">
+        <gradient 
+            android:startY="14.43958"
+            android:startX="10.46951"
+            android:endY="75.98682"
+            android:endX="79.9569"
+            android:type="linear">
+          <item android:offset="0" android:color="#4C000000"/>
+          <item android:offset="1" android:color="#00000000"/>
+        </gradient>
+      </aapt:attr>
+    </path>
+    <path
+        android:pathData="M5,7c0,-1.1046 0.8954,-2 2,-2h34c1.1046,0 2,0.8954 2,2v17h-38z"
+        android:strokeLineJoin="miter"
+        android:strokeWidth="1"
+        android:fillColor="#000000"
+        android:fillAlpha="0.1"
+        android:fillType="nonZero"
+        android:strokeColor="#00000000"
+        android:strokeLineCap="butt"/>
+  </group>
+</vector>
