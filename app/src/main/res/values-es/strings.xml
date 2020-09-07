@@ -3,4 +3,14 @@
 
     <string name="swipe_down_to_scan_the_network">Desliza abajo para escanear la red</string>
     <string name="device_icon">Icono del dispositivo</string>
+    <string name="interfaces_submenu">Interfaces</string>
+    <string name="preferences_submenu">Ajustes</string>
+    <string name="snackbar_copy_message">"{{text-to-copy}}" copiado al Portapapeles</string>
+    <string name="title_network_overview">Red {interface_name}</string>
+    <string name="title_device_detail">Dispositivo {deviceIp}</string>
+    <string name="title_card_device_info">Información del dispositivo</string>
+    <string name="field_name_device_ip">IP del dispositivo</string>
+    <string name="field_name_device_mac">MAC del dispositivo</string>
+    <string name="field_name_vendor_name">Nombre del vendedor</string>
+    <string name="title_open_ports">Puertos abiertos:</string>
 </resources>
