@@ -18,7 +18,18 @@ Features
 * Vendor detection
 
 
-![network overview](fastlane/metadata/android/en-US/images/phoneScreenshots/1-network-overview.png)
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/1-network-overview.png"
+     alt="Screenshot Network Overview"
+     height="700">
+
+
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/2-device-detail.png"
+     alt="Screenshot Device Detail"
+     height="700">
+
+<img src="fastlane/metadata/android/en-US/images/phoneScreenshots/3-drawer.png"
+     alt="Screenshot Drawer"
+     height="700">
 
 Build Vendor DB
 ---------------
