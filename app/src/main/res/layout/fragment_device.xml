@@ -32,10 +32,10 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
-        app:autoSizeTextType="uniform"
         android:gravity="center_vertical"
         android:lines="1"
         android:textAppearance="?attr/textAppearanceListItem"
+        app:autoSizeTextType="uniform"
         app:layout_constraintBaseline_toBaselineOf="@+id/ipTextView"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="cc:dd:44:ee:55" />
@@ -46,10 +46,10 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        app:autoSizeTextType="uniform"
-
         android:layout_marginBottom="16dp"
+
         android:contentDescription="@string/device_icon"
+        app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -63,9 +63,9 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        app:autoSizeTextType="uniform"
-
         android:textAlignment="textEnd"
+
+        app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/macTextView"
         app:layout_constraintStart_toEndOf="@+id/deviceNameTextView"
@@ -83,5 +83,5 @@
         app:layout_constraintEnd_toStartOf="@+id/vendorTextView"
         app:layout_constraintStart_toStartOf="@+id/ipTextView"
         app:layout_constraintTop_toTopOf="@+id/vendorTextView"
-        app:layout_constraintVertical_bias="0.5"
+        app:layout_constraintVertical_bias="0.5" />
 </androidx.constraintlayout.widget.ConstraintLayout>
