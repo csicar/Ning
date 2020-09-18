@@ -18,9 +18,10 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
-        android:autoSizeTextType="uniform"
+        android:gravity="center_vertical"
         android:lines="1"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        app:autoSizeTextType="uniform"
         app:layout_constraintEnd_toStartOf="@+id/macTextView"
         app:layout_constraintStart_toEndOf="@+id/device_icon"
         app:layout_constraintTop_toTopOf="parent"
@@ -31,7 +32,8 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
-        android:autoSizeTextType="uniform"
+        app:autoSizeTextType="uniform"
+        android:gravity="center_vertical"
         android:lines="1"
         android:textAppearance="?attr/textAppearanceListItem"
         app:layout_constraintBaseline_toBaselineOf="@+id/ipTextView"
@@ -44,7 +46,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
-        android:autoSizeTextType="uniform"
+        app:autoSizeTextType="uniform"
 
         android:layout_marginBottom="16dp"
         android:contentDescription="@string/device_icon"
@@ -61,7 +63,7 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
-        android:autoSizeTextType="uniform"
+        app:autoSizeTextType="uniform"
 
         android:textAlignment="textEnd"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -74,13 +76,12 @@
         android:id="@+id/deviceNameTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:autoSizeTextType="uniform"
-
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+
+        app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="@+id/vendorTextView"
         app:layout_constraintEnd_toStartOf="@+id/vendorTextView"
         app:layout_constraintStart_toStartOf="@+id/ipTextView"
         app:layout_constraintTop_toTopOf="@+id/vendorTextView"
-        app:layout_constraintVertical_bias="1.0"
-        tools:text="iPad of Some Long Name [aa:bb:dd:ee:ff]" />
+        app:layout_constraintVertical_bias="0.5"
 </androidx.constraintlayout.widget.ConstraintLayout>
