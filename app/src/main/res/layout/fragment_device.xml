@@ -36,7 +36,8 @@
         android:lines="1"
         android:textAppearance="?attr/textAppearanceListItem"
         app:autoSizeTextType="uniform"
-        app:layout_constraintBaseline_toBaselineOf="@+id/ipTextView"
+        app:layout_constraintTop_toTopOf="@id/ipTextView"
+        app:layout_constraintBottom_toBottomOf="@id/ipTextView"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="cc:dd:44:ee:55" />
 
