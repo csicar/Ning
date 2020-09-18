@@ -41,6 +41,12 @@ data class DeviceWithName(
             "Nintendo Co.,Ltd" -> R.drawable.ic_baseline_videogame_asset_48
             "AzureWave Technology Inc." -> R.drawable.ic_baseline_cast_48
             "Compal Broadband Networks, Inc." -> R.drawable.ic_baseline_router_48
+            "Ubiquiti Networks Inc." -> R.drawable.ic_baseline_router_48
+            "Sonos, Inc." -> R.drawable.ic_baseline_speaker_48
+            "AVM Audiovisuelles Marketing und Computersysteme GmbH" -> R.drawable.ic_baseline_router_48
+            "TP-LINK TECHNOLOGIES CO.,LTD." -> R.drawable.ic_baseline_router_48
+            "HUAWEI TECHNOLOGIES CO.,LTD" -> R.drawable.ic_baseline_phone_android_48
+            "Xiaomi Communications Co Ltd" -> R.drawable.ic_baseline_phone_android_48
             else -> R.drawable.ic_laptop_white_48dp
         }
 }
