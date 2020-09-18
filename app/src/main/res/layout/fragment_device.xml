@@ -12,23 +12,33 @@
 
     <TextView
         android:id="@+id/ipTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:gravity="center_vertical"
+        android:lines="1"
         android:textAppearance="@style/TextAppearance.AppCompat.Large"
-        app:layout_constraintBottom_toBottomOf="@+id/macTextView"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintEnd_toStartOf="@+id/macTextView"
         app:layout_constraintStart_toEndOf="@+id/device_icon"
-        app:layout_constraintTop_toTopOf="@+id/device_icon"
-        tools:text="192.168.0.234" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="192.168.178.234" />
 
     <TextView
         android:id="@+id/macTextView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/text_margin"
+        android:gravity="center_vertical"
+        android:lines="1"
         android:textAppearance="?attr/textAppearanceListItem"
+        app:autoSizeTextType="uniform"
+        app:layout_constraintTop_toTopOf="@id/ipTextView"
+        app:layout_constraintBottom_toBottomOf="@id/ipTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         tools:text="cc:dd:44:ee:55" />
 
     <ImageView
@@ -38,24 +48,29 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="16dp"
+
+        android:contentDescription="@string/device_icon"
+        app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_laptop_white_48dp"
-        android:contentDescription="@string/device_icon" />
+        app:srcCompat="@drawable/ic_laptop_white_48dp" />
 
     <TextView
         android:id="@+id/vendorTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
 
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:textAlignment="textEnd"
+
+        app:autoSizeTextType="uniform"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/macTextView"
         app:layout_constraintStart_toEndOf="@+id/deviceNameTextView"
-        app:layout_constraintTop_toBottomOf="@+id/macTextView"
+        app:layout_constraintTop_toBottomOf="@+id/ipTextView"
         tools:text="LCFC(HeFei) Electronics Technology co., ltd" />
 
     <TextView
@@ -63,9 +78,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
-        app:layout_constraintBottom_toBottomOf="@+id/device_icon"
+
+        app:autoSizeTextType="uniform"
+        app:layout_constraintBottom_toBottomOf="@+id/vendorTextView"
         app:layout_constraintEnd_toStartOf="@+id/vendorTextView"
         app:layout_constraintStart_toStartOf="@+id/ipTextView"
-        app:layout_constraintTop_toBottomOf="@+id/ipTextView"
-        tools:text="iPad of Some Long Name [aa:bb:dd:ee:ff]" />
+        app:layout_constraintTop_toTopOf="@+id/vendorTextView"
+        tools:text="iPad of Some Long Name [aa:bb:dd:ee:ff]"
+        app:layout_constraintVertical_bias="0.5" />
 </androidx.constraintlayout.widget.ConstraintLayout>
