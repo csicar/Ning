@@ -84,5 +84,6 @@
         app:layout_constraintEnd_toStartOf="@+id/vendorTextView"
         app:layout_constraintStart_toStartOf="@+id/ipTextView"
         app:layout_constraintTop_toTopOf="@+id/vendorTextView"
+        tools:text="iPad of Some Long Name [aa:bb:dd:ee:ff]"
         app:layout_constraintVertical_bias="0.5" />
 </androidx.constraintlayout.widget.ConstraintLayout>
