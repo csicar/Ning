@@ -9,8 +9,10 @@
     <string name="title_network_overview">Red {interface_name}</string>
     <string name="title_device_detail">Dispositivo {deviceIp}</string>
     <string name="title_card_device_info">Información del dispositivo</string>
+    <string name="field_name_device_name">Device Name</string>
     <string name="field_name_device_ip">IP del dispositivo</string>
     <string name="field_name_device_mac">MAC del dispositivo</string>
     <string name="field_name_vendor_name">Nombre del vendedor</string>
     <string name="title_open_ports">Puertos abiertos:</string>
+    <string name="this_device">This device</string>
 </resources>
