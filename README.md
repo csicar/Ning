@@ -37,3 +37,14 @@ Build Vendor DB
 ```bash
 go run createMacVendorDB.go
 ```
+
+Roadmap
+-------
+
+- [ ] Scan History
+    - [x] Save past scans in local db
+    - [x] Use past scans for candidate selection on next scan
+    - [ ] UI for scan history
+- [ ] producer consumer architecture for scan
+    - run `n` pings in parallel, start new ping when one ping is finished
+- [ ] combine scanners into `UnifiedDeviceScanner`
