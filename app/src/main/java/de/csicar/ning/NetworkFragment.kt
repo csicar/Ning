@@ -13,6 +13,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.viewModelScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.google.android.material.snackbar.Snackbar
 import de.csicar.ning.ui.RecyclerViewCommon
 import de.csicar.ning.util.AppPreferences
 import de.csicar.ning.util.CopyUtil
@@ -126,7 +127,11 @@ class NetworkFragment : Fragment() {
 
     private fun runScan() {
         viewModel.viewModelScope.launch {
-            viewModel.startScan(argumentInterfaceName)
+            val network = viewModel.startScan(argumentInterfaceName)
+            val view = this@NetworkFragment.view
+            if (network == null && view != null) {
+                Snackbar.make(view, "Network not found", Snackbar.LENGTH_LONG).show()
+            }
         }
     }
 
