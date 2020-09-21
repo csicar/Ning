@@ -10,10 +10,8 @@
     <string name="title_network_overview">Rede {interface_name}</string>
     <string name="title_device_detail">Dispositivo {deviceIp}</string>
     <string name="title_card_device_info">Informações do dispositivo</string>
-    <string name="field_name_device_name">Device Name</string>
     <string name="field_name_device_ip">IP do Dispositivo</string>
     <string name="field_name_device_mac">MAC do Dispositivo</string>
     <string name="field_name_vendor_name">Nome do fabricante</string>
     <string name="title_open_ports">Portas Abertas:</string>
-    <string name="this_device">This device</string>
 </resources>

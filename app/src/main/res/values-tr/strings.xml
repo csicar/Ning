@@ -9,10 +9,8 @@
     <string name="title_network_overview">{interface_name} Ağı</string>
     <string name="title_device_detail">{deviceIp} Cihazı</string>
     <string name="title_card_device_info">Cihaz Bilgisi</string>
-    <string name="field_name_device_name">Device Name</string>
     <string name="field_name_device_ip">Cihaz IP</string>
     <string name="field_name_device_mac">Cihaz MAC</string>
     <string name="field_name_vendor_name">Sağlayıcı Adı</string>
     <string name="title_open_ports">Açık Port\'lar:</string>
-    <string name="this_device">This device</string>
 </resources>
