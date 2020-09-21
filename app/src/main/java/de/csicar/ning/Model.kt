@@ -18,20 +18,25 @@ data class Device(
     val networkId: Long,
     val ip: Inet4Address,
     val deviceName: String?,
-    val hwAddress: MacAddress?
+    val hwAddress: MacAddress?,
+    val isScanningDevice: Boolean = false
 ) {
 
 
 }
 
-@DatabaseView("SELECT Device.deviceId, Device.networkId, Device.ip, Device.hwAddress, Device.deviceName, MacVendor.name as vendorName FROM Device LEFT JOIN MacVendor ON MacVendor.mac = substr(Device.hwAddress, 0, 9)")
+@DatabaseView("SELECT Device.deviceId, Device.networkId, Device.ip, Device.hwAddress, Device.deviceName, MacVendor.name as vendorName, Device.isScanningDevice FROM Device LEFT JOIN MacVendor ON MacVendor.mac = substr(Device.hwAddress, 0, 9)")
 data class DeviceWithName(
-    val deviceId: Long, val networkId: Long, val ip: Inet4Address, val hwAddress: MacAddress?
-    , val deviceName: String?
-    , val vendorName: String?
+    val deviceId: Long,
+    val networkId: Long,
+    val ip: Inet4Address,
+    val hwAddress: MacAddress?,
+    val deviceName: String?,
+    val vendorName: String?,
+    val isScanningDevice: Boolean
 ) {
     @Ignore
-    val asDevice = Device(deviceId, networkId, ip, deviceName, hwAddress)
+    val asDevice = Device(deviceId, networkId, ip, deviceName, hwAddress, isScanningDevice)
 
     val icon
         get() = when (vendorName) {

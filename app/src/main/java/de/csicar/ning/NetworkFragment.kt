@@ -91,7 +91,11 @@ class NetworkFragment : Fragment() {
                                 this@NetworkFragment
                             ).hideMacDetails)
                         vendorTextView.text = item.vendorName
-                        deviceNameTextView.text = item.deviceName
+                        deviceNameTextView.text = if (item.isScanningDevice) {
+                            getString(R.string.this_device)
+                        } else {
+                            item.deviceName
+                        }
                         deviceIcon.setImageResource(item.icon)
                     }
                 }

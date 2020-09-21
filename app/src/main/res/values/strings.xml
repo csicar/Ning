@@ -10,8 +10,10 @@
     <string name="title_network_overview">Network {interface_name}</string>
     <string name="title_device_detail">Device {deviceIp}</string>
     <string name="title_card_device_info">Device Information</string>
+    <string name="field_name_device_name">Device Name</string>
     <string name="field_name_device_ip">Device IP</string>
     <string name="field_name_device_mac">Device MAC</string>
     <string name="field_name_vendor_name">Vendor Name</string>
     <string name="title_open_ports">Open Ports:</string>
+    <string name="this_device">This device</string>
 </resources>
