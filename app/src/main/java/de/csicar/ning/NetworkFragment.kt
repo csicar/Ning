@@ -130,7 +130,7 @@ class NetworkFragment : Fragment() {
             val network = viewModel.startScan(argumentInterfaceName)
             val view = this@NetworkFragment.view
             if (network == null && view != null) {
-                Snackbar.make(view, "Network not found", Snackbar.LENGTH_LONG).show()
+                Snackbar.make(view, getString(R.string.error_network_not_found), Snackbar.LENGTH_LONG).show()
             }
         }
     }
