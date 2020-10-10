@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Ning</string>
+
+    <string name="swipe_down_to_scan_the_network">Herunterwischen, um Netzwerk zu scannen</string>
+    <string name="hideMacDetails" translatable="false">hideMacDetails</string>
+    <string name="device_icon">Geräte-Icon</string>
+    <string name="interfaces_submenu">Schnittstellen</string>
+    <string name="preferences_submenu">Einstellungen</string>
+    <string name="snackbar_copy_message">"{{text-to-copy}}" in Zwischenablage kopiert</string>
+    <string name="title_network_overview">Netzwerk {interface_name}</string>
+    <string name="title_device_detail">Gerät {deviceIp}</string>
+    <string name="title_card_device_info">Geräteinformation</string>
+    <string name="field_name_device_name">Gerätename</string>
+    <string name="field_name_device_ip">Geräte-IP</string>
+    <string name="field_name_device_mac">Geräte-MAC</string>
+    <string name="field_name_vendor_name">Herstellername</string>
+    <string name="title_open_ports">Offene Ports:</string>
+    <string name="this_device">Dieses Gerät</string>
+</resources>
