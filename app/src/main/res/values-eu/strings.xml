@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Ning</string>
+
+    <string name="swipe_down_to_scan_the_network">Arrastatu behera sarea aztertzeko</string>
+    <string name="hideMacDetails" translatable="false">hideMacDetails</string>
+    <string name="device_icon">Gailuaren ikurra</string>
+    <string name="interfaces_submenu">Interfazeak</string>
+    <string name="preferences_submenu">Hobespenak</string>
+    <string name="snackbar_copy_message">"{{text-to-copy}}" arbelean kopiatu da</string>
+    <string name="title_network_overview">{interface_name} sarea</string>
+    <string name="title_device_detail">{deviceIp} gailua</string>
+    <string name="title_card_device_info">Gailuaren informazioa</string>
+    <string name="field_name_device_name">Gailuaren izena</string>
+    <string name="field_name_device_ip">Gailuaren IP helbidea</string>
+    <string name="field_name_device_mac">Gailuaren MAC helbidea</string>
+    <string name="field_name_vendor_name">Saltzailearen izena</string>
+    <string name="title_open_ports">Ataka irekiak:</string>
+    <string name="this_device">Gailu hau</string>
+</resources>
