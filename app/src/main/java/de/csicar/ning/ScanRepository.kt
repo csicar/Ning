@@ -40,7 +40,8 @@ class ScanRepository(
             val networkData =
                 InterfaceScanner.getNetworkInterfaces()
                     .also { Log.d(TAG, "NetworkInterfaces: $it") }
-                    .find { it.interfaceName == interfaceName }!!
+                    .find { it.interfaceName == interfaceName } ?: return@withContext null
+
             val networkId = networkDao.insert(
                 Network.from(
                     networkData.address,
