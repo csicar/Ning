@@ -2,7 +2,6 @@
     <string name="app_name">Ning</string>
 
     <string name="swipe_down_to_scan_the_network">Herunterwischen, um Netzwerk zu scannen</string>
-    <string name="hideMacDetails" translatable="false">hideMacDetails</string>
     <string name="device_icon">Geräte-Icon</string>
     <string name="interfaces_submenu">Schnittstellen</string>
     <string name="preferences_submenu">Einstellungen</string>
