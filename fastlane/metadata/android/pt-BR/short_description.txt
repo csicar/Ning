@@ -1,0 +1,1 @@
+Ning: Analisar a rede local facilmente e rápido. Parecido ao Fing ou Nmap

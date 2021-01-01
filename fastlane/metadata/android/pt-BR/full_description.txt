@@ -1,0 +1,9 @@
+Procure por dispositivos conectados a sua rede local. Inspirado pelo Fing.
+
+O objetivo é fornecer uma visão geral fácil e rápida sobre a sua rede local.
+
+Fontes de dados incluem:
+* Resultados do comando Ping
+* Serviço de descoberta de redes (Bonjour, Avahi)
+* Tabelas ARP
+* As portas TCP e UDP abertas
