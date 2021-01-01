@@ -2,7 +2,6 @@
     <string name="app_name">Ning</string>
 
     <string name="swipe_down_to_scan_the_network">Arrastatu behera sarea aztertzeko</string>
-    <string name="hideMacDetails" translatable="false">hideMacDetails</string>
     <string name="device_icon">Gailuaren ikurra</string>
     <string name="interfaces_submenu">Interfazeak</string>
     <string name="preferences_submenu">Hobespenak</string>
