@@ -1,0 +1,9 @@
+Eskaneatu zure sare lokala gailu konektatuetarako. Fing-en inspiratua.
+
+Sare lokalari buruzko ikuspegi orokor azkarra eta erraza ematea da helburua.
+
+Hauek dira datu-iturriak:
+* Ping-gailuak
+* Network Service Discovery (Bonjour, Avahi)
+* ARP-Taulak
+* TCP eta UDP ataka irekiak
