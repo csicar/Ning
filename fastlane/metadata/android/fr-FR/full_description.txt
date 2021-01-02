@@ -1,0 +1,9 @@
+Scannez votre réseau local à la recherche d'appareils connectés. Inspiré par Fing.
+
+L'objectif est de fournir rapidement et facilement une vue d'ensemble du réseau local.
+
+Les sources de données comprennent :
+* Ping des appareils
+* Découverte de services du réseau (Bonjour, Avahi)
+* Tables ARP
+* Ports TCP / UDP ouverts

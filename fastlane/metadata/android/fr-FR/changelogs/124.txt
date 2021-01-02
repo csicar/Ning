@@ -1,0 +1,5 @@
+- Ajout d'une icône adaptative
+- Ajout des traductions en espagnol (@sguinetti)
+- Ajout des traductions en turc (@berkaygunduzz)
+- Ajout des traductions en portugais (@aevw)
+- Correction de la mise en page (liste déroulante, barre de menu, drawer)
