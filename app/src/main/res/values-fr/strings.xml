@@ -16,4 +16,5 @@
     <string name="title_open_ports">Ports ouverts :</string>
     <string name="this_device">Cet appareil</string>
     <string name="error_network_not_found">Réseau non trouvé</string>
+    <string name="hideMacAddressDetails">Masquer les détails de l\'adresse du MAC</string>
 </resources>

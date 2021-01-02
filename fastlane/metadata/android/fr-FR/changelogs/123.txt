@@ -1,0 +1,6 @@
+v1.2.3
+------
+
+* Correction d'un plantage de l'application lors du lancement d'un scan
+* Accélération du scan en utilisant les données des balayages précédents
+* Amélioration de la détection des appareils et du balayage des ports
