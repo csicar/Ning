@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Ning</string>
+
+    <string name="swipe_down_to_scan_the_network">Glissez vers le bas pour scanner le réseau</string>
+    <string name="hideMacDetails" translatable="false">hideMacDetails</string>
+    <string name="device_icon">Icône de l\'appareil</string>
+    <string name="interfaces_submenu">Interfaces</string>
+    <string name="preferences_submenu">Préférences</string>
+    <string name="snackbar_copy_message">"{{text-to-copy}}" copié dans le presse-papier</string>
+    <string name="title_network_overview">Réseau {interface_name}</string>
+    <string name="title_device_detail">Appareil {deviceIp}</string>
+    <string name="title_card_device_info">Informations sur l\'appareil</string>
+    <string name="field_name_device_name">Nom de l\'appareil</string>
+    <string name="field_name_device_ip">Adresse IP de l\'appareil</string>
+    <string name="field_name_device_mac">Adresse MAC de l\'appareil</string>
+    <string name="field_name_vendor_name">Nom du vendeur</string>
+    <string name="title_open_ports">Ports ouverts :</string>
+    <string name="this_device">Cet appareil</string>
+    <string name="error_network_not_found">Réseau non trouvé</string>
+</resources>
