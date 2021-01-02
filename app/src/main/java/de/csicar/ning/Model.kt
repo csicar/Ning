@@ -40,31 +40,36 @@ data class DeviceWithName(
 
     val icon
         get() = when {
-            vendorName == null -> R.drawable.ic_laptop_white_48dp
+            isScanningDevice -> R.drawable.ic_baseline_phone_android_48
 
+            /**
+             * Icons based on MAC address
+             */
+            hwAddress?.address?.contains("52:54:00") == true -> R.drawable.ic_laptop_white_48dp // Unofficial mac address range used by KVM
+
+            /**
+             * Icons based on vendor name
+             */
+            vendorName == null -> R.drawable.ic_laptop_white_48dp
             // Phone
             vendorName.contains("LG Electronics (Mobile Communications)", ignoreCase = true) -> R.drawable.ic_baseline_phone_android_48
             vendorName.contains("HUAWEI", ignoreCase = true) -> R.drawable.ic_baseline_phone_android_48
             vendorName.contains("Xiaomi", ignoreCase = true) -> R.drawable.ic_baseline_phone_android_48
-
+            vendorName.contains("Fairphone", ignoreCase = true) -> R.drawable.ic_baseline_phone_android_48
             // Router
             vendorName.contains("Compal", ignoreCase = true) -> R.drawable.ic_baseline_router_48
             vendorName.contains("Ubiquiti", ignoreCase = true) -> R.drawable.ic_baseline_router_48
             vendorName.contains("AVM", ignoreCase = true) -> R.drawable.ic_baseline_router_48
             vendorName.contains("TP-LINK", ignoreCase = true) -> R.drawable.ic_baseline_router_48
-
             // Speaker
             vendorName.contains("Sonos", ignoreCase = true) -> R.drawable.ic_baseline_speaker_48
-
             // SoC
             vendorName.contains("Espressif", ignoreCase = true) -> R.drawable.ic_memory_white_48dp
-
+            vendorName.contains("Raspberry", ignoreCase = true) -> R.drawable.ic_memory_white_48dp
             // Ethernet
             vendorName.contains("ADMTEK", ignoreCase = true) -> R.drawable.ic_baseline_settings_ethernet_48
-
             // Video game
             vendorName.contains("Nintendo", ignoreCase = true) -> R.drawable.ic_baseline_videogame_asset_48
-
             // Cast
             vendorName.contains("AzureWave", ignoreCase = true) -> R.drawable.ic_baseline_cast_48
 
