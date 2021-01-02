@@ -3,6 +3,6 @@
 
     <SwitchPreference
         android:defaultValue="false"
-        android:key="@string/hideMacDetails"
-        android:title="Hide MAC Address Details" />
+        android:key="hideMacDetails"
+        android:title="@string/hideMacAddressDetails" />
 </PreferenceScreen>

@@ -2,7 +2,6 @@
     <string name="app_name">Ning</string>
 
     <string name="swipe_down_to_scan_the_network">Swipe down to scan the network</string>
-    <string name="hideMacDetails" translatable="false">hideMacDetails</string>
     <string name="device_icon">Device Icon</string>
     <string name="interfaces_submenu">Interfaces</string>
     <string name="preferences_submenu">Preferences</string>
@@ -17,4 +16,5 @@
     <string name="title_open_ports">Open Ports:</string>
     <string name="this_device">This device</string>
     <string name="error_network_not_found">Network not found</string>
+    <string name="hideMacAddressDetails">Hide MAC Address Details</string>
 </resources>

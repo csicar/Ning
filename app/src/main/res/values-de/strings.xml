@@ -15,4 +15,5 @@
     <string name="field_name_vendor_name">Herstellername</string>
     <string name="title_open_ports">Offene Ports:</string>
     <string name="this_device">Dieses Gerät</string>
+    <string name="hideMacAddressDetails">Verstecke MAC-Adressen Details</string>
 </resources>

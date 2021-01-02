@@ -46,6 +46,6 @@ class AppPreferences {
 
     val hideMacDetails
         get(): Boolean {
-            return preferences.getBoolean(resources.getString(R.string.hideMacDetails), false)
+            return preferences.getBoolean("hideMacDetails", false)
         }
 }
