@@ -48,7 +48,35 @@ data class DeviceWithName(
     @Ignore
     val asDevice = Device(deviceId, networkId, ip, deviceName, hwAddress, isScanningDevice)
 
-    private val deviceType
+    val icon
+        get() = when (deviceTypeEnum) {
+            DeviceType.PHONE -> R.drawable.ic_baseline_phone_android_48
+            DeviceType.ROUTER -> R.drawable.ic_baseline_router_48
+            DeviceType.SPEAKER -> R.drawable.ic_baseline_speaker_48
+            DeviceType.SOC -> R.drawable.ic_memory_white_48dp
+            DeviceType.NETWORK_DEVICE -> R.drawable.ic_baseline_settings_ethernet_48
+            DeviceType.GAME_CONSOLE -> R.drawable.ic_baseline_videogame_asset_48
+            DeviceType.CAST -> R.drawable.ic_baseline_cast_48
+            DeviceType.PC -> R.drawable.ic_laptop_white_48dp
+            DeviceType.VM -> R.drawable.ic_baseline_layers_24
+            DeviceType.UNKNOWN -> R.drawable.ic_baseline_devices_other_24
+        }
+
+    val deviceType
+        get() = when (deviceTypeEnum) {
+            DeviceType.PC -> R.string.device_type_pc
+            DeviceType.VM -> R.string.device_type_vm
+            DeviceType.PHONE -> R.string.device_type_phone
+            DeviceType.SPEAKER -> R.string.device_type_speaker
+            DeviceType.SOC -> R.string.device_type_soc
+            DeviceType.ROUTER -> R.string.device_type_router
+            DeviceType.NETWORK_DEVICE -> R.string.device_type_network_device
+            DeviceType.GAME_CONSOLE -> R.string.device_type_game_console
+            DeviceType.CAST -> R.string.device_type_cast
+            DeviceType.UNKNOWN -> R.string.device_type_unknown
+        }
+
+    private val deviceTypeEnum
         get() = when {
             isScanningDevice -> DeviceType.PHONE
 
@@ -91,20 +119,6 @@ data class DeviceWithName(
             vendorName.contains("VMware", ignoreCase = true) -> DeviceType.VM
 
             else -> DeviceType.UNKNOWN
-        }
-
-    val icon
-        get() = when (deviceType) {
-            DeviceType.PHONE -> R.drawable.ic_baseline_phone_android_48
-            DeviceType.ROUTER -> R.drawable.ic_baseline_router_48
-            DeviceType.SPEAKER -> R.drawable.ic_baseline_speaker_48
-            DeviceType.SOC -> R.drawable.ic_memory_white_48dp
-            DeviceType.NETWORK_DEVICE -> R.drawable.ic_baseline_settings_ethernet_48
-            DeviceType.GAME_CONSOLE -> R.drawable.ic_baseline_videogame_asset_48
-            DeviceType.CAST -> R.drawable.ic_baseline_cast_48
-            DeviceType.PC -> R.drawable.ic_laptop_white_48dp
-            DeviceType.VM -> R.drawable.ic_baseline_layers_24
-            DeviceType.UNKNOWN -> R.drawable.ic_baseline_devices_other_24
         }
 }
 

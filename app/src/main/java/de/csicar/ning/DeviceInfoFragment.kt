@@ -39,11 +39,13 @@ class DeviceInfoFragment : Fragment() {
         val argumentDeviceId = arguments?.getLong("deviceId")!!
         val copyUtil = CopyUtil(view)
 
+        val deviceTypeTextView = view.findViewById<TextView>(R.id.deviceTypeTextView)
         val deviceIpTextView = view.findViewById<TextView>(R.id.deviceIpTextView)
         val deviceNameTextView = view.findViewById<TextView>(R.id.deviceNameTextView)
         val deviceHwAddressTextView = view.findViewById<TextView>(R.id.deviceHwAddressTextView)
         val deviceVendorTextView = view.findViewById<TextView>(R.id.deviceVendorTextView)
 
+        copyUtil.makeTextViewCopyable((deviceTypeTextView))
         copyUtil.makeTextViewCopyable((deviceIpTextView))
         copyUtil.makeTextViewCopyable(deviceNameTextView)
         copyUtil.makeTextViewCopyable(deviceHwAddressTextView)
@@ -51,6 +53,7 @@ class DeviceInfoFragment : Fragment() {
 
         viewModel.deviceDao.getById(argumentDeviceId).observe(this, Observer {
             fetchInfo(it.asDevice)
+            deviceTypeTextView.text = getString(it.deviceType)
             deviceIpTextView.text = it.ip.hostAddress
             deviceNameTextView.text = if (it.isScanningDevice) {
                 getString(R.string.this_device)

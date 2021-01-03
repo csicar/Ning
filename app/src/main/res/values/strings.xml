@@ -10,6 +10,7 @@
     <string name="title_device_detail">Device {deviceIp}</string>
     <string name="title_card_device_info">Device Information</string>
     <string name="field_name_device_name">Device Name</string>
+    <string name="field_name_device_type">Device Type</string>
     <string name="field_name_device_ip">Device IP</string>
     <string name="field_name_device_mac">Device MAC</string>
     <string name="field_name_vendor_name">Vendor Name</string>
@@ -17,4 +18,14 @@
     <string name="this_device">This device</string>
     <string name="error_network_not_found">Network not found</string>
     <string name="hideMacAddressDetails">Hide MAC Address Details</string>
+    <string name="device_type_pc">PC</string>
+    <string name="device_type_vm">Virtual machine</string>
+    <string name="device_type_phone">Phone/Tablet</string>
+    <string name="device_type_speaker">Speaker</string>
+    <string name="device_type_soc">System on chip</string>
+    <string name="device_type_router">Router</string>
+    <string name="device_type_network_device">Network device</string>
+    <string name="device_type_game_console">Game console</string>
+    <string name="device_type_cast">Cast</string>
+    <string name="device_type_unknown">Unknown</string>
 </resources>
