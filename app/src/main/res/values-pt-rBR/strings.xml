@@ -5,7 +5,7 @@
     <string name="device_icon">Ícone do aparelho</string>
     <string name="interfaces_submenu">Interfaces</string>
     <string name="preferences_submenu">Preferências</string>
-    <string name="snackbar_copy_message">Copiado "{{texto-a-copiar}}" para o Clipboard</string>
+    <string name="snackbar_copy_message">Copiado "{{texto-a-copiar}}" ao Clipboard</string>
     <string name="title_network_overview">Rede {nome_do_interface}</string>
     <string name="title_device_detail">Aparelho {Ipdoaparelho}</string>
     <string name="title_card_device_info">Info do aparelho</string>
@@ -15,4 +15,6 @@
     <string name="field_name_vendor_name">Nome do fornecedor</string>
     <string name="title_open_ports">Portas abertas:</string>
     <string name="this_device">Seu aparelho</string>
+    <string name="error_network_not_found">Nenhuma rede encontrada</string>
+    <string name="hideMacAddressDetails">Ocultar informações do MAC</string>
 </resources>
