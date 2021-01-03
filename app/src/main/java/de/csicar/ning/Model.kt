@@ -58,8 +58,8 @@ data class DeviceWithName(
             DeviceType.GAME_CONSOLE -> R.drawable.ic_baseline_videogame_asset_48
             DeviceType.CAST -> R.drawable.ic_baseline_cast_48
             DeviceType.PC -> R.drawable.ic_laptop_white_48dp
-            DeviceType.VM -> R.drawable.ic_baseline_layers_24
-            DeviceType.UNKNOWN -> R.drawable.ic_baseline_devices_other_24
+            DeviceType.VM -> R.drawable.ic_baseline_layers_48
+            DeviceType.UNKNOWN -> R.drawable.ic_baseline_devices_other_48
         }
 
     val deviceType
