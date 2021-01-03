@@ -63,7 +63,7 @@ data class DeviceWithName(
             vendorName == null -> DeviceType.UNKNOWN
             // Phone
             vendorName.contains("LG Electronics (Mobile Communications)", ignoreCase = true) -> DeviceType.PHONE
-            vendorName.contains("HUAWEI", ignoreCase = true) -> DeviceType.PHONE
+            vendorName.contains("HUAWEI Communications", ignoreCase = true) -> DeviceType.PHONE
             vendorName.contains("Xiaomi", ignoreCase = true) -> DeviceType.PHONE
             vendorName.contains("Fairphone", ignoreCase = true) -> DeviceType.PHONE
             // Router
