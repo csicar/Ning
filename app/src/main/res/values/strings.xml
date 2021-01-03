@@ -28,4 +28,5 @@
     <string name="device_type_game_console">Game console</string>
     <string name="device_type_cast">Cast</string>
     <string name="device_type_unknown">Unknown</string>
+    <string name="device_type_home_appliance">Home Appliance</string>
 </resources>

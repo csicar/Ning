@@ -18,7 +18,11 @@ class NsdScanner(application: Application, private val onUpdate : (ScanResult) -
     }
     val nsdManager =
         application.applicationContext.getSystemService(Context.NSD_SERVICE) as NsdManager
-    private val serviceTypes = listOf(
+    /** mDNS Service Types, that the application checks for.
+     * Unfortunately, android does not offer an API for discovering all services
+     * See: http://www.dns-sd.org/servicetypes.html
+     */
+    private val serviceTypes = setOf(
         "_workstation._tcp",
         "_companion-link._tcp",
         "_ssh._tcp",
@@ -26,7 +30,13 @@ class NsdScanner(application: Application, private val onUpdate : (ScanResult) -
         "_afpovertcp._tcp",
         "_device-info._tcp",
         "_googlecast._tcp",
-        "_printer._tcp"
+        "_printer._tcp",
+        "_ipp._tcp",
+        "_http._tcp",
+        "_smb._tcp",
+        "_nfs._tcp",
+        "_ftp._tcp",
+        "_coap._udp"
     )
 
     suspend fun scan() = withContext(Dispatchers.IO) {
@@ -58,17 +68,18 @@ class NsdScanner(application: Application, private val onUpdate : (ScanResult) -
         }
 
         override fun onStopDiscoveryFailed(serviceType: String?, errorCode: Int) {
-            Log.d(TAG, "discovery stop failed $serviceType $errorCode")
+            Log.e(TAG, "discovery stop failed $serviceType $errorCode")
         }
 
         override fun onStartDiscoveryFailed(serviceType: String?, errorCode: Int) {
-            Log.d(TAG, "discovery start failed $serviceType $errorCode")
+            Log.e(TAG, "discovery start failed $serviceType $errorCode")
         }
 
         override fun onDiscoveryStarted(serviceType: String?) {
         }
 
         override fun onDiscoveryStopped(serviceType: String?) {
+            Log.i(TAG, "Discovery stopped: $serviceType")
         }
 
         override fun onServiceLost(serviceInfo: NsdServiceInfo?) {
