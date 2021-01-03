@@ -61,11 +61,16 @@ data class DeviceWithName(
              * Device type based on vendor name
              */
             vendorName == null -> DeviceType.UNKNOWN
+            // PC
+            vendorName.contains("Micro-Star INTL", ignoreCase = true) -> DeviceType.PC
+            vendorName.contains("Dell", ignoreCase = true) -> DeviceType.PC
             // Phone
             vendorName.contains("LG Electronics (Mobile Communications)", ignoreCase = true) -> DeviceType.PHONE
             vendorName.contains("HUAWEI Communications", ignoreCase = true) -> DeviceType.PHONE
             vendorName.contains("Xiaomi", ignoreCase = true) -> DeviceType.PHONE
             vendorName.contains("Fairphone", ignoreCase = true) -> DeviceType.PHONE
+            vendorName.contains("Motorola Mobility", ignoreCase = true) -> DeviceType.PHONE
+            vendorName.contains("HTC", ignoreCase = true) -> DeviceType.PHONE
             // Router
             vendorName.contains("Compal", ignoreCase = true) -> DeviceType.ROUTER
             vendorName.contains("Ubiquiti", ignoreCase = true) -> DeviceType.ROUTER
