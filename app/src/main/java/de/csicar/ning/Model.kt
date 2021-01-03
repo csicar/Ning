@@ -32,6 +32,7 @@ enum class DeviceType {
     NETWORK_DEVICE,
     GAME_CONSOLE,
     CAST,
+    HOME_APPLIANCE,
     UNKNOWN;
 
     val icon
@@ -45,6 +46,7 @@ enum class DeviceType {
             NETWORK_DEVICE -> R.drawable.ic_baseline_settings_ethernet_48
             GAME_CONSOLE -> R.drawable.ic_baseline_videogame_asset_48
             CAST -> R.drawable.ic_baseline_cast_48
+            HOME_APPLIANCE -> R.drawable.ic_laptop_white_48dp
             UNKNOWN -> R.drawable.ic_baseline_devices_other_48
         }
 
@@ -59,6 +61,7 @@ enum class DeviceType {
             NETWORK_DEVICE -> R.string.device_type_network_device
             GAME_CONSOLE -> R.string.device_type_game_console
             CAST -> R.string.device_type_cast
+            HOME_APPLIANCE -> R.string.device_type_home_appliance
             UNKNOWN -> R.string.device_type_unknown
         }
 }
@@ -83,40 +86,67 @@ data class DeviceWithName(
             /**
              * Device type based on MAC address
              */
-            hwAddress?.address?.startsWith("52:54:00") == true -> DeviceType.VM // Unofficial mac address range used by KVM
+            // Unofficial mac address range used by KVM Virtual Machines
+            hwAddress?.address?.startsWith("52:54:00") == true -> DeviceType.VM
 
             /**
              * Device type based on vendor name
              */
             vendorName == null -> DeviceType.UNKNOWN
+
+            // Mixed
+            vendorName.contains("Apple, Inc.", ignoreCase = true) &&
+                    this.deviceName?.contains("MacBook") == true -> DeviceType.PC
+            vendorName.contains("Apple, Inc.", ignoreCase = true) &&
+                    this.deviceName?.contains("iPhone") == true -> DeviceType.PHONE
+
             // PC
             vendorName.contains("Micro-Star INTL", ignoreCase = true) -> DeviceType.PC
             vendorName.contains("Dell", ignoreCase = true) -> DeviceType.PC
+            vendorName.contains("Hewlett Packard", ignoreCase = true) -> DeviceType.PC
+            // Lenovo
+            vendorName.contains("LCFC(HeFei) Electronics Technology", ignoreCase = true) ->
+                DeviceType.PC
+            // Intel WIFI-Cards
+            vendorName.contains("Intel Corporate", ignoreCase = true) -> DeviceType.PC
+
             // Phone
-            vendorName.contains("LG Electronics (Mobile Communications)", ignoreCase = true) -> DeviceType.PHONE
+            vendorName.contains("LG Electronics (Mobile Communications)", ignoreCase = true) ->
+                DeviceType.PHONE
             vendorName.contains("HUAWEI", ignoreCase = true) -> DeviceType.PHONE
             vendorName.contains("Xiaomi Communications", ignoreCase = true) -> DeviceType.PHONE
             vendorName.contains("Fairphone", ignoreCase = true) -> DeviceType.PHONE
             vendorName.contains("Motorola Mobility", ignoreCase = true) -> DeviceType.PHONE
             vendorName.contains("HTC", ignoreCase = true) -> DeviceType.PHONE
+
             // Router
             vendorName.contains("Compal", ignoreCase = true) -> DeviceType.ROUTER
             vendorName.contains("Ubiquiti", ignoreCase = true) -> DeviceType.ROUTER
             vendorName.contains("AVM", ignoreCase = true) -> DeviceType.ROUTER
             vendorName.contains("TP-LINK", ignoreCase = true) -> DeviceType.ROUTER
+
             // Speaker
             vendorName.contains("Sonos", ignoreCase = true) -> DeviceType.SPEAKER
+
             // SoC
             vendorName.contains("Espressif", ignoreCase = true) -> DeviceType.SOC
             vendorName.contains("Raspberry", ignoreCase = true) -> DeviceType.SOC
+
             // Network device
             vendorName.contains("ADMTEK", ignoreCase = true) -> DeviceType.NETWORK_DEVICE
+
             // Video game
             vendorName.contains("Nintendo", ignoreCase = true) -> DeviceType.GAME_CONSOLE
+
             // Cast
             vendorName.contains("AzureWave", ignoreCase = true) -> DeviceType.CAST
+
             // VM
             vendorName.contains("VMware", ignoreCase = true) -> DeviceType.VM
+
+            // Home Appliance
+            vendorName.contains("XIAOMI Electronics,CO.,LTD", ignoreCase = true) ->
+                DeviceType.HOME_APPLIANCE
 
             else -> DeviceType.UNKNOWN
         }
@@ -203,6 +233,6 @@ data class PortDescription(
             PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy"),
             PortDescription(0, 62078, Protocol.TCP, "iPhone-Sync", "lockdown iOS Service")
 
-            )
+        )
     }
 }
