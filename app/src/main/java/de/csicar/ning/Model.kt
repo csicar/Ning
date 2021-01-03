@@ -20,9 +20,47 @@ data class Device(
     val deviceName: String?,
     val hwAddress: MacAddress?,
     val isScanningDevice: Boolean = false
-) {
+)
 
+enum class DeviceType {
+    PC,
+    VM,
+    PHONE,
+    SPEAKER,
+    SOC,
+    ROUTER,
+    NETWORK_DEVICE,
+    GAME_CONSOLE,
+    CAST,
+    UNKNOWN;
 
+    val icon
+        get() = when (this) {
+            PC -> R.drawable.ic_laptop_white_48dp
+            VM -> R.drawable.ic_baseline_layers_48
+            PHONE -> R.drawable.ic_baseline_phone_android_48
+            SPEAKER -> R.drawable.ic_baseline_speaker_48
+            SOC -> R.drawable.ic_memory_white_48dp
+            ROUTER -> R.drawable.ic_baseline_router_48
+            NETWORK_DEVICE -> R.drawable.ic_baseline_settings_ethernet_48
+            GAME_CONSOLE -> R.drawable.ic_baseline_videogame_asset_48
+            CAST -> R.drawable.ic_baseline_cast_48
+            UNKNOWN -> R.drawable.ic_baseline_devices_other_48
+        }
+
+    val label
+        get() = when (this) {
+            PC -> R.string.device_type_pc
+            VM -> R.string.device_type_vm
+            PHONE -> R.string.device_type_phone
+            SPEAKER -> R.string.device_type_speaker
+            SOC -> R.string.device_type_soc
+            ROUTER -> R.string.device_type_router
+            NETWORK_DEVICE -> R.string.device_type_network_device
+            GAME_CONSOLE -> R.string.device_type_game_console
+            CAST -> R.string.device_type_cast
+            UNKNOWN -> R.string.device_type_unknown
+        }
 }
 
 @DatabaseView("SELECT Device.deviceId, Device.networkId, Device.ip, Device.hwAddress, Device.deviceName, MacVendor.name as vendorName, Device.isScanningDevice FROM Device LEFT JOIN MacVendor ON MacVendor.mac = substr(Device.hwAddress, 0, 9)")
@@ -38,21 +76,49 @@ data class DeviceWithName(
     @Ignore
     val asDevice = Device(deviceId, networkId, ip, deviceName, hwAddress, isScanningDevice)
 
-    val icon
-        get() = when (vendorName) {
-            "Espressif Inc." -> R.drawable.ic_memory_white_48dp
-            "ADMTEK INCORPORATED" -> R.drawable.ic_baseline_settings_ethernet_48
-            "LG Electronics (Mobile Communications)" -> R.drawable.ic_baseline_phone_android_48
-            "Nintendo Co.,Ltd" -> R.drawable.ic_baseline_videogame_asset_48
-            "AzureWave Technology Inc." -> R.drawable.ic_baseline_cast_48
-            "Compal Broadband Networks, Inc." -> R.drawable.ic_baseline_router_48
-            "Ubiquiti Networks Inc." -> R.drawable.ic_baseline_router_48
-            "Sonos, Inc." -> R.drawable.ic_baseline_speaker_48
-            "AVM Audiovisuelles Marketing und Computersysteme GmbH" -> R.drawable.ic_baseline_router_48
-            "TP-LINK TECHNOLOGIES CO.,LTD." -> R.drawable.ic_baseline_router_48
-            "HUAWEI TECHNOLOGIES CO.,LTD" -> R.drawable.ic_baseline_phone_android_48
-            "Xiaomi Communications Co Ltd" -> R.drawable.ic_baseline_phone_android_48
-            else -> R.drawable.ic_laptop_white_48dp
+    val deviceType
+        get() = when {
+            isScanningDevice -> DeviceType.PHONE
+
+            /**
+             * Device type based on MAC address
+             */
+            hwAddress?.address?.startsWith("52:54:00") == true -> DeviceType.VM // Unofficial mac address range used by KVM
+
+            /**
+             * Device type based on vendor name
+             */
+            vendorName == null -> DeviceType.UNKNOWN
+            // PC
+            vendorName.contains("Micro-Star INTL", ignoreCase = true) -> DeviceType.PC
+            vendorName.contains("Dell", ignoreCase = true) -> DeviceType.PC
+            // Phone
+            vendorName.contains("LG Electronics (Mobile Communications)", ignoreCase = true) -> DeviceType.PHONE
+            vendorName.contains("HUAWEI", ignoreCase = true) -> DeviceType.PHONE
+            vendorName.contains("Xiaomi Communications", ignoreCase = true) -> DeviceType.PHONE
+            vendorName.contains("Fairphone", ignoreCase = true) -> DeviceType.PHONE
+            vendorName.contains("Motorola Mobility", ignoreCase = true) -> DeviceType.PHONE
+            vendorName.contains("HTC", ignoreCase = true) -> DeviceType.PHONE
+            // Router
+            vendorName.contains("Compal", ignoreCase = true) -> DeviceType.ROUTER
+            vendorName.contains("Ubiquiti", ignoreCase = true) -> DeviceType.ROUTER
+            vendorName.contains("AVM", ignoreCase = true) -> DeviceType.ROUTER
+            vendorName.contains("TP-LINK", ignoreCase = true) -> DeviceType.ROUTER
+            // Speaker
+            vendorName.contains("Sonos", ignoreCase = true) -> DeviceType.SPEAKER
+            // SoC
+            vendorName.contains("Espressif", ignoreCase = true) -> DeviceType.SOC
+            vendorName.contains("Raspberry", ignoreCase = true) -> DeviceType.SOC
+            // Network device
+            vendorName.contains("ADMTEK", ignoreCase = true) -> DeviceType.NETWORK_DEVICE
+            // Video game
+            vendorName.contains("Nintendo", ignoreCase = true) -> DeviceType.GAME_CONSOLE
+            // Cast
+            vendorName.contains("AzureWave", ignoreCase = true) -> DeviceType.CAST
+            // VM
+            vendorName.contains("VMware", ignoreCase = true) -> DeviceType.VM
+
+            else -> DeviceType.UNKNOWN
         }
 }
 
