@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), NetworkFragment.OnListFragmentInteract
                     main_drawer_layout.closeDrawers()
                     true
                 }
-                it.setIcon(R.drawable.ic_settings_ethernet_white_24dp)
+                it.setIcon(R.drawable.ic_baseline_settings_ethernet_48)
                 it.isCheckable = true
                 it.isEnabled = true
             }
