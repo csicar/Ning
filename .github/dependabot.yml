@@ -1,0 +1,9 @@
+version: 2
+updates:
+- package-ecosystem: gradle
+  directory: "/"
+  schedule:
+    interval: daily
+    time: "03:45"
+    timezone: Europe/Berlin
+  open-pull-requests-limit: 99
