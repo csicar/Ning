@@ -32,7 +32,35 @@ enum class DeviceType {
     NETWORK_DEVICE,
     GAME_CONSOLE,
     CAST,
-    UNKNOWN
+    UNKNOWN;
+
+    val icon
+        get() = when (this) {
+            PC -> R.drawable.ic_laptop_white_48dp
+            VM -> R.drawable.ic_baseline_layers_48
+            PHONE -> R.drawable.ic_baseline_phone_android_48
+            SPEAKER -> R.drawable.ic_baseline_speaker_48
+            SOC -> R.drawable.ic_memory_white_48dp
+            ROUTER -> R.drawable.ic_baseline_router_48
+            NETWORK_DEVICE -> R.drawable.ic_baseline_settings_ethernet_48
+            GAME_CONSOLE -> R.drawable.ic_baseline_videogame_asset_48
+            CAST -> R.drawable.ic_baseline_cast_48
+            UNKNOWN -> R.drawable.ic_baseline_devices_other_48
+        }
+
+    val label
+        get() = when (this) {
+            PC -> R.string.device_type_pc
+            VM -> R.string.device_type_vm
+            PHONE -> R.string.device_type_phone
+            SPEAKER -> R.string.device_type_speaker
+            SOC -> R.string.device_type_soc
+            ROUTER -> R.string.device_type_router
+            NETWORK_DEVICE -> R.string.device_type_network_device
+            GAME_CONSOLE -> R.string.device_type_game_console
+            CAST -> R.string.device_type_cast
+            UNKNOWN -> R.string.device_type_unknown
+        }
 }
 
 @DatabaseView("SELECT Device.deviceId, Device.networkId, Device.ip, Device.hwAddress, Device.deviceName, MacVendor.name as vendorName, Device.isScanningDevice FROM Device LEFT JOIN MacVendor ON MacVendor.mac = substr(Device.hwAddress, 0, 9)")
@@ -48,35 +76,7 @@ data class DeviceWithName(
     @Ignore
     val asDevice = Device(deviceId, networkId, ip, deviceName, hwAddress, isScanningDevice)
 
-    val icon
-        get() = when (deviceTypeEnum) {
-            DeviceType.PHONE -> R.drawable.ic_baseline_phone_android_48
-            DeviceType.ROUTER -> R.drawable.ic_baseline_router_48
-            DeviceType.SPEAKER -> R.drawable.ic_baseline_speaker_48
-            DeviceType.SOC -> R.drawable.ic_memory_white_48dp
-            DeviceType.NETWORK_DEVICE -> R.drawable.ic_baseline_settings_ethernet_48
-            DeviceType.GAME_CONSOLE -> R.drawable.ic_baseline_videogame_asset_48
-            DeviceType.CAST -> R.drawable.ic_baseline_cast_48
-            DeviceType.PC -> R.drawable.ic_laptop_white_48dp
-            DeviceType.VM -> R.drawable.ic_baseline_layers_48
-            DeviceType.UNKNOWN -> R.drawable.ic_baseline_devices_other_48
-        }
-
     val deviceType
-        get() = when (deviceTypeEnum) {
-            DeviceType.PC -> R.string.device_type_pc
-            DeviceType.VM -> R.string.device_type_vm
-            DeviceType.PHONE -> R.string.device_type_phone
-            DeviceType.SPEAKER -> R.string.device_type_speaker
-            DeviceType.SOC -> R.string.device_type_soc
-            DeviceType.ROUTER -> R.string.device_type_router
-            DeviceType.NETWORK_DEVICE -> R.string.device_type_network_device
-            DeviceType.GAME_CONSOLE -> R.string.device_type_game_console
-            DeviceType.CAST -> R.string.device_type_cast
-            DeviceType.UNKNOWN -> R.string.device_type_unknown
-        }
-
-    private val deviceTypeEnum
         get() = when {
             isScanningDevice -> DeviceType.PHONE
 

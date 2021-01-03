@@ -97,7 +97,7 @@ class NetworkFragment : Fragment() {
                         } else {
                             item.deviceName
                         }
-                        deviceIcon.setImageResource(item.icon)
+                        deviceIcon.setImageResource(item.deviceType.icon)
                     }
                 }
 

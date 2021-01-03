@@ -53,7 +53,7 @@ class DeviceInfoFragment : Fragment() {
 
         viewModel.deviceDao.getById(argumentDeviceId).observe(this, Observer {
             fetchInfo(it.asDevice)
-            deviceTypeTextView.text = getString(it.deviceType)
+            deviceTypeTextView.text = getString(it.deviceType.label)
             deviceIpTextView.text = it.ip.hostAddress
             deviceNameTextView.text = if (it.isScanningDevice) {
                 getString(R.string.this_device)
