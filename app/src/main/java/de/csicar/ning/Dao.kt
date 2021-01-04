@@ -54,13 +54,15 @@ interface DeviceDao {
     }
 
     @Transaction
-    fun upsertName(networkId: Long, ip: Inet4Address, name: String, allowNew: Boolean = true) {
+    fun upsertName(networkId: Long, ip: Inet4Address, name: String, allowNew: Boolean = true): Long? {
         val existingDevice = getByAddressInNetwork(ip, networkId)
         if (existingDevice != null) {
             updateServiceName(existingDevice.deviceId, name)
+            return existingDevice.deviceId
         } else if (allowNew) {
-            insert(Device(0, networkId, ip, name, null))
+            return insert(Device(0, networkId, ip, name, null))
         }
+        return null
     }
 
     @Transaction
