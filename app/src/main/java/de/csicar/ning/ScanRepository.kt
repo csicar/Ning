@@ -92,6 +92,11 @@ class ScanRepository(
                     }
                 }.scan()
             }, launch {
+                Log.d(TAG, "asdasdasd")
+                LowLevelMDnsScanner { newResult ->
+                    Log.d(TAG, "res")
+                }.probeMDns()
+            }, launch {
                 updateFromArp()
             }, launch {
                 val userDevice = LocalMacScanner.asDevice(network) ?: return@launch
