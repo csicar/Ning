@@ -1,0 +1,32 @@
+<resources>
+    <string name="app_name">Ning</string>
+
+    <string name="swipe_down_to_scan_the_network">向下滑动扫描本地网络</string>
+    <string name="device_icon">设备图标</string>
+    <string name="interfaces_submenu">接口</string>
+    <string name="preferences_submenu">选项</string>
+    <string name="snackbar_copy_message">已复制 "{{text-to-copy}}" 到剪贴板</string>
+    <string name="title_network_overview">网络 {interface_name}</string>
+    <string name="title_device_detail">设备 {deviceIp}</string>
+    <string name="title_card_device_info">设备信息</string>
+    <string name="field_name_device_name">设备名称</string>
+    <string name="field_name_device_type">设备类型</string>
+    <string name="field_name_device_ip">设备 IP</string>
+    <string name="field_name_device_mac">设置 MAC</string>
+    <string name="field_name_vendor_name">厂商名称</string>
+    <string name="title_open_ports">开放端口:</string>
+    <string name="this_device">此设备</string>
+    <string name="error_network_not_found">未找到网络</string>
+    <string name="hideMacAddressDetails">隐藏 MAC 地址详情</string>
+    <string name="device_type_pc">个人计算机</string>
+    <string name="device_type_vm">虚拟机</string>
+    <string name="device_type_phone">手机/平板</string>
+    <string name="device_type_speaker">扬声器</string>
+    <string name="device_type_soc">片上系统</string>
+    <string name="device_type_router">路由器</string>
+    <string name="device_type_network_device">网络设备</string>
+    <string name="device_type_game_console">游戏主机</string>
+    <string name="device_type_cast">投屏设备</string>
+    <string name="device_type_unknown">未知</string>
+    <string name="device_type_home_appliance">家用电器</string>
+</resources>
