@@ -32,13 +32,15 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
         ds.timeToLive = 2
         ds.soTimeout = 1000
         ds.send(dp)
-        val receiveBuffer = ByteArray(1024)
+        val receiveBuffer = ByteArray(1024 * 16)
         while (true) {
             val dp2 = DatagramPacket(receiveBuffer, receiveBuffer.size)
             ds.receive(dp2)
-            val textContent = String(dp2.data, Charset.forName("UTF8"));
-            Log.d(TAG, "data: ${dp2.data} --  ${textContent}")
-
+            val paketContent = dp2.data.copyOfRange(0, dp2.length)
+            val textContent = String(paketContent, Charset.forName("UTF8"));
+            Log.d(TAG, "data: ${paketContent} --  ${textContent}")
+            val parsed = parse(paketContent)
+            Log.d(TAG, "parsed: $parsed")
         }
         ds.close()
 
@@ -55,30 +57,21 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
         val answers = mutableListOf<DnsAnswers>()
         println("\n\n answer records (index: $index)")
         repeat(noAnswerRecords) {
-            val (newIndex, answer) = parseAnswer(
-                byteArray.copyOfRange(index, byteArray.size),
-                noAnswerRecords
-            )
+            val (newIndex, answer) = parseAnswer(index, byteArray)
             println("==> answer: $answer")
             index = newIndex
             answers += answer
         }
         println("\n\n authority records (index: $index)")
         repeat(noAuthorityRecords) {
-            val (newIndex, answer) = parseAnswer(
-                byteArray.copyOfRange(index, byteArray.size),
-                noAnswerRecords
-            )
+            val (newIndex, answer) = parseAnswer(index, byteArray)
             println("==> answer: $answer")
             index = newIndex
             answers += answer
         }
         println("\n\n additional records (index: $index)")
         repeat(noAdditionalRecords) {
-            val (newIndex, answer) = parseAnswer(
-                byteArray.copyOfRange(index, byteArray.size),
-                noAnswerRecords
-            )
+            val (newIndex, answer) = parseAnswer(index, byteArray)
             println("==> answer: $answer")
             index = newIndex
             answers += answer
@@ -94,70 +87,116 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
         return value
     }
 
-    fun parseString(byteArray: ByteArray): Pair<Int, List<String>> {
+    fun parseString(
+        startIndex: Int,
+        byteArray: ByteArray,
+        references: MutableMap<Int, List<String>> = mutableMapOf(),
+        depth: Int = 1
+    ): Pair<Int, List<String>> {
+        val depthStr = "\t".repeat(depth)
+        //println("\n$depthStr parseString at index $startIndex")
         val name: MutableList<String> = mutableListOf()
-        var i = 0;
-        while (byteArray[i] != 0x00.toByte() && i <= byteArray.size) {
-            val partLength = byteArray[i]
-            print(partLength)
-            val stringStart = i + 1
-            val stringEnd = stringStart + partLength
-            name += listOf(String(byteArray.copyOfRange(stringStart, stringEnd), Charsets.UTF_8))
-            println(name)
-            i += partLength + 1
+        var i = startIndex;
+        var hitReference = false
+        while (i < byteArray.size && byteArray[i] != 0x00.toByte() && !hitReference) {
+            val partLength = byteArray[i].toUByte()
+            //println("$depthStr  string part at $i length: $partLength ")
+            val referenceMask = 0b11000000
+            if (partLength.toInt().and(referenceMask) != 0) {
+                val referenceIndex =
+                    partLength.toInt().and(referenceMask.inv()) * 0xFF + byteArray[i + 1]
+                //println("$depthStr  goto reference -> $referenceIndex (0b${referenceIndex.toString(2)})")
+                val referenceValue = references.getOrPut(referenceIndex) {
+                    if (depth > 30) {
+                        listOf("")
+                    } else {
+                        parseString(referenceIndex, byteArray, references, depth + 1).second
+                    }
+                }
+                name += referenceValue
+                //println("$depthStr  referenceValue $referenceValue (from index: $referenceIndex) state: $references")
+                hitReference = true
+                i += 1
+            } else {
+                val stringStart = i + 1
+                val stringEnd = stringStart + partLength.toInt()
+                name += listOf(
+                    String(
+                        byteArray.copyOfRange(stringStart, stringEnd),
+                        Charsets.UTF_8
+                    )
+                ).also {
+                    //println("$depthStr  direct string part: $it (from index: $stringStart)")
+                }
+                i += partLength.toInt() + 1
+            }
+
         }
+        //println("$depthStr  done\n")
         return i to name
     }
 
-    fun parseAnswer(byteArray: ByteArray, numberOfAnswers: Int): Pair<Int, DnsAnswers> {
-        val (i, name) = parseString(byteArray)
+    fun parseAnswer(
+        startIndex: Int,
+        byteArray: ByteArray
+    ): Pair<Int, DnsAnswers> {
+        val (i, name) = parseString(startIndex, byteArray)
         val type = byteArray.rangeToInt(i + 1, i + 2)
         val classCode = byteArray.rangeToInt(i + 3, i + 4)
         val timeToLive = byteArray.rangeToInt(i + 5, i + 9)
-        println("type: $type (${parseRecordType(type)}), classCode: $classCode, ttl: $timeToLive")
         val dataLength = byteArray.rangeToInt(i + 9, i + 10)
-        println(String(byteArray))
-        println(byteArray[i + 11])
-        val dataContent = byteArray.copyOfRange(i + 11, i + 11 + dataLength)
-        val (_, domainName) = when (parseRecordType(type)) {
-            RecordType.POINTER -> parseString(dataContent)
-            RecordType.A -> parseString(dataContent)
-            null -> null to null
+        val dataIndex = i + 11
+        println("parseAnswer at $startIndex => type: $type (${parseRecordType(type)}), classCode: $classCode, ttl: $timeToLive, dataIndex: $dataIndex, name: $name")
+        println("i: $i")
+
+        val combinedName = name.joinToString(".")
+        val dnsAnswer = when (parseRecordType(type)) {
+            RecordType.POINTER ->
+                DnsAnswers(combinedName, parseString(dataIndex, byteArray).second, "")
+            RecordType.SRV ->
+                DnsAnswers(combinedName, parseString(dataIndex, byteArray).second, "")
+            RecordType.TXT ->
+                DnsAnswers(combinedName, listOf(), parseString(dataIndex, byteArray).second.joinToString("."))
+            RecordType.A ->
+                DnsAnswers(combinedName, listOf(Inet4Address.getByAddress(byteArray.copyOfRange(dataIndex, dataIndex+4)).toString()), "")
+            RecordType.AAAA ->
+                DnsAnswers(combinedName, listOf(Inet6Address.getByAddress(byteArray.copyOfRange(dataIndex, dataIndex+16)).toString()), "")
+            null -> TODO("unknown record type $type")
             else -> TODO("not implemented for: ${parseRecordType(type)}")
         }
-        return (i + 11 + dataLength) to DnsAnswers(
-            name.joinToString("."),
-            domainName?.joinToString(".") ?: "",
-            ""
-        )
+        return (i + 11 + dataLength) to dnsAnswer
+
     }
 
     enum class RecordType {
         A, NS, MD, MF, CNAME, SOA, MB, MG, MR, NULL, WKS,
-        POINTER, HINFO, MINFO, MX, TXT
+        POINTER, HINFO, MINFO, MX, TXT, AAAA, SRV
     }
+
     // https://www.ietf.org/rtc/rtc1035.html#section-3.2.2
     fun parseRecordType(typeCode: Int) = when (typeCode) {
-        1->RecordType.A
-        2->RecordType.NS
-        3->RecordType.MD
-        4->RecordType.MF
-        5->RecordType.CNAME
-        6->RecordType.SOA
-        7->RecordType.MB
-        8->RecordType.MG
-        9->RecordType.MR
-        10->RecordType.NULL
-        11->RecordType.WKS
+        1 -> RecordType.A
+        2 -> RecordType.NS
+        3 -> RecordType.MD
+        4 -> RecordType.MF
+        5 -> RecordType.CNAME
+        6 -> RecordType.SOA
+        7 -> RecordType.MB
+        8 -> RecordType.MG
+        9 -> RecordType.MR
+        10 -> RecordType.NULL
+        11 -> RecordType.WKS
         12 -> RecordType.POINTER
-        13->RecordType.HINFO
-        14->RecordType.MINFO
-        15->RecordType.MX
-        16->RecordType.TXT
+        13 -> RecordType.HINFO
+        14 -> RecordType.MINFO
+        15 -> RecordType.MX
+        16 -> RecordType.TXT
+        28 -> RecordType.AAAA
+        33 -> RecordType.SRV
         else -> null
     }
 
-    data class DnsAnswers(val name: String, val domainName: String, val txt: String)
+    data class DnsAnswers(val name: String, val domainName: List<String>, val txt: String)
 
     data class ScanResult(val content: String)
 }
