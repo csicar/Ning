@@ -93,10 +93,9 @@ class ScanRepository(
 //                }
                     //.scan()
             }, launch {
-                Log.d(TAG, "asdasdasd")
                 LowLevelMDnsScanner { newResult ->
-                    Log.d(TAG, "res")
-                }.probeMDns()
+                    Log.d(TAG, "res: $newResult")
+                }.probeCommon()
             }, launch {
                 updateFromArp()
             }, launch {

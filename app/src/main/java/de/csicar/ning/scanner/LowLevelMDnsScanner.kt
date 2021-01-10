@@ -2,7 +2,11 @@ package de.csicar.ning.scanner
 
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
+import java.io.PrintWriter
+import java.lang.IndexOutOfBoundsException
 import java.net.*
 import java.nio.charset.Charset
 
@@ -11,20 +15,47 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
         val MDNS_IP: InetAddress =
             Inet4Address.getByAddress(byteArrayOf(224.toByte(), 0, 0, 251.toByte()))
         const val MDNS_PORT = 5353
-        const val SERVICE_PORT = 11323
+        const val SERVICE_PORT = 0 // Let OS choose one
         val TAG = LowLevelMDnsScanner::class.java.name
     }
 
-    suspend fun probeMDns() = withContext(Dispatchers.IO) {
-        Log.d(TAG, "probe!")
-        val bytes =
-            (byteArrayOf(0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
-                    //  ^- Header
-                    + 0x05 + "_coap".toByteArray() + 0x04 + "_udp".toByteArray() + 0x05 + "local".toByteArray() + 0x00
-                    //  # ^- Name
-                    + 0x00 + 0x0c
-                    //  # ^- termination & type PTR
-                    + 0x80.toByte() + 0x01)
+    fun createMDnsRequest(serviceName: String): ByteArray {
+        val nameParts = serviceName.split(".").flatMap {
+            listOf(it.length.toByte()) + it.toByteArray().toList()
+        }.toByteArray()
+
+        return (byteArrayOf(0x00, 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00)
+                //  ^- Header
+                + nameParts + 0x00
+                //  # ^- Name
+                + 0x00 + 0x0c
+                //  # ^- termination & type PTR
+                + 0x80.toByte() + 0x01)
+    }
+
+    suspend fun probeCommon() = withContext(Dispatchers.IO) {
+        listOf(
+        "_workstation._tcp",
+        "_companion-link._tcp",
+        "_ssh._tcp",
+        "_adisk._tcp",
+        "_afpovertcp._tcp",
+        "_device-info._tcp",
+        "_googlecast._tcp",
+        "_printer._tcp",
+        "_ipp._tcp",
+        "_http._tcp",
+        "_smb._tcp",
+            "_services._dns-sd._udp",
+        "_hap._tcp",
+        "_coap._udp").map {
+            async { probeMDns("$it.local") }
+        }.awaitAll()
+    }
+
+    suspend fun probeMDns(serviceName: String) = withContext(Dispatchers.IO) {
+        Log.d(TAG, "probe service: $serviceName")
+        val bytes = createMDnsRequest(serviceName)
         // # ^- UNICAST & Q Class
         val ds = MulticastSocket(SERVICE_PORT)
         ds.joinGroup(MDNS_IP);
@@ -33,48 +64,58 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
         ds.soTimeout = 1000
         ds.send(dp)
         val receiveBuffer = ByteArray(1024 * 16)
-        while (true) {
-            val dp2 = DatagramPacket(receiveBuffer, receiveBuffer.size)
-            ds.receive(dp2)
-            val paketContent = dp2.data.copyOfRange(0, dp2.length)
-            val textContent = String(paketContent, Charset.forName("UTF8"));
-            Log.d(TAG, "data: ${paketContent} --  ${textContent}")
-            val parsed = parse(paketContent)
-            Log.d(TAG, "parsed: $parsed")
+        try {
+
+            while (true) {
+                val dp2 = DatagramPacket(receiveBuffer, receiveBuffer.size)
+                ds.receive(dp2)
+                val paketContent = dp2.data.copyOfRange(0, dp2.length)
+                val textContent = String(paketContent, Charset.forName("UTF8"));
+                Log.d(TAG, "data: ${paketContent} --  ${textContent}")
+                val parsed = parse(paketContent)
+                Log.d(TAG, "parsed: $parsed")
+                onUpdate(ScanResult(parsed, dp2.address, dp2.port))
+            }
+        } catch (ex: SocketTimeoutException) {
+            // no need to handle this: This is normal behaviour
+        } catch(ex: IndexOutOfBoundsException) {
+            Log.e(TAG, "Parsing failed for $serviceName!", ex)
+        }finally {
+
+                ds.close()
         }
-        ds.close()
 
         true
 
     }
 
-    fun parse(byteArray: ByteArray): List<DnsAnswers> {
+    fun parse(byteArray: ByteArray): List<DnsAnswer> {
         val noAnswerRecords = byteArray.rangeToInt(6, 7)
         val noAuthorityRecords = byteArray.rangeToInt(8, 9)
         val noAdditionalRecords = byteArray.rangeToInt(10, 11)
         println("noAnswerRecords: $noAnswerRecords, noAuthorityRecords: $noAuthorityRecords, noAdditionalRecords: $noAdditionalRecords")
         var index = 12
-        val answers = mutableListOf<DnsAnswers>()
+        val answers = mutableListOf<DnsAnswer>()
         println("\n\n answer records (index: $index)")
         repeat(noAnswerRecords) {
             val (newIndex, answer) = parseAnswer(index, byteArray)
             println("==> answer: $answer")
             index = newIndex
-            answers += answer
+            if(answer != null) answers += answer
         }
         println("\n\n authority records (index: $index)")
         repeat(noAuthorityRecords) {
             val (newIndex, answer) = parseAnswer(index, byteArray)
             println("==> answer: $answer")
             index = newIndex
-            answers += answer
+            if(answer != null) answers += answer
         }
         println("\n\n additional records (index: $index)")
         repeat(noAdditionalRecords) {
             val (newIndex, answer) = parseAnswer(index, byteArray)
             println("==> answer: $answer")
             index = newIndex
-            answers += answer
+            if(answer != null) answers += answer
         }
         return answers
     }
@@ -139,7 +180,7 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
     fun parseAnswer(
         startIndex: Int,
         byteArray: ByteArray
-    ): Pair<Int, DnsAnswers> {
+    ): Pair<Int, DnsAnswer?> {
         val (i, name) = parseString(startIndex, byteArray)
         val type = byteArray.rangeToInt(i + 1, i + 2)
         val classCode = byteArray.rangeToInt(i + 3, i + 4)
@@ -152,17 +193,19 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
         val combinedName = name.joinToString(".")
         val dnsAnswer = when (parseRecordType(type)) {
             RecordType.POINTER ->
-                DnsAnswers(combinedName, parseString(dataIndex, byteArray).second, "")
+                DnsAnswer(combinedName, parseString(dataIndex, byteArray).second, "")
             RecordType.SRV ->
-                DnsAnswers(combinedName, parseString(dataIndex, byteArray).second, "")
+                DnsAnswer(combinedName, parseString(dataIndex, byteArray).second, "")
             RecordType.TXT ->
-                DnsAnswers(combinedName, listOf(), parseString(dataIndex, byteArray).second.joinToString("."))
+                DnsAnswer(combinedName, listOf(), parseString(dataIndex, byteArray).second.joinToString("."))
             RecordType.A ->
-                DnsAnswers(combinedName, listOf(Inet4Address.getByAddress(byteArray.copyOfRange(dataIndex, dataIndex+4)).toString()), "")
+                DnsAnswer(combinedName, listOf(Inet4Address.getByAddress(byteArray.copyOfRange(dataIndex, dataIndex+4)).toString()), "")
             RecordType.AAAA ->
-                DnsAnswers(combinedName, listOf(Inet6Address.getByAddress(byteArray.copyOfRange(dataIndex, dataIndex+16)).toString()), "")
-            null -> TODO("unknown record type $type")
-            else -> TODO("not implemented for: ${parseRecordType(type)}")
+                DnsAnswer(combinedName, listOf(Inet6Address.getByAddress(byteArray.copyOfRange(dataIndex, dataIndex+16)).toString()), "")
+            else -> {
+                Log.e(TAG, "unhandled record type: $type")
+                null
+            }
         }
         return (i + 11 + dataLength) to dnsAnswer
 
@@ -173,6 +216,7 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
         POINTER, HINFO, MINFO, MX, TXT, AAAA, SRV
     }
 
+    // https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml
     // https://www.ietf.org/rtc/rtc1035.html#section-3.2.2
     fun parseRecordType(typeCode: Int) = when (typeCode) {
         1 -> RecordType.A
@@ -196,7 +240,7 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
         else -> null
     }
 
-    data class DnsAnswers(val name: String, val domainName: List<String>, val txt: String)
+    data class DnsAnswer(val name: String, val domainName: List<String>, val txt: String)
 
-    data class ScanResult(val content: String)
+    data class ScanResult(val content: List<DnsAnswer>, val ip: InetAddress, val port: Int)
 }

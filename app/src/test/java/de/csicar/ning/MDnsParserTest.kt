@@ -104,22 +104,22 @@ class MDnsParserTest {
         val result = scanner.parse(paketFromDump(paket))
         assertEquals(
             listOf(
-                LowLevelMDnsScanner.DnsAnswers(
+                LowLevelMDnsScanner.DnsAnswer(
                     name = "_hap._tcp.local",
                     domainName = listOf("HASS Bridge 0KQ6 A72F86", "_hap", "_tcp", "local"),
                     txt = ""
                 ),
-                LowLevelMDnsScanner.DnsAnswers(
+                LowLevelMDnsScanner.DnsAnswer(
                     name = "HASS Bridge 0KQ6 A72F86._hap._tcp.local",
                     domainName = listOf(),
                     txt = ""
                 ),
-                LowLevelMDnsScanner.DnsAnswers(
+                LowLevelMDnsScanner.DnsAnswer(
                     name = "HASS Bridge 0KQ6 A72F86._hap._tcp.local",
                     domainName = listOf(),
                     txt = "md=HASS Bridge 0KQ6.pv=1.0.id=1B:E1:13:17:21:16.c#=2.s#=1.ff=0.ci=2.sf=0.sh=qt6RpA==.HASS Bridge 0KQ6 A72F86._hap._tcp.local"
                 ),
-                LowLevelMDnsScanner.DnsAnswers(name="HASS Bridge 0KQ6 A72F86._hap._tcp.local", domainName=listOf("/192.168.10.3"), txt="")
+                LowLevelMDnsScanner.DnsAnswer(name="HASS Bridge 0KQ6 A72F86._hap._tcp.local", domainName=listOf("/192.168.10.3"), txt="")
             ),
             result
         )
@@ -202,23 +202,23 @@ class MDnsParserTest {
         val result = scanner.parse(paketFromDump(paket))
         assertEquals(
             listOf(
-                LowLevelMDnsScanner.DnsAnswers(
+                LowLevelMDnsScanner.DnsAnswer(
                     name = "_esphomelib._tcp.local",
                     domainName = listOf("esphome_wohnzimmer", "_esphomelib", "_tcp", "local"),
                     txt = ""
                 ),
 
-                LowLevelMDnsScanner.DnsAnswers(
+                LowLevelMDnsScanner.DnsAnswer(
                     name = "esphome_wohnzimmer._esphomelib._tcp.local",
                     domainName = listOf(),
                     txt = ""
                 ),
-                LowLevelMDnsScanner.DnsAnswers(
+                LowLevelMDnsScanner.DnsAnswer(
                     name = "esphome_wohnzimmer._esphomelib._tcp.local",
                     domainName = listOf(),
                     txt = "mac=607d3a6e42c6.address=esphome_wohnzimmer.local.version=1.15.3.esphome_wohnzimmer.local"
                 ),
-                LowLevelMDnsScanner.DnsAnswers(name="esphome_wohnzimmer.local", domainName=listOf("/192.168.0.150"), txt="")
+                LowLevelMDnsScanner.DnsAnswer(name="esphome_wohnzimmer.local", domainName=listOf("/192.168.0.150"), txt="")
             ),
             result
         )
