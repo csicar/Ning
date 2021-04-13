@@ -10,9 +10,23 @@
     <string name="title_device_detail">{deviceIp} gailua</string>
     <string name="title_card_device_info">Gailuaren informazioa</string>
     <string name="field_name_device_name">Gailuaren izena</string>
+    <string name="field_name_device_type">Gailu mota</string>
     <string name="field_name_device_ip">Gailuaren IP helbidea</string>
     <string name="field_name_device_mac">Gailuaren MAC helbidea</string>
     <string name="field_name_vendor_name">Saltzailearen izena</string>
     <string name="title_open_ports">Ataka irekiak:</string>
     <string name="this_device">Gailu hau</string>
+    <string name="error_network_not_found">Ez da sarerik aurkitu</string>
+    <string name="hideMacAddressDetails">Ezkutatu MAC helbidearen xehetasunak</string>
+    <string name="device_type_pc">Ordenagailua</string>
+    <string name="device_type_vm">Makina birtuala</string>
+    <string name="device_type_phone">Mugikorra/Tableta</string>
+    <string name="device_type_speaker">Bozgorailua</string>
+    <string name="device_type_soc">Sistema txipean</string>
+    <string name="device_type_router">Routerra</string>
+    <string name="device_type_network_device">Sare-gailua</string>
+    <string name="device_type_game_console">Joko-kontsola</string>
+    <string name="device_type_cast">Cast</string>
+    <string name="device_type_unknown">Ezezaguna</string>
+    <string name="device_type_home_appliance">Domotika</string>
 </resources>
