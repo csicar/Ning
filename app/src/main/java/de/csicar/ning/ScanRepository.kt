@@ -15,6 +15,7 @@ class ScanRepository(
     private val networkDao: NetworkDao,
     private val scanDao: ScanDao,
     private val deviceDao: DeviceDao,
+    private val portDao: PortDao,
     private val application: Application
 ) {
     companion object {
@@ -79,9 +80,22 @@ class ScanRepository(
                     scanProgress.postValue(scanProgress.value + newResult.progressIncrease)
                 }.pingIpAddresses()
             }, launch {
-                NsdScanner(application) { newResult ->
-                    deviceDao.upsertName(networkId, newResult.ipAddress, newResult.name)
-                }.scan()
+//                NsdScanner(application) { newResult ->
+//                    val deviceId =
+//                        deviceDao.upsertName(networkId, newResult.ipAddress, newResult.name)
+//                    Log.d(TAG, "NSD Scanner result $deviceId")
+//                    if (deviceId != null && newResult.port != null) {
+//                        runBlocking {
+//                            Log.d(TAG, "added new port based on NSD Scanner result $newResult")
+//                            portDao.upsert(Port(0, newResult.port, newResult.protocol, deviceId))
+//                        }
+//                    }
+//                }
+                    //.scan()
+            }, launch {
+                LowLevelMDnsScanner { newResult ->
+                    Log.d(TAG, "res: $newResult")
+                }.probeCommon()
             }, launch {
                 updateFromArp()
             }, launch {

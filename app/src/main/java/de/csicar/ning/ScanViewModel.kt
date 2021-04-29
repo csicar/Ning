@@ -7,11 +7,6 @@ import android.net.NetworkRequest
 import android.util.Log
 import androidx.lifecycle.*
 import de.csicar.ning.scanner.*
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import java.net.Inet4Address
 
 class ScanViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -21,7 +16,13 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     private val networkDao = db.networkDao()
     val portDao = db.portDao()
     private val scanDao = db.scanDao()
-    private val networkScanRepository = ScanRepository(networkDao, scanDao, deviceDao, application)
+    private val networkScanRepository = ScanRepository(
+        networkDao,
+        scanDao,
+        deviceDao,
+        portDao,
+        application
+    )
     val scanProgress by lazy { MutableLiveData<ScanRepository.ScanProgress>() }
     private val currentNetworkId = MutableLiveData<Long>()
     val currentScanId = MutableLiveData<Long>()
