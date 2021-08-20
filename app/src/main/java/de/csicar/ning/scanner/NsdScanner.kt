@@ -5,24 +5,27 @@ import android.content.Context
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.util.Log
-import de.csicar.ning.Device
-import de.csicar.ning.ScanViewModel
+import de.csicar.ning.Protocol
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import java.net.Inet4Address
 
-class NsdScanner(application: Application, private val onUpdate : (ScanResult) -> Unit) {
+class NsdScanner(application: Application, private val onUpdate: (ScanResult) -> Unit) {
     companion object {
         val TAG = NsdScanner::class.java.name
     }
+
     val nsdManager =
         application.applicationContext.getSystemService(Context.NSD_SERVICE) as NsdManager
+
     /** mDNS Service Types, that the application checks for.
      * Unfortunately, android does not offer an API for discovering all services
      * See: http://www.dns-sd.org/servicetypes.html
      */
     private val serviceTypes = setOf(
+        "_services._dns-sd._udp",
         "_workstation._tcp",
         "_companion-link._tcp",
         "_ssh._tcp",
@@ -34,15 +37,21 @@ class NsdScanner(application: Application, private val onUpdate : (ScanResult) -
         "_ipp._tcp",
         "_http._tcp",
         "_smb._tcp",
-        "_nfs._tcp",
-        "_ftp._tcp",
-        "_coap._udp"
+        "_hap._tcp",
+        "_coap._tcp"
     )
 
     suspend fun scan() = withContext(Dispatchers.IO) {
-        serviceTypes.map { serviceType ->
+        serviceTypes.chunked(8).map { serviceTypes ->
             async {
-                nsdManager.discoverServices(serviceType, NsdManager.PROTOCOL_DNS_SD, NsdListener())
+                serviceTypes.forEach { serviceType ->
+                    nsdManager.discoverServices(
+                        serviceType,
+                        NsdManager.PROTOCOL_DNS_SD,
+                        NsdListener()
+                    )
+                    delay(20000)
+                }
             }
         }
     }
@@ -57,7 +66,21 @@ class NsdScanner(application: Application, private val onUpdate : (ScanResult) -
             if (serviceInfo == null) return
             val host = serviceInfo.host
             if (host !is Inet4Address) return
-            onUpdate(ScanResult(host, serviceInfo.serviceName))
+            Log.d(TAG, "resolved!")
+            Log.d(TAG, serviceInfo.toString())
+            val protocolType = when {
+                serviceInfo.serviceType.contains("_tcp") -> Protocol.TCP
+                serviceInfo.serviceType.contains("_udp") -> Protocol.UDP
+                else -> TODO()
+            }
+            onUpdate(
+                ScanResult(
+                    host,
+                    if (serviceInfo.port == 0) 0 else serviceInfo.port,
+                    serviceInfo.serviceName,
+                    protocolType
+                )
+            )
 
         }
     }
@@ -87,5 +110,14 @@ class NsdScanner(application: Application, private val onUpdate : (ScanResult) -
 
     }
 
-    data class ScanResult(val ipAddress: Inet4Address, val name: String)
+    data class ScanResult(
+        val ipAddress: Inet4Address,
+        /**
+         * Will be null, if the port is likely not a valid port. (For example `_device_info` returns
+         * port 0
+         */
+        val port: Int?,
+        val name: String,
+        val protocol: Protocol
+    )
 }
