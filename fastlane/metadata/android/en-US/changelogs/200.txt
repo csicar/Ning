@@ -1,0 +1,2 @@
+- Use custom-build mDNS system for improved speed and mac address detection
+- Update dependencies
