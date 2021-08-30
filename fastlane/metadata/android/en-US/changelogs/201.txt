@@ -1,0 +1,2 @@
+- Fix crash caused by missing database migration
+- Update dependencies
