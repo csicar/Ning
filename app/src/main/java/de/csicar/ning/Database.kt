@@ -9,7 +9,7 @@ import java.net.Inet4Address
 @Database(
     entities = [Network::class, Device::class, Port::class, MacVendor::class, Scan::class],
     views = [DeviceWithName::class],
-    version = 21
+    version = 22
 )
 @TypeConverters(Converter::class)
 abstract class AppDatabase : RoomDatabase() {
