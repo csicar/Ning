@@ -41,7 +41,7 @@ Roadmap
 - [ ] producer consumer architecture for scan
     - run `n` pings in parallel, start new ping when one ping is finished
 - [ ] combine scanners into `UnifiedDeviceScanner`
-- [ ] Low-Level mDNS Service Discovery
+- [x] Low-Level mDNS Service Discovery
 
 
 Contributing
