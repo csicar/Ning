@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Ning</string>
-
     <string name="swipe_down_to_scan_the_network">Desliza abajo para escanear la red</string>
     <string name="device_icon">Icono del dispositivo</string>
     <string name="interfaces_submenu">Interfaces</string>
@@ -13,4 +12,20 @@
     <string name="field_name_device_mac">MAC del dispositivo</string>
     <string name="field_name_vendor_name">Nombre del vendedor</string>
     <string name="title_open_ports">Puertos abiertos:</string>
+    <string name="field_name_device_name">Nombre del dispositivo</string>
+    <string name="field_name_device_type">Tipo de dispositivo</string>
+    <string name="this_device">Este dispositivo</string>
+    <string name="error_network_not_found">Red no encontrada</string>
+    <string name="hideMacAddressDetails">No mostrad detalles de dirección MAC</string>
+    <string name="device_type_pc">PC</string>
+    <string name="device_type_vm">Máquina virtual</string>
+    <string name="device_type_phone">Smartphone/Tablet</string>
+    <string name="device_type_speaker">Altavoz</string>
+    <string name="device_type_soc">Sistema en chip</string>
+    <string name="device_type_router">Router</string>
+    <string name="device_type_network_device">Dispositivo de red</string>
+    <string name="device_type_game_console">Videoconsola</string>
+    <string name="device_type_cast">Emitir</string>
+    <string name="device_type_unknown">Desconocido</string>
+    <string name="device_type_home_appliance">Electrodoméstico</string>
 </resources>
