@@ -6,12 +6,12 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 31
+    buildToolsVersion "30.0.2"
     defaultConfig {
         applicationId "de.csicar.ning"
         minSdkVersion 23
-        targetSdkVersion 29
+        targetSdkVersion 31
         versionCode 201
         versionName "2.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -31,7 +31,7 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$nav_version"
 
 
-    def room_version = "2.2.6"
+    def room_version = "2.3.0"
 
     implementation "androidx.room:room-runtime:$room_version"
     kapt "androidx.room:room-compiler:$room_version"
@@ -54,10 +54,10 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation "androidx.appcompat:appcompat:1.3.1"
-    implementation "androidx.core:core-ktx:1.3.2"
-    implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+    implementation "androidx.core:core-ktx:1.7.0"
+    implementation "androidx.constraintlayout:constraintlayout:2.1.1"
     implementation "androidx.recyclerview:recyclerview:1.2.1"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2"
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
 
     implementation "androidx.legacy:legacy-support-v4:1.0.0"

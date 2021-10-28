@@ -61,11 +61,11 @@ class Converter {
 
     @TypeConverter
     fun toMacAddress(value: String?): MacAddress? {
-        return if (value != null) MacAddress(value.toUpperCase()) else null
+        return if (value != null) MacAddress(value.uppercase(Locale.getDefault())) else null
     }
 
     @TypeConverter
     fun fromMacAddress(value: MacAddress?): String? {
-        return value?.address?.toUpperCase()
+        return value?.address?.uppercase(Locale.getDefault())
     }
 }
