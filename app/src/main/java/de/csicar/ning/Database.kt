@@ -5,6 +5,7 @@ import androidx.room.*
 import de.csicar.ning.scanner.MacAddress
 import de.csicar.ning.util.inet4AddressFromInt
 import java.net.Inet4Address
+import java.util.*
 
 @Database(
     entities = [Network::class, Device::class, Port::class, MacVendor::class, Scan::class],
