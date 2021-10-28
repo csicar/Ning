@@ -54,7 +54,21 @@ class PortScanner(val ip: InetAddress) {
         }
     }
 
-    suspend fun scanPorts() = withContext(Dispatchers.Main) {
+    suspend fun scanAllPorts() = withContext(Dispatchers.Main) {
+        (1 .. 65535).flatMap {
+            listOf(
+                async {
+                    PortResult(it, Protocol.TCP, isTcpPortOpen(it))
+                },
+                async {
+                    PortResult(it, Protocol.UDP, isUdpPortOpen(it))
+                }
+            )
+        }
+    }
+
+
+    suspend fun scanCommonPorts() = withContext(Dispatchers.Main) {
         PortDescription.commonPorts.flatMap {
             listOf(
                 async {

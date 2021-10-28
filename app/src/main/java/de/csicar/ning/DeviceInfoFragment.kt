@@ -54,8 +54,8 @@ class DeviceInfoFragment : Fragment() {
         copyUtil.makeTextViewCopyable(deviceHwAddressTextView)
         copyUtil.makeTextViewCopyable(deviceVendorTextView)
 
-        viewModel.deviceDao.getById(argumentDeviceId).observe(this, Observer {
-            fetchInfo(it.asDevice)
+        viewModel.deviceDao.getById(argumentDeviceId).observe(viewLifecycleOwner, Observer {
+            fetchCommonPorts(it.asDevice)
             deviceTypeTextView.text = getString(it.deviceType.label)
             deviceIpTextView.text = it.ip.hostAddress
             deviceNameTextView.text = if (it.isScanningDevice) {
@@ -70,7 +70,15 @@ class DeviceInfoFragment : Fragment() {
 
         val ports = viewModel.portDao.getAllForDevice(argumentDeviceId)
 
-        recyclerView.setHandler(context!!, this, object :
+        this.scanAllPortsButton = view.findViewById(R.id.scanAllPorts)
+
+        this.scanAllPortsButton.setOnClickListener {
+            viewModel.viewModelScope.launch(context = Dispatchers.IO) {
+                fetchAllPorts(viewModel.deviceDao.getByIdNow(argumentDeviceId))
+            }
+        }
+
+        recyclerView.setHandler(requireContext(), this, object :
             RecyclerViewCommon.Handler<Port>(R.layout.fragment_port_item, ports) {
             override fun shareIdentity(a: Port, b: Port) = a.port == b.port
             override fun areContentsTheSame(a: Port, b: Port) = a == b
@@ -118,10 +126,27 @@ class DeviceInfoFragment : Fragment() {
         return view
     }
 
-    fun fetchInfo(device: Device) {
+    private fun fetchAllPorts(device: Device) {
         viewModel.viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                PortScanner(device.ip).scanPorts().forEach {
+                PortScanner(device.ip).scanAllPorts().forEach {
+                    launch {
+                        val result = it.await()
+                        if (result.isOpen) {
+                            viewModel.portDao.upsert(
+                                Port(0, result.port, result.protocol, device.deviceId)
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun fetchCommonPorts(device: Device) {
+        viewModel.viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                PortScanner(device.ip).scanCommonPorts().forEach {
                     launch {
                         val result = it.await()
                         if (result.isOpen) {

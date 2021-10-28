@@ -29,4 +29,5 @@
     <string name="device_type_cast">Cast</string>
     <string name="device_type_unknown">Unknown</string>
     <string name="device_type_home_appliance">Home Appliance</string>
+    <string name="scanAllPorts">more Ports...</string>
 </resources>
