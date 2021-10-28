@@ -5,6 +5,7 @@ import androidx.room.*
 import de.csicar.ning.scanner.MacAddress
 import de.csicar.ning.util.inet4AddressFromInt
 import java.net.Inet4Address
+import java.util.*
 
 @Database(
     entities = [Network::class, Device::class, Port::class, MacVendor::class, Scan::class],
@@ -61,11 +62,11 @@ class Converter {
 
     @TypeConverter
     fun toMacAddress(value: String?): MacAddress? {
-        return if (value != null) MacAddress(value.toUpperCase()) else null
+        return if (value != null) MacAddress(value.uppercase(Locale.getDefault())) else null
     }
 
     @TypeConverter
     fun fromMacAddress(value: MacAddress?): String? {
-        return value?.address?.toUpperCase()
+        return value?.address?.uppercase(Locale.getDefault())
     }
 }

@@ -9,15 +9,14 @@ import android.widget.ImageView
 import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.lifecycle.viewModelScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.snackbar.Snackbar
 import de.csicar.ning.ui.RecyclerViewCommon
 import de.csicar.ning.util.AppPreferences
 import de.csicar.ning.util.CopyUtil
-import kotlinx.android.synthetic.main.fragment_device.view.*
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
@@ -28,9 +27,8 @@ import kotlin.math.roundToInt
  */
 class NetworkFragment : Fragment() {
     private var listener: OnListFragmentInteractionListener? = null
-    private val viewModel by lazy {
-        ViewModelProviders.of(activity!!).get(ScanViewModel::class.java)
-    }
+    val viewModel : ScanViewModel by activityViewModels()
+
     lateinit var swipeRefreshLayout: SwipeRefreshLayout
     lateinit var emptyListInfo: View
 
@@ -70,18 +68,18 @@ class NetworkFragment : Fragment() {
 
         val devicesList = view.findViewById<RecyclerViewCommon>(R.id.devicesList)
         devicesList.setHandler(
-            context!!,
+            requireContext(),
             this,
             object : RecyclerViewCommon.Handler<DeviceWithName>(
                 R.layout.fragment_device,
                 viewModel.devices
             ) {
                 override fun bindItem(view: View): (DeviceWithName) -> Unit {
-                    val ipTextView: TextView = view.ipTextView
-                    val macTextView: TextView = view.macTextView
-                    val vendorTextView: TextView = view.vendorTextView
-                    val deviceNameTextView: TextView = view.deviceNameTextView
-                    val deviceIcon: ImageView = view.device_icon
+                    val ipTextView: TextView = view.findViewById(R.id.ipTextView)
+                    val macTextView: TextView = view.findViewById(R.id.macTextView)
+                    val vendorTextView: TextView = view.findViewById(R.id.vendorTextView)
+                    val deviceNameTextView: TextView = view.findViewById(R.id.deviceNameTextView)
+                    val deviceIcon: ImageView = view.findViewById(R.id.device_icon)
 
                     copyUtil.makeTextViewCopyable(macTextView)
 

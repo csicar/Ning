@@ -19,7 +19,7 @@ class ScanRepository(
     private val application: Application
 ) {
     companion object {
-        val TAG = ScanRepository.javaClass.name
+        val TAG: String = ScanRepository::class.java.name
     }
 
     private val scanId by lazy {

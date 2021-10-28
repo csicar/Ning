@@ -6,16 +6,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.csicar.ning.scanner.PortScanner
 import de.csicar.ning.ui.RecyclerViewCommon
 import de.csicar.ning.util.AppPreferences
 import de.csicar.ning.util.CopyUtil
-import kotlinx.android.synthetic.main.fragment_port_item.view.*
+//import kotlinx.android.synthetic.main.fragment_port_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -27,14 +30,14 @@ import kotlinx.coroutines.withContext
  * [DeviceInfoFragment.OnListFragmentInteractionListener] interface.
  */
 class DeviceInfoFragment : Fragment() {
-    lateinit var viewModel: ScanViewModel
+    val viewModel: ScanViewModel by activityViewModels()
+    lateinit var scanAllPortsButton: Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_deviceinfo_list, container, false)
-        viewModel = ViewModelProviders.of(activity!!).get(ScanViewModel::class.java)
         val recyclerView = view.findViewById<RecyclerViewCommon>(R.id.list)
         val argumentDeviceId = arguments?.getLong("deviceId")!!
         val copyUtil = CopyUtil(view)
@@ -96,9 +99,9 @@ class DeviceInfoFragment : Fragment() {
             }
 
             override fun bindItem(view: View): (value: Port) -> Unit {
-                val portNumberTextView: TextView = view.portNumberTextView
-                val protocolTextView: TextView = view.protocolTextView
-                val serviceTextView: TextView = view.serviceNameTextView
+                val portNumberTextView: TextView = view.findViewById(R.id.portNumberTextView)
+                val protocolTextView: TextView = view.findViewById(R.id.protocolTextView)
+                val serviceTextView: TextView = view.findViewById(R.id.serviceNameTextView)
 
                 copyUtil.makeTextViewCopyable(portNumberTextView)
                 copyUtil.makeTextViewCopyable(protocolTextView)
