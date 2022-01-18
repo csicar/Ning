@@ -54,7 +54,7 @@ class DeviceInfoFragment : Fragment() {
         copyUtil.makeTextViewCopyable(deviceHwAddressTextView)
         copyUtil.makeTextViewCopyable(deviceVendorTextView)
 
-        viewModel.deviceDao.getById(argumentDeviceId).observe(this, Observer {
+        viewModel.deviceDao.getById(argumentDeviceId).observe(viewLifecycleOwner, Observer {
             fetchInfo(it.asDevice)
             deviceTypeTextView.text = getString(it.deviceType.label)
             deviceIpTextView.text = it.ip.hostAddress
@@ -70,7 +70,7 @@ class DeviceInfoFragment : Fragment() {
 
         val ports = viewModel.portDao.getAllForDevice(argumentDeviceId)
 
-        recyclerView.setHandler(context!!, this, object :
+        recyclerView.setHandler(requireContext(), this, object :
             RecyclerViewCommon.Handler<Port>(R.layout.fragment_port_item, ports) {
             override fun shareIdentity(a: Port, b: Port) = a.port == b.port
             override fun areContentsTheSame(a: Port, b: Port) = a == b

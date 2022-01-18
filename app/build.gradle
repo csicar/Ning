@@ -10,7 +10,9 @@ android {
     defaultConfig {
         applicationId "de.csicar.ning"
         minSdkVersion 23
-        targetSdkVersion 31
+        // The targetSdkVersion needs to be below 31 to get access to `ip neigh`
+        //noinspection OldTargetApi
+        targetSdkVersion 29
         versionCode 201
         versionName "2.0.1"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

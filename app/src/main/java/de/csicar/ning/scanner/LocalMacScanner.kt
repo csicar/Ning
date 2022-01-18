@@ -1,5 +1,6 @@
 package de.csicar.ning.scanner
 
+import de.csicar.ning.AvailabilityStatus
 import de.csicar.ning.Device
 import de.csicar.ning.Network
 import java.net.Inet4Address
@@ -12,7 +13,7 @@ object LocalMacScanner {
             .filterKeys { network.containsAddress(it) }.entries.firstOrNull()
             ?: return null
 
-        return Device(0, network.networkId, foundMac.key, null, foundMac.value, true)
+        return Device(0, network.networkId, foundMac.key, null, foundMac.value, true, availabilityStatus = AvailabilityStatus.UNKNOWN)
     }
 
     private fun intToMacAddress(value: ByteArray) =

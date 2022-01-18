@@ -10,7 +10,7 @@ import java.util.*
 @Database(
     entities = [Network::class, Device::class, Port::class, MacVendor::class, Scan::class],
     views = [DeviceWithName::class],
-    version = 22
+    version = 24
 )
 @TypeConverters(Converter::class)
 abstract class AppDatabase : RoomDatabase() {

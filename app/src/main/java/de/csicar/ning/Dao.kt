@@ -32,7 +32,7 @@ interface NetworkDao {
 
 @Dao
 interface DeviceDao {
-    @Query("Select * FROM DeviceWithName WHERE networkId = :networkId ORDER BY ip ASC")
+    @Query("Select * FROM DeviceWithName WHERE networkId = :networkId ORDER BY availabilityStatus, ip ASC")
     fun getAll(networkId: Long): LiveData<List<DeviceWithName>>
 
 
@@ -54,24 +54,12 @@ interface DeviceDao {
     }
 
     @Transaction
-    fun upsertName(networkId: Long, ip: Inet4Address, name: String, allowNew: Boolean = true): Long? {
-        val existingDevice = getByAddressInNetwork(ip, networkId)
-        if (existingDevice != null) {
-            updateServiceName(existingDevice.deviceId, name)
-            return existingDevice.deviceId
-        } else if (allowNew) {
-            return insert(Device(0, networkId, ip, name, null))
-        }
-        return null
-    }
-
-    @Transaction
     fun upsertHwAddress(networkId: Long, ip: Inet4Address, hwAddress: MacAddress, allowNew: Boolean) {
         val existingDevice = getByAddressInNetwork(ip, networkId)
         if(existingDevice != null) {
             updateHwAddress(existingDevice.deviceId, hwAddress)
         } else if(allowNew) {
-            insert(Device(0, networkId, ip, null, hwAddress))
+            insert(Device(0, networkId, ip, null, hwAddress, isScanningDevice = false, availabilityStatus = AvailabilityStatus.UNKNOWN))
         }
     }
 
@@ -100,12 +88,23 @@ interface DeviceDao {
     @Query("UPDATE Device SET deviceName = :deviceName WHERE deviceId = :deviceId")
     fun updateServiceName(deviceId: Long, deviceName: String?)
 
+
+    @Query("UPDATE Device SET availabilityStatus = :availabilityStatus WHERE deviceId = :deviceId")
+    fun updateAvailability(deviceId: Long, availabilityStatus: AvailabilityStatus)
+
     @Transaction
     fun insertIfNew(networkId: Long, ip: Inet4Address): Long {
         val existingAddress = getByAddressInNetwork(ip, networkId)
-            ?: return insert(Device(0, networkId, ip, null, null))
+            ?: return insert(Device(0, networkId, ip, null, null, availabilityStatus = AvailabilityStatus.UNKNOWN))
         return existingAddress.deviceId
     }
+
+    @Transaction
+    fun reportAvailableDevice(networkId: Long, ip: Inet4Address) : Long =
+        insertIfNew(networkId, ip).also {
+            updateAvailability(it, AvailabilityStatus.AVAILABLE)
+        }
+
 }
 
 @Dao

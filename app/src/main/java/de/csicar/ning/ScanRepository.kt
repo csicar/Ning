@@ -74,7 +74,7 @@ class ScanRepository(
                 PingScanner(network, ipGuesses) { newResult ->
                     if (newResult.isReachable) {
                         Log.d(TAG, "isReachable ${newResult.ipAddress}")
-                        deviceDao.insertIfNew(networkId, newResult.ipAddress)
+                        deviceDao.reportAvailableDevice(networkId, newResult.ipAddress)
                         launch { updateFromArp() }
                     }
                     scanProgress.postValue(scanProgress.value + newResult.progressIncrease)
@@ -119,7 +119,7 @@ class ScanRepository(
                     scanId.value ?: return@forEach,
                     ip,
                     it.value.hwAddress,
-                    false
+                    true
                 )
             }
         }

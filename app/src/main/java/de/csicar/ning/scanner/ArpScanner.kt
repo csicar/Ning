@@ -39,7 +39,7 @@ private fun InputStream.readStreamAsTable(): Sequence<List<String>> {
 
 object ArpScanner {
     
-    private val TAG = ArpScanner.javaClass.name
+    private val TAG = this.javaClass.name
 
     suspend fun getFromAllSources() = withContext(Dispatchers.Default) {
         listOf(async { getArpTableFromFile() }, async { getArpTableFromIpCommand() })
@@ -70,6 +70,10 @@ object ArpScanner {
             try {
 
                 val execution = Runtime.getRuntime().exec("ip neigh")
+                val errors = execution.errorStream.bufferedReader().readText()
+                if (errors != "") {
+                    Log.e(TAG, "stderr when running `ip neigh`: $errors")
+                }
                 execution.waitFor()
                 execution.inputStream.readStreamAsTable()
                     .filter { it.size >= 5 }

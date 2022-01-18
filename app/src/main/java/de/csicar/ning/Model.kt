@@ -19,8 +19,14 @@ data class Device(
     val ip: Inet4Address,
     val deviceName: String?,
     val hwAddress: MacAddress?,
-    val isScanningDevice: Boolean = false
+    val isScanningDevice: Boolean = false,
+    val availabilityStatus: AvailabilityStatus// = AvailabilityStatus.AVAILABLE
 )
+
+enum class AvailabilityStatus {
+    AVAILABLE,
+    UNKNOWN
+}
 
 enum class DeviceType {
     PC,
@@ -66,7 +72,7 @@ enum class DeviceType {
         }
 }
 
-@DatabaseView("SELECT Device.deviceId, Device.networkId, Device.ip, Device.hwAddress, Device.deviceName, MacVendor.name as vendorName, Device.isScanningDevice FROM Device LEFT JOIN MacVendor ON MacVendor.mac = substr(Device.hwAddress, 0, 9)")
+@DatabaseView("SELECT Device.deviceId, Device.networkId, Device.ip, Device.hwAddress, Device.deviceName, MacVendor.name as vendorName, Device.isScanningDevice, Device.availabilityStatus FROM Device LEFT JOIN MacVendor ON MacVendor.mac = substr(Device.hwAddress, 0, 9)")
 data class DeviceWithName(
     val deviceId: Long,
     val networkId: Long,
@@ -74,10 +80,11 @@ data class DeviceWithName(
     val hwAddress: MacAddress?,
     val deviceName: String?,
     val vendorName: String?,
-    val isScanningDevice: Boolean
+    val isScanningDevice: Boolean,
+    val availabilityStatus: AvailabilityStatus
 ) {
     @Ignore
-    val asDevice = Device(deviceId, networkId, ip, deviceName, hwAddress, isScanningDevice)
+    val asDevice = Device(deviceId, networkId, ip, deviceName, hwAddress, isScanningDevice, availabilityStatus)
 
     val deviceType
         get() = when {
