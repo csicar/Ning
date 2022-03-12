@@ -70,18 +70,21 @@ class DeviceInfoFragment : Fragment() {
 
         val ports = viewModel.portDao.getAllForDevice(argumentDeviceId)
 
-        recyclerView.setHandler(context!!, this, object :
+        recyclerView.setHandler(requireContext(), this, object :
             RecyclerViewCommon.Handler<Port>(R.layout.fragment_port_item, ports) {
             override fun shareIdentity(a: Port, b: Port) = a.port == b.port
             override fun areContentsTheSame(a: Port, b: Port) = a == b
             override fun onClickListener(view: View, value: Port) {
                 viewModel.viewModelScope.launch(context = Dispatchers.IO) {
                     val ip = viewModel.deviceDao.getByIdNow(value.deviceId).ip
+                    val portDescription = PortDescription.commonPorts.find { it.port == value.port }
                     withContext(Dispatchers.Main) {
-                        Intent(Intent.ACTION_VIEW).apply {
-                            data = Uri.parse("http://${ip}:${value.port}")
-                        }.also {
-                            startActivity(it)
+                        if (portDescription?.urlSchema == null) {
+                            copyUtil.copyText("${ip.hostAddress}:${value.port}")
+                        } else {
+                            val intent = Intent(Intent.ACTION_VIEW)
+                            intent.data = Uri.parse("${portDescription.urlSchema}://${ip}:${value.port}")
+                            startActivity(intent)
                         }
                     }
                 }
