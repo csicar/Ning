@@ -43,7 +43,7 @@ dependencies {
     // optional - Kotlin Extensions and Coroutines support for Room
     implementation "androidx.room:room-ktx:$room_version"
 
-    def lifecycle_version = "2.4.0"
+    def lifecycle_version = "2.6.0"
 
     // ViewModel and LiveData
     //implementation "androidx.lifecycle:lifecycle-extensions:$lifecycle_version"
