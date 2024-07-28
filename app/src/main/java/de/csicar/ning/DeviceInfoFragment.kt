@@ -3,16 +3,16 @@ package de.csicar.ning
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.csicar.ning.scanner.PortScanner
 import de.csicar.ning.ui.RecyclerViewCommon
@@ -20,6 +20,9 @@ import de.csicar.ning.util.AppPreferences
 import de.csicar.ning.util.CopyUtil
 //import kotlinx.android.synthetic.main.fragment_port_item.view.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.InternalCoroutinesApi
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -30,6 +33,10 @@ import kotlinx.coroutines.withContext
  * [DeviceInfoFragment.OnListFragmentInteractionListener] interface.
  */
 class DeviceInfoFragment : Fragment() {
+    companion object {
+        val TAG: String = DeviceInfoFragment::class.java.name
+    }
+
     val viewModel: ScanViewModel by activityViewModels()
     lateinit var scanAllPortsButton: Button
 
@@ -47,6 +54,7 @@ class DeviceInfoFragment : Fragment() {
         val deviceNameTextView = view.findViewById<TextView>(R.id.deviceNameTextView)
         val deviceHwAddressTextView = view.findViewById<TextView>(R.id.deviceHwAddressTextView)
         val deviceVendorTextView = view.findViewById<TextView>(R.id.deviceVendorTextView)
+        val portScanProgressBar = view.findViewById<ProgressBar>(R.id.portScanProgressBar)
 
         copyUtil.makeTextViewCopyable((deviceTypeTextView))
         copyUtil.makeTextViewCopyable((deviceIpTextView))
@@ -55,7 +63,9 @@ class DeviceInfoFragment : Fragment() {
         copyUtil.makeTextViewCopyable(deviceVendorTextView)
 
         viewModel.deviceDao.getById(argumentDeviceId).observe(viewLifecycleOwner, Observer {
-            fetchCommonPorts(it.asDevice)
+            fetchCommonPorts(it.asDevice) { progress ->
+                portScanProgressBar.progress = (progress * 1000).toInt()
+            }
             deviceTypeTextView.text = getString(it.deviceType.label)
             deviceIpTextView.text = it.ip.hostAddress
             deviceNameTextView.text = if (it.isScanningDevice) {
@@ -74,7 +84,10 @@ class DeviceInfoFragment : Fragment() {
 
         this.scanAllPortsButton.setOnClickListener {
             viewModel.viewModelScope.launch(context = Dispatchers.IO) {
-                fetchAllPorts(viewModel.deviceDao.getByIdNow(argumentDeviceId))
+                Log.d(TAG, "scan all ports")
+                fetchAllPorts(viewModel.deviceDao.getByIdNow(argumentDeviceId)) {
+                    portScanProgressBar.progress = (it * 1000).toInt()
+                }
             }
         }
 
@@ -126,29 +139,40 @@ class DeviceInfoFragment : Fragment() {
         return view
     }
 
-    private fun fetchAllPorts(device: Device) {
+    private fun fetchAllPorts(device: Device, onProgress: (Double) -> Unit) {
         viewModel.viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                PortScanner(device.ip).scanAllPorts().forEach {
-                    launch {
-                        val result = it.await()
-                        if (result.isOpen) {
-                            viewModel.portDao.upsert(
-                                Port(0, result.port, result.protocol, device.deviceId)
-                            )
-                        }
+                Log.d(TAG, "fetchAllPort")
+                val portScans = PortScanner(device.ip).scanAllPorts()
+                var currentProgress = 0.0
+
+                portScans.onEach {
+                    currentProgress += it.progressPortion
+                    Log.d(TAG, "from progress scan $it ($currentProgress)")
+                    onProgress(currentProgress)
+                }.collect { result: PortScanner.PortResult ->
+                    if (result.isOpen) {
+                        viewModel.portDao.upsert(
+                            Port(0, result.port, result.protocol, device.deviceId)
+                        )
                     }
                 }
             }
         }
     }
 
-    private fun fetchCommonPorts(device: Device) {
+    private fun fetchCommonPorts(device: Device, onProgress: (Double) -> Unit) {
         viewModel.viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                PortScanner(device.ip).scanCommonPorts().forEach {
+                val portScans = PortScanner(device.ip).scanCommonPorts()
+                var currentProgress = 0.0
+                portScans.forEach {
                     launch {
                         val result = it.await()
+
+                        currentProgress += 1.0 / portScans.size
+                        onProgress(currentProgress)
+
                         if (result.isOpen) {
                             viewModel.portDao.upsert(
                                 Port(

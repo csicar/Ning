@@ -144,6 +144,13 @@
             android:text="@string/title_open_ports"
             android:textAppearance="@style/TextAppearance.AppCompat.Body2" />
 
+        <ProgressBar
+            android:id="@+id/portScanProgressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:max="1000"
+            tools:progress="300"
+            android:layout_height="wrap_content"/>
         <de.csicar.ning.ui.RecyclerViewCommon
             android:id="@+id/list"
             android:name="de.csicar.ning.DeviceInfoFragment"

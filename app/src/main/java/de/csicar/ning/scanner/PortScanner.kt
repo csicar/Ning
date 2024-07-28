@@ -1,12 +1,18 @@
 package de.csicar.ning.scanner
 
 import android.util.Log
+import de.csicar.ning.DeviceInfoFragment
 import de.csicar.ning.Port
 import de.csicar.ning.PortDescription
 import de.csicar.ning.Protocol
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.io.InterruptedIOException
@@ -48,38 +54,39 @@ class PortScanner(val ip: InetAddress) {
             return@withContext false
         } catch (ex: NoRouteToHostException) {
             Log.d(TAG, "No Route to Host: $ex")
-            return@withContext  false
+            return@withContext false
         } finally {
             socket?.close()
         }
     }
 
-    suspend fun scanAllPorts() = withContext(Dispatchers.Main) {
-        (1 .. 65535).flatMap {
-            listOf(
-                async {
-                    PortResult(it, Protocol.TCP, isTcpPortOpen(it))
-                },
-                async {
-                    PortResult(it, Protocol.UDP, isUdpPortOpen(it))
-                }
-            )
+    suspend fun scanAllPorts(): Flow<PortResult> {
+        val range = (1..65535)
+        return range.asFlow().flatMapMerge(concurrency = 128) {
+            Log.d(DeviceInfoFragment.TAG, "scan port $it")
+            flow {
+                emit(PortResult(it, Protocol.TCP, isTcpPortOpen(it), 1.0 / range.count()))
+                emit(PortResult(it, Protocol.UDP, isUdpPortOpen(it), 1.0 / range.count()))
+            }
         }
     }
 
 
     suspend fun scanCommonPorts() = withContext(Dispatchers.Main) {
-        PortDescription.commonPorts.flatMap {
-            listOf(
-                async {
-                    PortResult(it.port, Protocol.TCP, isTcpPortOpen(it.port))
-                },
-                async {
-                    PortResult(it.port, Protocol.UDP, isUdpPortOpen(it.port))
-                }
-            )
+        val ports = PortDescription.commonPorts
+        ports.flatMap {
+            listOf(async {
+                PortResult(it.port, Protocol.TCP, isTcpPortOpen(it.port), 1.0 / ports.count())
+            }, async {
+                PortResult(it.port, Protocol.UDP, isUdpPortOpen(it.port), 1.0 / ports.count())
+            })
         }
     }
 
-    data class PortResult(val port: Int, val protocol: Protocol, val isOpen: Boolean)
+    data class PortResult(
+        val port: Int,
+        val protocol: Protocol,
+        val isOpen: Boolean,
+        val progressPortion: Double
+    )
 }

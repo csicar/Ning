@@ -6,7 +6,6 @@ apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 31
-    buildToolsVersion "30.0.2"
     defaultConfig {
         applicationId "de.csicar.ning"
         minSdkVersion 23
@@ -24,6 +23,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'de.csicar.ning'
 
 }
 

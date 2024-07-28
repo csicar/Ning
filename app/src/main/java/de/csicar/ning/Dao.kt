@@ -114,7 +114,7 @@ interface PortDao {
     fun insert(port: Port): Long
 
     @Transaction
-    suspend fun upsert(port: Port): Long {
+    fun upsert(port: Port): Long {
         val portFromDB = getPortFromNumber(port.deviceId, port.port) ?: return insert(port)
 
         update(Port(portFromDB.portId, port.port, port.protocol, port.deviceId))
@@ -135,7 +135,7 @@ interface PortDao {
 @Dao
 interface ScanDao {
     @Insert
-    suspend fun insert(scan: Scan): Long
+    fun insert(scan: Scan): Long
 
     @Query("Select * FROM SCAN")
     fun getAll(): LiveData<List<Scan>>
