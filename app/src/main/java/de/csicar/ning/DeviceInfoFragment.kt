@@ -10,15 +10,12 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import de.csicar.ning.scanner.PortScanner
 import de.csicar.ning.ui.RecyclerViewCommon
 import de.csicar.ning.util.AppPreferences
 import de.csicar.ning.util.CopyUtil
-//import kotlinx.android.synthetic.main.fragment_port_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

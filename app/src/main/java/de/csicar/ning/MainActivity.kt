@@ -1,26 +1,15 @@
 package de.csicar.ning
 
 import android.os.Bundle
-import android.util.Log
-import android.view.SubMenu
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
-import androidx.core.internal.view.SupportMenuItem.SHOW_AS_ACTION_ALWAYS
 import androidx.core.os.bundleOf
-import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.FragmentNavigator
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.NavigationUI
+import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import kotlinx.coroutines.launch
-import androidx.navigation.ui.navigateUp
 import de.csicar.ning.databinding.ActivityMainBinding
 
 

@@ -1,12 +1,15 @@
 package de.csicar.ning.scanner
 
+import android.util.Log
 import de.csicar.ning.Device
 import de.csicar.ning.Network
 import java.net.Inet4Address
 import java.net.NetworkInterface
-
+import java.net.SocketException
 
 object LocalMacScanner {
+    private val TAG = LocalMacScanner::class.java.name
+
     fun asDevice(network: Network): Device? {
         val foundMac = getMacAddresses()
             .filterKeys { network.containsAddress(it) }.entries.firstOrNull()
@@ -33,8 +36,8 @@ object LocalMacScanner {
                         }
                 }
                 .associate { it }
-        } catch (ex: Exception) { //handle exception
-            ex.printStackTrace()
+        } catch (ex: SocketException) {
+            Log.w(TAG, "Failed to enumerate network interfaces", ex)
             emptyMap()
         }
     }

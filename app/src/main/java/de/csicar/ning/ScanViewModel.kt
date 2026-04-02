@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.NetworkRequest
-import android.util.Log
 import androidx.lifecycle.*
 import de.csicar.ning.scanner.*
 
@@ -32,17 +31,10 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     val currentNetworks = Transformations.switchMap(currentScanId) {
-        Log.d("asd", "netowkrsadss $it")
         networkDao.getAll(it)
     }
 
     fun fetchAvailableInterfaces() = networkScanRepository.fetchAvailableInterfaces()
-
-    val availableInterfaces by lazy {
-        val med = MediatorLiveData<List<InterfaceScanner.NetworkResult>>()
-
-
-    }
 
     class NetworksLiveData(context: Context, private val networkScanRepository: ScanRepository) :
         LiveData<List<InterfaceScanner.NetworkResult>>()

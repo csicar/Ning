@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
-import java.io.PrintWriter
 import java.lang.IndexOutOfBoundsException
 import java.net.*
 import java.nio.charset.Charset
@@ -93,27 +92,20 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
         val noAnswerRecords = byteArray.rangeToInt(6, 7)
         val noAuthorityRecords = byteArray.rangeToInt(8, 9)
         val noAdditionalRecords = byteArray.rangeToInt(10, 11)
-        println("noAnswerRecords: $noAnswerRecords, noAuthorityRecords: $noAuthorityRecords, noAdditionalRecords: $noAdditionalRecords")
         var index = 12
         val answers = mutableListOf<DnsAnswer>()
-        println("\n\n answer records (index: $index)")
         repeat(noAnswerRecords) {
             val (newIndex, answer) = parseAnswer(index, byteArray)
-            println("==> answer: $answer")
             index = newIndex
             if(answer != null) answers += answer
         }
-        println("\n\n authority records (index: $index)")
         repeat(noAuthorityRecords) {
             val (newIndex, answer) = parseAnswer(index, byteArray)
-            println("==> answer: $answer")
             index = newIndex
             if(answer != null) answers += answer
         }
-        println("\n\n additional records (index: $index)")
         repeat(noAdditionalRecords) {
             val (newIndex, answer) = parseAnswer(index, byteArray)
-            println("==> answer: $answer")
             index = newIndex
             if(answer != null) answers += answer
         }
@@ -187,9 +179,6 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
         val timeToLive = byteArray.rangeToInt(i + 5, i + 9)
         val dataLength = byteArray.rangeToInt(i + 9, i + 10)
         val dataIndex = i + 11
-        println("parseAnswer at $startIndex => type: $type (${parseRecordType(type)}), classCode: $classCode, ttl: $timeToLive, dataIndex: $dataIndex, name: $name")
-        println("i: $i")
-
         val combinedName = name.joinToString(".")
         val dnsAnswer = when (parseRecordType(type)) {
             RecordType.POINTER ->
