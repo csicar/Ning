@@ -2,6 +2,7 @@ package de.csicar.ning.scanner
 
 import android.util.Log
 import de.csicar.ning.Device
+import de.csicar.ning.DeviceId
 import de.csicar.ning.Network
 import java.net.Inet4Address
 import java.net.NetworkInterface
@@ -15,7 +16,7 @@ object LocalMacScanner {
             .filterKeys { network.containsAddress(it) }.entries.firstOrNull()
             ?: return null
 
-        return Device(0, network.networkId, foundMac.key, null, foundMac.value, true)
+        return Device(DeviceId(0), network.networkId, foundMac.key, null, foundMac.value, true)
     }
 
     private fun intToMacAddress(value: ByteArray) =

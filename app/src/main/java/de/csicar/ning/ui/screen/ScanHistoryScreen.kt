@@ -48,7 +48,7 @@ fun ScanHistoryScreen(
             }
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(scans.sortedByDescending { it.startedAt }, key = { it.scanId }) { scan ->
+                items(scans.sortedByDescending { it.startedAt }, key = { it.scanId.value }) { scan ->
                     ScanHistoryItemWithNetwork(
                         scan = scan,
                         viewModel = viewModel,
@@ -128,7 +128,7 @@ private fun ScanHistoryItem(
                     }
                 } else {
                     Text(
-                        text = "Scan #${scan.scanId}",
+                        text = "Scan #${scan.scanId.value}",
                         style = MaterialTheme.typography.bodyLarge
                     )
                 }

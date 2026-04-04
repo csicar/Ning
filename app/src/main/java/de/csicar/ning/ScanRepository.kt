@@ -22,18 +22,18 @@ class ScanRepository(
         val TAG: String = ScanRepository::class.java.name
     }
 
-    private val scanId = MutableStateFlow<Long?>(null)
-    private val networkId = MutableStateFlow<Long?>(null)
+    private val scanId = MutableStateFlow<ScanId?>(null)
+    private val networkId = MutableStateFlow<NetworkId?>(null)
 
     fun fetchAvailableInterfaces() = InterfaceScanner.getNetworkInterfaces()
 
     suspend fun startScan(
         interfaceName: String,
         scanProgress: MutableStateFlow<ScanProgress>,
-        currentNetwork: MutableStateFlow<Long?>
+        currentNetwork: MutableStateFlow<NetworkId?>
     ) =
         withContext(Dispatchers.IO) {
-            val newScanId = scanDao.insert(Scan(0, System.currentTimeMillis()))
+            val newScanId = scanDao.insert(Scan(ScanId(0), System.currentTimeMillis()))
             val connectionInfo = getWifiConnectionInfo(application)
             val bssid = if (connectionInfo == null) null else MacAddress(connectionInfo.bssid)
             val ssid = cleanSsid(connectionInfo?.ssid)

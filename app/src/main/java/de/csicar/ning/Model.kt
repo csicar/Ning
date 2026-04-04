@@ -9,13 +9,18 @@ import de.csicar.ning.util.inet4AddressFromInt
 import de.csicar.ning.util.maskWith
 import java.net.Inet4Address
 
+@JvmInline value class ScanId(val value: Long)
+@JvmInline value class NetworkId(val value: Long)
+@JvmInline value class DeviceId(val value: Long)
+@JvmInline value class PortId(val value: Long)
+
 @Entity
-data class Scan(@PrimaryKey(autoGenerate = true) val scanId: Long, val startedAt: Long)
+data class Scan(@PrimaryKey(autoGenerate = true) val scanId: ScanId, val startedAt: Long)
 
 @Entity
 data class Device(
-    @PrimaryKey(autoGenerate = true) val deviceId: Long,
-    val networkId: Long,
+    @PrimaryKey(autoGenerate = true) val deviceId: DeviceId,
+    val networkId: NetworkId,
     val ip: Inet4Address,
     val deviceName: String?,
     val hwAddress: MacAddress?,
@@ -68,8 +73,8 @@ enum class DeviceType {
 
 @DatabaseView("SELECT Device.deviceId, Device.networkId, Device.ip, Device.hwAddress, Device.deviceName, MacVendor.name as vendorName, Device.isScanningDevice FROM Device LEFT JOIN MacVendor ON MacVendor.mac = substr(Device.hwAddress, 0, 9)")
 data class DeviceWithName(
-    val deviceId: Long,
-    val networkId: Long,
+    val deviceId: DeviceId,
+    val networkId: NetworkId,
     val ip: Inet4Address,
     val hwAddress: MacAddress?,
     val deviceName: String?,
@@ -154,10 +159,10 @@ data class DeviceWithName(
 
 @Entity
 data class Network(
-    @PrimaryKey(autoGenerate = true) val networkId: Long,
+    @PrimaryKey(autoGenerate = true) val networkId: NetworkId,
     val baseIp: Inet4Address,
     val mask: Short,
-    val scanId: Long,
+    val scanId: ScanId,
     val interfaceName: String,
     val bssid: MacAddress?,
     val ssid: String?
@@ -166,12 +171,12 @@ data class Network(
         fun from(
             ip: Inet4Address,
             mask: Short,
-            scanId: Long,
+            scanId: ScanId,
             interfaceName: String,
             bssid: MacAddress?,
             ssid: String?
         ): Network {
-            return Network(0, ip.maskWith(mask), mask, scanId, interfaceName, bssid, ssid)
+            return Network(NetworkId(0), ip.maskWith(mask), mask, scanId, interfaceName, bssid, ssid)
         }
     }
 
@@ -198,9 +203,9 @@ enum class Protocol {
 
 @Entity
 data class Port(
-    @PrimaryKey(autoGenerate = true) val portId: Long, val port: Int,
+    @PrimaryKey(autoGenerate = true) val portId: PortId, val port: Int,
     val protocol: Protocol,
-    val deviceId: Long
+    val deviceId: DeviceId
 ) {
     val description get() = PortDescription.commonPorts.find { it.port == port }
 }
@@ -211,7 +216,7 @@ data class MacVendor(val name: String, val mac: String)
 @Entity
 data class PortDescription(
     @PrimaryKey
-    val portId: Long,
+    val portId: PortId,
     val port: Int,
     val protocol: Protocol,
     val serviceName: String,
@@ -220,19 +225,19 @@ data class PortDescription(
 ) {
     companion object {
         val commonPorts = listOf(
-            PortDescription(0, 21, Protocol.TCP, "FTP", "File Transfer Protocol", "ftp"),
-            PortDescription(0, 22, Protocol.TCP, "SFTP/SSH", "Secure FTP or Secure Shell", "ssh"),
-            PortDescription(0, 80, Protocol.TCP, "HTTP", "Hypertext Transport Protocol", "http"),
-            PortDescription(0, 53, Protocol.UDP, "DNS", "DNS Server", null),
-            PortDescription(0, 443, Protocol.TCP, "HTTPS", "Secure HTTP", "https"),
-            PortDescription(0, 548, Protocol.TCP, "AFP", "AFP over TCP", "afp"),
-            PortDescription(0, 631, Protocol.TCP, "IPP", "Internet Printing Protocol", "ipp"),
-            PortDescription(0, 989, Protocol.TCP, "FTPS", "FTP over TLS", "ftps"),
-            PortDescription(0, 1883, Protocol.TCP, "MQTT", "Message Queuing Telemetry Transport", "mqtt"),
-            PortDescription(0, 5000, Protocol.TCP, "UPNP", "Universal Plug and Play", null),
-            PortDescription(0, 8000, Protocol.TCP, "HTTP Alt", "HTTP common alternative", "http"),
-            PortDescription(0, 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy", "http"),
-            PortDescription(0, 62078, Protocol.TCP, "iPhone-Sync", "lockdown iOS Service", null)
+            PortDescription(PortId(0), 21, Protocol.TCP, "FTP", "File Transfer Protocol", "ftp"),
+            PortDescription(PortId(0), 22, Protocol.TCP, "SFTP/SSH", "Secure FTP or Secure Shell", "ssh"),
+            PortDescription(PortId(0), 80, Protocol.TCP, "HTTP", "Hypertext Transport Protocol", "http"),
+            PortDescription(PortId(0), 53, Protocol.UDP, "DNS", "DNS Server", null),
+            PortDescription(PortId(0), 443, Protocol.TCP, "HTTPS", "Secure HTTP", "https"),
+            PortDescription(PortId(0), 548, Protocol.TCP, "AFP", "AFP over TCP", "afp"),
+            PortDescription(PortId(0), 631, Protocol.TCP, "IPP", "Internet Printing Protocol", "ipp"),
+            PortDescription(PortId(0), 989, Protocol.TCP, "FTPS", "FTP over TLS", "ftps"),
+            PortDescription(PortId(0), 1883, Protocol.TCP, "MQTT", "Message Queuing Telemetry Transport", "mqtt"),
+            PortDescription(PortId(0), 5000, Protocol.TCP, "UPNP", "Universal Plug and Play", null),
+            PortDescription(PortId(0), 8000, Protocol.TCP, "HTTP Alt", "HTTP common alternative", "http"),
+            PortDescription(PortId(0), 8080, Protocol.TCP, "HTTP-Proxy", "HTTP Proxy", "http"),
+            PortDescription(PortId(0), 62078, Protocol.TCP, "iPhone-Sync", "lockdown iOS Service", null)
         )
     }
 }

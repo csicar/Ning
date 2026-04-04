@@ -113,7 +113,7 @@ fun DeviceListScreen(
                 }
             } else {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(devices, key = { it.deviceId }) { device ->
+                    items(devices, key = { it.deviceId.value }) { device ->
                         DeviceItem(
                             device = device,
                             onClick = { onDeviceClick(device) },

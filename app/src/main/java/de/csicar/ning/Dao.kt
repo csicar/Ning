@@ -8,37 +8,43 @@ import java.net.Inet4Address
 @Dao
 interface NetworkDao {
     @Query("Select * FROM network WHERE scanId = :scanId")
-    fun getAll(scanId: Long): Flow<List<Network>>
+    fun getAll(scanId: ScanId): Flow<List<Network>>
 
     @Query("Select * FROM network WHERE scanId = :scanId")
-    fun getAllNow(scanId: Long): List<Network>
+    fun getAllNow(scanId: ScanId): List<Network>
 
     @Insert
-    fun insert(network: Network): Long
+    fun insertRaw(network: Network): Long
+
+    @Transaction
+    fun insert(network: Network): NetworkId = NetworkId(insertRaw(network))
 
     @Insert
     fun insertAll(vararg networks: Network)
 
     @Query("SELECT * FROM network WHERE networkId = :networkId")
-    fun getByIdNow(networkId: Long): Network
+    fun getByIdNow(networkId: NetworkId): Network
 
     @Query("SELECT * FROM network WHERE networkId = :networkId")
-    fun getById(networkId: Long): Flow<Network>
+    fun getById(networkId: NetworkId): Flow<Network>
 }
 
 @Dao
 interface DeviceDao {
     @Query("Select * FROM DeviceWithName WHERE networkId = :networkId ORDER BY ip ASC")
-    fun getAll(networkId: Long): Flow<List<DeviceWithName>>
+    fun getAll(networkId: NetworkId): Flow<List<DeviceWithName>>
 
     @Query("SELECT * FROM Device WHERE networkId = :networkId")
-    fun getAllNow(networkId: Long): List<Device>
+    fun getAllNow(networkId: NetworkId): List<Device>
 
     @Insert
-    fun insert(device: Device): Long
+    fun insertRaw(device: Device): Long
 
     @Transaction
-    fun upsert(device: Device): Long {
+    fun insert(device: Device): DeviceId = DeviceId(insertRaw(device))
+
+    @Transaction
+    fun upsert(device: Device): DeviceId {
         val existingDevice = getByAddressInNetwork(device.ip, device.networkId)
         return if (existingDevice == null) {
             insert(device)
@@ -49,24 +55,24 @@ interface DeviceDao {
     }
 
     @Transaction
-    fun upsertName(networkId: Long, ip: Inet4Address, name: String, allowNew: Boolean = true): Long? {
+    fun upsertName(networkId: NetworkId, ip: Inet4Address, name: String, allowNew: Boolean = true): DeviceId? {
         val existingDevice = getByAddressInNetwork(ip, networkId)
         if (existingDevice != null) {
             updateServiceName(existingDevice.deviceId, name)
             return existingDevice.deviceId
         } else if (allowNew) {
-            return insert(Device(0, networkId, ip, name, null))
+            return insert(Device(DeviceId(0), networkId, ip, name, null))
         }
         return null
     }
 
     @Transaction
-    fun upsertHwAddress(networkId: Long, ip: Inet4Address, hwAddress: MacAddress, allowNew: Boolean) {
+    fun upsertHwAddress(networkId: NetworkId, ip: Inet4Address, hwAddress: MacAddress, allowNew: Boolean) {
         val existingDevice = getByAddressInNetwork(ip, networkId)
         if(existingDevice != null) {
             updateHwAddress(existingDevice.deviceId, hwAddress)
         } else if(allowNew) {
-            insert(Device(0, networkId, ip, null, hwAddress))
+            insert(Device(DeviceId(0), networkId, ip, null, hwAddress))
         }
     }
 
@@ -74,30 +80,30 @@ interface DeviceDao {
     fun update(device: Device)
 
     @Query("SELECT * FROM DeviceWithName WHERE deviceId = :id")
-    fun getById(id: Long): Flow<DeviceWithName?>
+    fun getById(id: DeviceId): Flow<DeviceWithName?>
 
     @Query("SELECT * FROM DEVICE WHERE deviceId = :id")
-    fun getByIdNow(id: Long): Device
+    fun getByIdNow(id: DeviceId): Device
 
     @Query("SELECT * FROM Device WHERE ip = :ip AND networkId = :networkId")
-    fun getByAddressInNetwork(ip: Inet4Address, networkId: Long): Device?
+    fun getByAddressInNetwork(ip: Inet4Address, networkId: NetworkId): Device?
 
     @Query("SELECT * FROM Device WHERE ip = :ip AND networkId IN (SELECT networkId FROM Network WHERE scanId = :scanId)")
-    fun getByAddress(ip: Inet4Address, scanId: Long): Device?
+    fun getByAddress(ip: Inet4Address, scanId: ScanId): Device?
 
     @Query("SELECT * FROM device WHERE networkId IN (SELECT networkId FROM Network WHERE ssid=:ssid and bssid= :bssid and baseIp = :baseIp)")
     fun getDevicesInPreviousScans(ssid: String?, bssid: MacAddress?, baseIp: Inet4Address): List<Device>
 
     @Query("UPDATE Device SET hwAddress = :hwAddress WHERE deviceId = :deviceId")
-    fun updateHwAddress(deviceId: Long, hwAddress: MacAddress)
+    fun updateHwAddress(deviceId: DeviceId, hwAddress: MacAddress)
 
     @Query("UPDATE Device SET deviceName = :deviceName WHERE deviceId = :deviceId")
-    fun updateServiceName(deviceId: Long, deviceName: String?)
+    fun updateServiceName(deviceId: DeviceId, deviceName: String?)
 
     @Transaction
-    fun insertIfNew(networkId: Long, ip: Inet4Address): Long {
+    fun insertIfNew(networkId: NetworkId, ip: Inet4Address): DeviceId {
         val existingAddress = getByAddressInNetwork(ip, networkId)
-            ?: return insert(Device(0, networkId, ip, null, null))
+            ?: return insert(Device(DeviceId(0), networkId, ip, null, null))
         return existingAddress.deviceId
     }
 }
@@ -105,10 +111,13 @@ interface DeviceDao {
 @Dao
 interface PortDao {
     @Insert
-    fun insert(port: Port): Long
+    fun insertRaw(port: Port): Long
 
     @Transaction
-    suspend fun upsert(port: Port): Long {
+    fun insert(port: Port): PortId = PortId(insertRaw(port))
+
+    @Transaction
+    suspend fun upsert(port: Port): PortId {
         val portFromDB = getPortFromNumber(port.deviceId, port.port) ?: return insert(port)
 
         update(Port(portFromDB.portId, port.port, port.protocol, port.deviceId))
@@ -119,16 +128,19 @@ interface PortDao {
     fun update(port: Port)
 
     @Query("SELECT * FROM Port WHERE deviceId = :deviceId AND port = :port")
-    fun getPortFromNumber(deviceId: Long, port: Int): Port?
+    fun getPortFromNumber(deviceId: DeviceId, port: Int): Port?
 
     @Query("SELECT * FROM Port WHERE deviceId = :deviceId")
-    fun getAllForDevice(deviceId: Long): Flow<List<Port>>
+    fun getAllForDevice(deviceId: DeviceId): Flow<List<Port>>
 }
 
 @Dao
 interface ScanDao {
     @Insert
-    suspend fun insert(scan: Scan): Long
+    suspend fun insertRaw(scan: Scan): Long
+
+    @Transaction
+    suspend fun insert(scan: Scan): ScanId = ScanId(insertRaw(scan))
 
     @Query("Select * FROM SCAN")
     fun getAll(): Flow<List<Scan>>
@@ -137,7 +149,7 @@ interface ScanDao {
     fun getAllNow(): List<Scan>
 
     @Query("SELECT * FROM SCAN WHERE scanId = :scanId")
-    fun getById(scanId: Long): Flow<Scan?>
+    fun getById(scanId: ScanId): Flow<Scan?>
 }
 
 @Dao

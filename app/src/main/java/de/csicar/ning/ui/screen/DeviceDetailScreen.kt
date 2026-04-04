@@ -18,6 +18,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import de.csicar.ning.DeviceId
 import de.csicar.ning.DeviceWithName
 import de.csicar.ning.Port
 import de.csicar.ning.PortDescription
@@ -31,7 +32,7 @@ import kotlinx.coroutines.withContext
 @Composable
 fun DeviceDetailScreen(
     viewModel: ScanViewModel,
-    deviceId: Long
+    deviceId: DeviceId
 ) {
     val device by viewModel.getDevice(deviceId).collectAsState(initial = null)
     val ports by viewModel.getPortsForDevice(deviceId).collectAsState(initial = emptyList())
@@ -64,7 +65,7 @@ fun DeviceDetailScreen(
             )
         }
 
-        items(ports, key = { it.portId }) { port ->
+        items(ports, key = { it.portId.value }) { port ->
             PortItem(
                 port = port,
                 viewModel = viewModel,

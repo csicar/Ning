@@ -69,4 +69,16 @@ class Converter {
     fun fromMacAddress(value: MacAddress?): String? {
         return value?.address?.uppercase(Locale.getDefault())
     }
+
+    @TypeConverter fun fromScanId(id: ScanId) = id.value
+    @TypeConverter fun toScanId(value: Long) = ScanId(value)
+
+    @TypeConverter fun fromNetworkId(id: NetworkId) = id.value
+    @TypeConverter fun toNetworkId(value: Long) = NetworkId(value)
+
+    @TypeConverter fun fromDeviceId(id: DeviceId) = id.value
+    @TypeConverter fun toDeviceId(value: Long) = DeviceId(value)
+
+    @TypeConverter fun fromPortId(id: PortId) = id.value
+    @TypeConverter fun toPortId(value: Long) = PortId(value)
 }

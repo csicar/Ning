@@ -12,12 +12,13 @@ import androidx.compose.ui.unit.dp
 import de.csicar.ning.DeviceWithName
 import de.csicar.ning.Network
 import de.csicar.ning.R
+import de.csicar.ning.ScanId
 import de.csicar.ning.ScanViewModel
 
 @Composable
 fun ScanDetailScreen(
     viewModel: ScanViewModel,
-    scanId: Long,
+    scanId: ScanId,
     onDeviceClick: (DeviceWithName) -> Unit
 ) {
     val networks by viewModel.getNetworksForScan(scanId).collectAsState(initial = emptyList())
@@ -79,7 +80,7 @@ fun ScanDetailScreen(
                 }
             } else {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(devices, key = { it.deviceId }) { device ->
+                    items(devices, key = { it.deviceId.value }) { device ->
                         DeviceItem(
                             device = device,
                             onClick = { onDeviceClick(device) }

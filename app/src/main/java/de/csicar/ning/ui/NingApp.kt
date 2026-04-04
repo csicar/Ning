@@ -17,7 +17,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.*
 import androidx.navigation.navArgument
+import de.csicar.ning.DeviceId
 import de.csicar.ning.R
+import de.csicar.ning.ScanId
 import de.csicar.ning.ScanViewModel
 import de.csicar.ning.ui.screen.DeviceDetailScreen
 import de.csicar.ning.ui.screen.DeviceListScreen
@@ -41,9 +43,9 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
                      currentRoute == null
 
     // Get device for detail screen title
-    val deviceId = navBackStackEntry?.arguments?.getLong("deviceId")
-    val device by if (deviceId != null && currentRoute?.startsWith("deviceDetail") == true) {
-        viewModel.getDevice(deviceId).collectAsState(initial = null)
+    val deviceIdLong = navBackStackEntry?.arguments?.getLong("deviceId")
+    val device by if (deviceIdLong != null && currentRoute?.startsWith("deviceDetail") == true) {
+        viewModel.getDevice(DeviceId(deviceIdLong)).collectAsState(initial = null)
     } else {
         remember { mutableStateOf(null) }
     }
@@ -163,7 +165,7 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
                             currentRoute == "settings" ->
                                 stringResource(R.string.preferences_submenu)
                             else -> {
-                                val interfaceName = navBackStackEntry?.arguments?.getString("interfaceName") ?: "wlan0"
+                                val interfaceName = navBackStackEntry?.arguments?.getString("interfaceName") ?: "<unknown>"
                                 stringResource(R.string.title_network_overview, interfaceName)
                             }
                         }
@@ -190,6 +192,7 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
         ) { paddingValues ->
             NavHost(
                 navController = navController,
+                // TODO: fix this. get default interface name instead of wlan0
                 startDestination = "deviceList/wlan0",
                 modifier = Modifier.padding(paddingValues)
             ) {
@@ -197,15 +200,15 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
                     "deviceList/{interfaceName}",
                     arguments = listOf(navArgument("interfaceName") {
                         type = NavType.StringType
-                        defaultValue = "wlan0"
                     })
                 ) { backStackEntry ->
+                    // TODO: this should not have any default value
                     val interfaceName = backStackEntry.arguments?.getString("interfaceName") ?: "wlan0"
                     DeviceListScreen(
                         viewModel = viewModel,
                         interfaceName = interfaceName,
                         onDeviceClick = { device ->
-                            navController.navigate("deviceDetail/${device.deviceId}")
+                            navController.navigate("deviceDetail/${device.deviceId.value}")
                         }
                     )
                 }
@@ -214,10 +217,10 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
                     "deviceDetail/{deviceId}",
                     arguments = listOf(navArgument("deviceId") { type = NavType.LongType })
                 ) { backStackEntry ->
-                    val deviceId = backStackEntry.arguments?.getLong("deviceId") ?: return@composable
+                    val deviceIdLong = backStackEntry.arguments?.getLong("deviceId") ?: return@composable
                     DeviceDetailScreen(
                         viewModel = viewModel,
-                        deviceId = deviceId
+                        deviceId = DeviceId(deviceIdLong)
                     )
                 }
 
@@ -225,7 +228,7 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
                     ScanHistoryScreen(
                         viewModel = viewModel,
                         onScanClick = { scan ->
-                            navController.navigate("scanDetail/${scan.scanId}")
+                            navController.navigate("scanDetail/${scan.scanId.value}")
                         }
                     )
                 }
@@ -234,12 +237,12 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
                     "scanDetail/{scanId}",
                     arguments = listOf(navArgument("scanId") { type = NavType.LongType })
                 ) { backStackEntry ->
-                    val scanId = backStackEntry.arguments?.getLong("scanId") ?: return@composable
+                    val scanIdLong = backStackEntry.arguments?.getLong("scanId") ?: return@composable
                     ScanDetailScreen(
                         viewModel = viewModel,
-                        scanId = scanId,
+                        scanId = ScanId(scanIdLong),
                         onDeviceClick = { device ->
-                            navController.navigate("deviceDetail/${device.deviceId}")
+                            navController.navigate("deviceDetail/${device.deviceId.value}")
                         }
                     )
                 }

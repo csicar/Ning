@@ -29,8 +29,8 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     )
 
     val scanProgress = MutableStateFlow<ScanRepository.ScanProgress>(ScanRepository.ScanProgress.ScanNotStarted)
-    private val currentNetworkId = MutableStateFlow<Long?>(null)
-    val currentScanId = MutableStateFlow<Long?>(null)
+    private val currentNetworkId = MutableStateFlow<NetworkId?>(null)
+    val currentScanId = MutableStateFlow<ScanId?>(null)
 
     val devices: StateFlow<List<DeviceWithName>> = currentNetworkId
         .filterNotNull()
@@ -46,13 +46,13 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getAllScans(): Flow<List<Scan>> = scanDao.getAll()
 
-    fun getNetworksForScan(scanId: Long): Flow<List<Network>> = networkDao.getAll(scanId)
+    fun getNetworksForScan(scanId: ScanId): Flow<List<Network>> = networkDao.getAll(scanId)
 
-    fun getDevicesForNetwork(networkId: Long): Flow<List<DeviceWithName>> = deviceDao.getAll(networkId)
+    fun getDevicesForNetwork(networkId: NetworkId): Flow<List<DeviceWithName>> = deviceDao.getAll(networkId)
 
-    fun getDevice(id: Long): Flow<DeviceWithName?> = deviceDao.getById(id)
+    fun getDevice(id: DeviceId): Flow<DeviceWithName?> = deviceDao.getById(id)
 
-    fun getPortsForDevice(id: Long): Flow<List<Port>> = portDao.getAllForDevice(id)
+    fun getPortsForDevice(id: DeviceId): Flow<List<Port>> = portDao.getAllForDevice(id)
 
     fun scanPorts(device: Device) {
         viewModelScope.launch {
@@ -63,7 +63,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
                         if (result.isOpen) {
                             portDao.upsert(
                                 Port(
-                                    0,
+                                    PortId(0),
                                     result.port,
                                     result.protocol,
                                     device.deviceId
