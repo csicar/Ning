@@ -22,7 +22,7 @@ data class ArpEntry(val ip: InetAddress, val hwAddress: MacAddress) {
 data class MacAddress(val address: String) {
     fun getAddress(hideMacDetail: Boolean): String {
         if (hideMacDetail) {
-            return address.substring(0, "aa:bb:cc".length) + ":XX:XX:XX"
+            return address.take("aa:bb:cc".length) + ":XX:XX:XX"
         }
         return address
     }
@@ -46,7 +46,7 @@ object ArpScanner {
         listOf(
             async { getArpTableFromFile() },
             async { getArpTableFromIpCommand() },
-            async { getArpTableFromNDK() }
+            async { getArpTableFromNdk() }
         )
             .awaitAll()
             .asSequence()
@@ -88,7 +88,7 @@ object ArpScanner {
             }
         }
 
-    private suspend fun getArpTableFromNDK(): Sequence<ArpEntry> =
+    private suspend fun getArpTableFromNdk(): Sequence<ArpEntry> =
         withContext(Dispatchers.IO) {
             try {
                 val arpOutput = ArpNDK.getARP()
@@ -112,6 +112,4 @@ object ArpScanner {
             }
         }
 }
-
-
 
