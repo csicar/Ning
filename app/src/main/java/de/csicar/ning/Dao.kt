@@ -74,7 +74,7 @@ interface DeviceDao {
     fun update(device: Device)
 
     @Query("SELECT * FROM DeviceWithName WHERE deviceId = :id")
-    fun getById(id: Long): Flow<DeviceWithName>
+    fun getById(id: Long): Flow<DeviceWithName?>
 
     @Query("SELECT * FROM DEVICE WHERE deviceId = :id")
     fun getByIdNow(id: Long): Device

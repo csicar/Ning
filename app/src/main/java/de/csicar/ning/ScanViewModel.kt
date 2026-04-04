@@ -44,7 +44,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
 
     fun fetchAvailableInterfaces() = networkScanRepository.fetchAvailableInterfaces()
 
-    fun getDevice(id: Long): Flow<DeviceWithName> = deviceDao.getById(id)
+    fun getDevice(id: Long): Flow<DeviceWithName?> = deviceDao.getById(id)
 
     fun getPortsForDevice(id: Long): Flow<List<Port>> = portDao.getAllForDevice(id)
 

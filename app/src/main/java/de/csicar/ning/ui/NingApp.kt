@@ -35,6 +35,14 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
     val currentRoute = navBackStackEntry?.destination?.route
     val isTopLevel = currentRoute?.startsWith("deviceList") == true || currentRoute == null
 
+    // Get device for detail screen title
+    val deviceId = navBackStackEntry?.arguments?.getLong("deviceId")
+    val device by if (deviceId != null && currentRoute?.startsWith("deviceDetail") == true) {
+        viewModel.getDevice(deviceId).collectAsState(initial = null)
+    } else {
+        remember { mutableStateOf(null) }
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         gesturesEnabled = isTopLevel,
@@ -116,7 +124,7 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
                     title = {
                         val title = when {
                             currentRoute?.startsWith("deviceDetail") == true -> {
-                                val deviceIp = navBackStackEntry?.arguments?.getLong("deviceId")?.toString() ?: ""
+                                val deviceIp = device?.ip?.hostAddress ?: ""
                                 stringResource(R.string.title_device_detail, deviceIp)
                             }
                             currentRoute == "settings" ->
