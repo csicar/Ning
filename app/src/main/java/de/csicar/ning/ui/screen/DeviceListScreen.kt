@@ -61,14 +61,6 @@ fun DeviceListScreen(
         )
     }
 
-    // Trigger initial scan
-    LaunchedEffect(interfaceName) {
-        val network = viewModel.startScan(interfaceName)
-        if (network == null) {
-            Toast.makeText(context, context.getString(R.string.error_network_not_found), Toast.LENGTH_LONG).show()
-        }
-    }
-
     Column(modifier = Modifier.fillMaxSize()) {
         // Progress bar
         when (val progress = scanProgress) {
@@ -90,29 +82,31 @@ fun DeviceListScreen(
             },
             modifier = Modifier.fillMaxSize()
         ) {
-            if (devices.isEmpty() && scanProgress is ScanRepository.ScanProgress.ScanNotStarted) {
-                // Empty state
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Icon(
-                            painter = painterResource(R.drawable.ic_arrow_downward_white_64dp),
-                            contentDescription = null,
-                            modifier = Modifier.size(64.dp),
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = stringResource(R.string.swipe_down_to_scan_the_network),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
+                if (devices.isEmpty() && scanProgress is ScanRepository.ScanProgress.ScanNotStarted) {
+                    // Empty state
+                    item {
+                        Box(
+                            modifier = Modifier.fillParentMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Icon(
+                                    painter = painterResource(R.drawable.ic_arrow_downward_white_64dp),
+                                    contentDescription = null,
+                                    modifier = Modifier.size(64.dp),
+                                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                Text(
+                                    text = stringResource(R.string.swipe_down_to_scan_the_network),
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        }
                     }
-                }
-            } else {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                } else {
                     items(devices, key = { it.deviceId.value }) { device ->
                         DeviceItem(
                             device = device,
