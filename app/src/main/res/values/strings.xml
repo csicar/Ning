@@ -32,4 +32,5 @@
     <string name="scan_notification_channel">Network Scan</string>
     <string name="scan_notification_title">Scanning network</string>
     <string name="scan_notification_progress">Scan progress: %1$d%%</string>
+    <string name="scan_notification_complete">Scan complete</string>
 </resources>
