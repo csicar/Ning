@@ -23,7 +23,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import de.csicar.ning.DeviceWithName
 import de.csicar.ning.R
 import de.csicar.ning.ScanRepository
@@ -39,7 +38,6 @@ fun DeviceListScreen(
     val devices by viewModel.devices.collectAsState()
     val scanProgress by viewModel.scanProgress.collectAsState()
     val context = LocalContext.current
-    val coroutineScope = rememberCoroutineScope()
     var permissionsGranted by remember { mutableStateOf(false) }
     val isRefreshing = scanProgress is ScanRepository.ScanProgress.ScanRunning
 
@@ -53,12 +51,14 @@ fun DeviceListScreen(
 
     // Request permissions on first launch
     LaunchedEffect(Unit) {
-        permissionLauncher.launch(
-            arrayOf(
-                Manifest.permission.ACCESS_FINE_LOCATION,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            )
+        val permissions = mutableListOf(
+            Manifest.permission.ACCESS_FINE_LOCATION,
+            Manifest.permission.ACCESS_COARSE_LOCATION
         )
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS)
+        }
+        permissionLauncher.launch(permissions.toTypedArray())
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -76,9 +76,7 @@ fun DeviceListScreen(
         PullToRefreshBox(
             isRefreshing = isRefreshing,
             onRefresh = {
-                coroutineScope.launch {
-                    viewModel.startScan(interfaceName)
-                }
+                viewModel.startScan(interfaceName)
             },
             modifier = Modifier.fillMaxSize()
         ) {

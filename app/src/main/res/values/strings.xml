@@ -29,4 +29,7 @@
     <string name="device_type_cast">Cast</string>
     <string name="device_type_unknown">Unknown</string>
     <string name="device_type_home_appliance">Home Appliance</string>
+    <string name="scan_notification_channel">Network Scan</string>
+    <string name="scan_notification_title">Scanning network</string>
+    <string name="scan_notification_progress">Scan progress: %1$d%%</string>
 </resources>

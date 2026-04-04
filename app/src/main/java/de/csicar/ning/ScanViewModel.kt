@@ -1,6 +1,8 @@
 package de.csicar.ning
 
 import android.app.Application
+import android.content.Intent
+import android.os.Build
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import de.csicar.ning.scanner.InterfaceScanner
@@ -20,17 +22,10 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     private val networkDao = db.networkDao()
     val portDao = db.portDao()
     private val scanDao = db.scanDao()
-    private val networkScanRepository = ScanRepository(
-        networkDao,
-        scanDao,
-        deviceDao,
-        portDao,
-        application
-    )
 
-    val scanProgress = MutableStateFlow<ScanRepository.ScanProgress>(ScanRepository.ScanProgress.ScanNotStarted)
-    private val currentNetworkId = MutableStateFlow<NetworkId?>(null)
-    val currentScanId = MutableStateFlow<ScanId?>(null)
+    val scanProgress: StateFlow<ScanRepository.ScanProgress> = ScanService.scanProgress
+    private val currentNetworkId: StateFlow<NetworkId?> = ScanService.currentNetworkId
+    val currentScanId: StateFlow<ScanId?> = ScanService.currentScanId
 
     val devices: StateFlow<List<DeviceWithName>> = currentNetworkId
         .filterNotNull()
@@ -42,7 +37,7 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         .flatMapLatest { networkDao.getAll(it) }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    fun fetchAvailableInterfaces() = networkScanRepository.fetchAvailableInterfaces()
+    fun fetchAvailableInterfaces() = InterfaceScanner.getNetworkInterfaces()
 
     fun getAllScans(): Flow<List<Scan>> = scanDao.getAll()
 
@@ -76,9 +71,15 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    suspend fun startScan(interfaceName: String): Network? {
-        val network = networkScanRepository.startScan(interfaceName, scanProgress, currentNetworkId) ?: return null
-        currentScanId.value = network.scanId
-        return network
+    fun startScan(interfaceName: String) {
+        val context = getApplication<Application>()
+        val intent = Intent(context, ScanService::class.java).apply {
+            putExtra(ScanService.EXTRA_INTERFACE_NAME, interfaceName)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            context.startForegroundService(intent)
+        } else {
+            context.startService(intent)
+        }
     }
 }
