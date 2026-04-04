@@ -10,7 +10,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import de.csicar.ning.Network
 import de.csicar.ning.R
 import de.csicar.ning.Scan
 import de.csicar.ning.ScanViewModel
@@ -47,8 +49,9 @@ fun ScanHistoryScreen(
         } else {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(scans.sortedByDescending { it.startedAt }, key = { it.scanId }) { scan ->
-                    ScanHistoryItem(
+                    ScanHistoryItemWithNetwork(
                         scan = scan,
+                        viewModel = viewModel,
                         onClick = { onScanClick(scan) }
                     )
                     HorizontalDivider()
@@ -59,8 +62,25 @@ fun ScanHistoryScreen(
 }
 
 @Composable
+private fun ScanHistoryItemWithNetwork(
+    scan: Scan,
+    viewModel: ScanViewModel,
+    onClick: () -> Unit
+) {
+    val networks by viewModel.getNetworksForScan(scan.scanId).collectAsState(initial = emptyList())
+    val firstNetwork = networks.firstOrNull()
+
+    ScanHistoryItem(
+        scan = scan,
+        network = firstNetwork,
+        onClick = onClick
+    )
+}
+
+@Composable
 private fun ScanHistoryItem(
     scan: Scan,
+    network: Network?,
     onClick: () -> Unit
 ) {
     Surface(
@@ -81,14 +101,41 @@ private fun ScanHistoryItem(
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = "Scan #${scan.scanId}",
-                    style = MaterialTheme.typography.bodyLarge
-                )
+                // Show interface and SSID if available
+                if (network != null) {
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = network.interfaceName,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        network.ssid?.let { ssid ->
+                            Text(
+                                text = "•",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                            Text(
+                                text = ssid,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                maxLines = 1,
+                                overflow = TextOverflow.Ellipsis
+                            )
+                        }
+                    }
+                } else {
+                    Text(
+                        text = "Scan #${scan.scanId}",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = formatTimestamp(scan.startedAt),
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
