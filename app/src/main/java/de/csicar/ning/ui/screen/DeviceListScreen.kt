@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.*
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 import de.csicar.ning.DeviceWithName
 import de.csicar.ning.R
 import de.csicar.ning.ScanRepository
@@ -37,7 +39,9 @@ fun DeviceListScreen(
     val devices by viewModel.devices.collectAsState()
     val scanProgress by viewModel.scanProgress.collectAsState()
     val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
     var permissionsGranted by remember { mutableStateOf(false) }
+    val isRefreshing = scanProgress is ScanRepository.ScanProgress.ScanRunning
 
     // Request location permissions
     val permissionLauncher = rememberLauncherForActivityResult(
@@ -77,35 +81,45 @@ fun DeviceListScreen(
             else -> {}
         }
 
-        if (devices.isEmpty() && scanProgress is ScanRepository.ScanProgress.ScanNotStarted) {
-            // Empty state
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_downward_white_64dp),
-                        contentDescription = null,
-                        modifier = Modifier.size(64.dp),
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text(
-                        text = stringResource(R.string.swipe_down_to_scan_the_network),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+        PullToRefreshBox(
+            isRefreshing = isRefreshing,
+            onRefresh = {
+                coroutineScope.launch {
+                    viewModel.startScan(interfaceName)
                 }
-            }
-        } else {
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(devices, key = { it.deviceId }) { device ->
-                    DeviceItem(
-                        device = device,
-                        onClick = { onDeviceClick(device) },
-                        onLongClick = { copyToClipboard(context, device.ip.hostAddress ?: "") }
-                    )
+            },
+            modifier = Modifier.fillMaxSize()
+        ) {
+            if (devices.isEmpty() && scanProgress is ScanRepository.ScanProgress.ScanNotStarted) {
+                // Empty state
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_arrow_downward_white_64dp),
+                            contentDescription = null,
+                            modifier = Modifier.size(64.dp),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text(
+                            text = stringResource(R.string.swipe_down_to_scan_the_network),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+            } else {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(devices, key = { it.deviceId }) { device ->
+                        DeviceItem(
+                            device = device,
+                            onClick = { onDeviceClick(device) },
+                            onLongClick = { copyToClipboard(context, device.ip.hostAddress ?: "") }
+                        )
+                    }
                 }
             }
         }
