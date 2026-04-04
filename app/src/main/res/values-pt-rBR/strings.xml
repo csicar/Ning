@@ -5,9 +5,9 @@
     <string name="device_icon">Ícone do aparelho</string>
     <string name="interfaces_submenu">Interfaces</string>
     <string name="preferences_submenu">Preferências</string>
-    <string name="snackbar_copy_message">Copiado "{{texto-a-copiar}}" ao Clipboard</string>
-    <string name="title_network_overview">Rede {nome_do_interface}</string>
-    <string name="title_device_detail">Aparelho {Ipdoaparelho}</string>
+    <string name="snackbar_copy_message">Copiado "%1$s" ao Clipboard</string>
+    <string name="title_network_overview">Rede %1$s</string>
+    <string name="title_device_detail">Aparelho %1$s</string>
     <string name="title_card_device_info">Info do aparelho</string>
     <string name="field_name_device_name">Nome do aparelho</string>
     <string name="field_name_device_ip">IP do aparelho</string>

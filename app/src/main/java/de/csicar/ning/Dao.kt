@@ -1,15 +1,14 @@
 package de.csicar.ning
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import de.csicar.ning.scanner.MacAddress
+import kotlinx.coroutines.flow.Flow
 import java.net.Inet4Address
 
 @Dao
 interface NetworkDao {
     @Query("Select * FROM network WHERE scanId = :scanId")
-    fun getAll(scanId: Long): LiveData<List<Network>>
-
+    fun getAll(scanId: Long): Flow<List<Network>>
 
     @Query("Select * FROM network WHERE scanId = :scanId")
     fun getAllNow(scanId: Long): List<Network>
@@ -23,18 +22,14 @@ interface NetworkDao {
     @Query("SELECT * FROM network WHERE networkId = :networkId")
     fun getByIdNow(networkId: Long): Network
 
-
     @Query("SELECT * FROM network WHERE networkId = :networkId")
-    fun getById(networkId: Long): LiveData<Network>
-
-
+    fun getById(networkId: Long): Flow<Network>
 }
 
 @Dao
 interface DeviceDao {
     @Query("Select * FROM DeviceWithName WHERE networkId = :networkId ORDER BY ip ASC")
-    fun getAll(networkId: Long): LiveData<List<DeviceWithName>>
-
+    fun getAll(networkId: Long): Flow<List<DeviceWithName>>
 
     @Query("SELECT * FROM Device WHERE networkId = :networkId")
     fun getAllNow(networkId: Long): List<Device>
@@ -79,7 +74,7 @@ interface DeviceDao {
     fun update(device: Device)
 
     @Query("SELECT * FROM DeviceWithName WHERE deviceId = :id")
-    fun getById(id: Long): LiveData<DeviceWithName>
+    fun getById(id: Long): Flow<DeviceWithName>
 
     @Query("SELECT * FROM DEVICE WHERE deviceId = :id")
     fun getByIdNow(id: Long): Device
@@ -92,7 +87,6 @@ interface DeviceDao {
 
     @Query("SELECT * FROM device WHERE networkId IN (SELECT networkId FROM Network WHERE ssid=:ssid and bssid= :bssid and baseIp = :baseIp)")
     fun getDevicesInPreviousScans(ssid: String?, bssid: MacAddress?, baseIp: Inet4Address): List<Device>
-
 
     @Query("UPDATE Device SET hwAddress = :hwAddress WHERE deviceId = :deviceId")
     fun updateHwAddress(deviceId: Long, hwAddress: MacAddress)
@@ -127,9 +121,8 @@ interface PortDao {
     @Query("SELECT * FROM Port WHERE deviceId = :deviceId AND port = :port")
     fun getPortFromNumber(deviceId: Long, port: Int): Port?
 
-
     @Query("SELECT * FROM Port WHERE deviceId = :deviceId")
-    fun getAllForDevice(deviceId: Long): LiveData<List<Port>>
+    fun getAllForDevice(deviceId: Long): Flow<List<Port>>
 }
 
 @Dao
@@ -138,14 +131,13 @@ interface ScanDao {
     suspend fun insert(scan: Scan): Long
 
     @Query("Select * FROM SCAN")
-    fun getAll(): LiveData<List<Scan>>
+    fun getAll(): Flow<List<Scan>>
 
     @Query("Select * FROM SCAN")
     fun getAllNow(): List<Scan>
 
     @Query("SELECT * FROM SCAN WHERE scanId = :scanId")
-    fun getById(scanId: Long): LiveData<Scan?>
-
+    fun getById(scanId: Long): Flow<Scan?>
 }
 
 @Dao

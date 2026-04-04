@@ -1,12 +1,17 @@
 package de.csicar.ning
 
 import android.app.Application
-import android.content.Context
-import android.net.ConnectivityManager
-import android.net.NetworkRequest
-import androidx.lifecycle.*
-import de.csicar.ning.scanner.*
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import de.csicar.ning.scanner.InterfaceScanner
+import de.csicar.ning.scanner.PortScanner
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ScanViewModel(application: Application) : AndroidViewModel(application) {
 
     private val db = AppDatabase.createInstance(application)
@@ -22,41 +27,46 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         portDao,
         application
     )
-    val scanProgress by lazy { MutableLiveData<ScanRepository.ScanProgress>() }
-    private val currentNetworkId = MutableLiveData<Long>()
-    val currentScanId = MutableLiveData<Long>()
 
-    val devices = Transformations.switchMap(currentNetworkId) {
-        deviceDao.getAll(it)
-    }
+    val scanProgress = MutableStateFlow<ScanRepository.ScanProgress>(ScanRepository.ScanProgress.ScanNotStarted)
+    private val currentNetworkId = MutableStateFlow<Long?>(null)
+    val currentScanId = MutableStateFlow<Long?>(null)
 
-    val currentNetworks = Transformations.switchMap(currentScanId) {
-        networkDao.getAll(it)
-    }
+    val devices: StateFlow<List<DeviceWithName>> = currentNetworkId
+        .filterNotNull()
+        .flatMapLatest { deviceDao.getAll(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val currentNetworks: StateFlow<List<Network>> = currentScanId
+        .filterNotNull()
+        .flatMapLatest { networkDao.getAll(it) }
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun fetchAvailableInterfaces() = networkScanRepository.fetchAvailableInterfaces()
 
-    class NetworksLiveData(context: Context, private val networkScanRepository: ScanRepository) :
-        LiveData<List<InterfaceScanner.NetworkResult>>()
-         {
-        private val connectivityManager: ConnectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        private val callback = object: ConnectivityManager.NetworkCallback() {
-            override fun onAvailable(network: android.net.Network) {
-                refresh()
+    fun getDevice(id: Long): Flow<DeviceWithName> = deviceDao.getById(id)
+
+    fun getPortsForDevice(id: Long): Flow<List<Port>> = portDao.getAllForDevice(id)
+
+    fun scanPorts(device: Device) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                PortScanner(device.ip).scanPorts().forEach {
+                    launch {
+                        val result = it.await()
+                        if (result.isOpen) {
+                            portDao.upsert(
+                                Port(
+                                    0,
+                                    result.port,
+                                    result.protocol,
+                                    device.deviceId
+                                )
+                            )
+                        }
+                    }
+                }
             }
-        }
-        override fun onActive() {
-            super.onActive()
-            connectivityManager.registerNetworkCallback(NetworkRequest.Builder().build(), callback)
-        }
-
-        override fun onInactive() {
-            super.onInactive()
-            connectivityManager.unregisterNetworkCallback(callback)
-        }
-
-        fun refresh() {
-            value = networkScanRepository.fetchAvailableInterfaces()
         }
     }
 
@@ -66,4 +76,3 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
         return network
     }
 }
-

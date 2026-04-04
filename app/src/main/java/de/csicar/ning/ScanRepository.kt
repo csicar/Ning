@@ -5,9 +5,9 @@ import android.content.Context
 import android.net.wifi.WifiInfo
 import android.net.wifi.WifiManager
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import de.csicar.ning.scanner.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
 import java.net.Inet4Address
 
 
@@ -22,16 +22,14 @@ class ScanRepository(
         val TAG: String = ScanRepository::class.java.name
     }
 
-    private val scanId by lazy {
-        MutableLiveData<Long>()
-    }
+    private val scanId = MutableStateFlow<Long?>(null)
 
     fun fetchAvailableInterfaces() = InterfaceScanner.getNetworkInterfaces()
 
     suspend fun startScan(
         interfaceName: String,
-        scanProgress: MutableLiveData<ScanProgress>,
-        currentNetwork: MutableLiveData<Long>
+        scanProgress: MutableStateFlow<ScanProgress>,
+        currentNetwork: MutableStateFlow<Long?>
     ) =
         withContext(Dispatchers.IO) {
             val newScanId = scanDao.insert(Scan(0, 0))
@@ -53,11 +51,10 @@ class ScanRepository(
                     connectionInfo?.ssid
                 )
             )
-            withContext(Dispatchers.Main) {
-                scanProgress.value = ScanProgress.ScanNotStarted
-                scanId.value = newScanId
-                currentNetwork.value = networkId
-            }
+            scanProgress.value = ScanProgress.ScanNotStarted
+            scanId.value = newScanId
+            currentNetwork.value = networkId
+
             val network = networkDao.getByIdNow(networkId)
                 .also { Log.d(TAG, "new network scan added: $it") }
 
@@ -77,7 +74,7 @@ class ScanRepository(
                         deviceDao.insertIfNew(networkId, newResult.ipAddress)
                         launch { updateFromArp() }
                     }
-                    scanProgress.postValue(scanProgress.value + newResult.progressIncrease)
+                    scanProgress.value = scanProgress.value + newResult.progressIncrease
                 }.pingIpAddresses()
             }, launch {
                 LowLevelMDnsScanner { newResult ->
@@ -92,9 +89,7 @@ class ScanRepository(
             updateFromArp()
             delay(500)
             updateFromArp()
-            withContext(Dispatchers.Main) {
-                scanProgress.value = ScanProgress.ScanFinished
-            }
+            scanProgress.value = ScanProgress.ScanFinished
             network
         }
 

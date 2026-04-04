@@ -2,11 +2,7 @@ package de.csicar.ning.util
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.content.res.Resources
-import android.view.View
-import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import de.csicar.ning.R
 import java.net.Inet4Address
 
 fun Int.toInet4Address(host: String = "") =
@@ -28,24 +24,14 @@ fun Inet4Address.maskWith(maskLength: Short): Inet4Address {
     return inet4AddressFromInt("", masked)
 }
 
-class AppPreferences {
-    val context: Context
-    private val resources: Resources
-    private val preferences: SharedPreferences
+class AppPreferences(val context: Context) {
+    private val preferences: SharedPreferences =
+        PreferenceManager.getDefaultSharedPreferences(context)
 
-    constructor(context: Context, resources: Resources) {
-        this.context = context
-        this.resources = resources
-        this.preferences = PreferenceManager.getDefaultSharedPreferences(context)
+    val hideMacDetails: Boolean
+        get() = preferences.getBoolean("hideMacDetails", false)
+
+    fun setHideMacDetails(value: Boolean) {
+        preferences.edit().putBoolean("hideMacDetails", value).apply()
     }
-
-    constructor(view: View) : this(view.context, view.resources)
-
-    constructor(fragment: Fragment) : this(fragment.requireContext(), fragment.resources)
-
-
-    val hideMacDetails
-        get(): Boolean {
-            return preferences.getBoolean("hideMacDetails", false)
-        }
 }

@@ -5,9 +5,9 @@
     <string name="device_icon">Cihaz Simgesi</string>
     <string name="interfaces_submenu">Arayüzler</string>
     <string name="preferences_submenu">Tercihler</string>
-    <string name="snackbar_copy_message">"{{text-to-copy}}" panoya kopyalandı</string>
-    <string name="title_network_overview">{interface_name} Ağı</string>
-    <string name="title_device_detail">{deviceIp} Cihazı</string>
+    <string name="snackbar_copy_message">"%1$s" panoya kopyalandı</string>
+    <string name="title_network_overview">%1$s Ağı</string>
+    <string name="title_device_detail">%1$s Cihazı</string>
     <string name="title_card_device_info">Cihaz Bilgisi</string>
     <string name="field_name_device_ip">Cihaz IP</string>
     <string name="field_name_device_mac">Cihaz MAC</string>

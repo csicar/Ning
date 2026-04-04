@@ -5,9 +5,9 @@
     <string name="device_icon">设备图标</string>
     <string name="interfaces_submenu">接口</string>
     <string name="preferences_submenu">选项</string>
-    <string name="snackbar_copy_message">已复制 "{{text-to-copy}}" 到剪贴板</string>
-    <string name="title_network_overview">网络 {interface_name}</string>
-    <string name="title_device_detail">设备 {deviceIp}</string>
+    <string name="snackbar_copy_message">已复制 "%1$s" 到剪贴板</string>
+    <string name="title_network_overview">网络 %1$s</string>
+    <string name="title_device_detail">设备 %1$s</string>
     <string name="title_card_device_info">设备信息</string>
     <string name="field_name_device_name">设备名称</string>
     <string name="field_name_device_type">设备类型</string>

@@ -5,9 +5,9 @@
     <string name="device_icon">Icône de l\'appareil</string>
     <string name="interfaces_submenu">Interfaces</string>
     <string name="preferences_submenu">Préférences</string>
-    <string name="snackbar_copy_message">"{{text-to-copy}}" copié dans le presse-papier</string>
-    <string name="title_network_overview">Réseau {interface_name}</string>
-    <string name="title_device_detail">Appareil {deviceIp}</string>
+    <string name="snackbar_copy_message">"%1$s" copié dans le presse-papier</string>
+    <string name="title_network_overview">Réseau %1$s</string>
+    <string name="title_device_detail">Appareil %1$s</string>
     <string name="title_card_device_info">Informations sur l\'appareil</string>
     <string name="field_name_device_name">Nom de l\'appareil</string>
     <string name="field_name_device_ip">Adresse IP de l\'appareil</string>

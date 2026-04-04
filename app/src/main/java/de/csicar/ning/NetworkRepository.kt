@@ -1,14 +1,9 @@
 package de.csicar.ning
 
-import androidx.lifecycle.LiveData
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.Flow
 
 class NetworkRepository(private val networkDao: NetworkDao) {
-    suspend fun getNetwork(networkId: Long): LiveData<Network> {
-        withContext(Dispatchers.IO) {
-            networkDao.getById(networkId)
-        }
+    fun getNetwork(networkId: Long): Flow<Network> {
         return networkDao.getById(networkId)
     }
 }

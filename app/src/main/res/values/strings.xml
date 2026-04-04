@@ -5,9 +5,9 @@
     <string name="device_icon">Device Icon</string>
     <string name="interfaces_submenu">Interfaces</string>
     <string name="preferences_submenu">Preferences</string>
-    <string name="snackbar_copy_message">Copied "{{text-to-copy}}" to the Clipboard</string>
-    <string name="title_network_overview">Network {interface_name}</string>
-    <string name="title_device_detail">Device {deviceIp}</string>
+    <string name="snackbar_copy_message">Copied \"%1$s\" to the Clipboard</string>
+    <string name="title_network_overview">Network %1$s</string>
+    <string name="title_device_detail">Device %1$s</string>
     <string name="title_card_device_info">Device Information</string>
     <string name="field_name_device_name">Device Name</string>
     <string name="field_name_device_type">Device Type</string>
