@@ -38,6 +38,11 @@ android {
         compose true
         buildConfig true
     }
+
+    lint {
+        // Needed since we need to stick to `targetSdk = 31` for `ip neigh` support
+        disable 'ExpiredTargetSdkVersion'
+    }
 }
 
 dependencies {
