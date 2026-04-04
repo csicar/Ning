@@ -23,6 +23,7 @@ class ScanRepository(
     }
 
     private val scanId = MutableStateFlow<Long?>(null)
+    private val networkId = MutableStateFlow<Long?>(null)
 
     fun fetchAvailableInterfaces() = InterfaceScanner.getNetworkInterfaces()
 
@@ -54,6 +55,7 @@ class ScanRepository(
             )
             scanProgress.value = ScanProgress.ScanNotStarted
             scanId.value = newScanId
+            this@ScanRepository.networkId.value = networkId
             currentNetwork.value = networkId
 
             val network = networkDao.getByIdNow(networkId)
@@ -99,7 +101,7 @@ class ScanRepository(
             val ip = it.key
             if (ip is Inet4Address) {
                 deviceDao.upsertHwAddress(
-                    scanId.value ?: return@forEach,
+                    networkId.value ?: return@forEach,
                     ip,
                     it.value.hwAddress,
                     false
