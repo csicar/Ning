@@ -21,6 +21,8 @@ import de.csicar.ning.R
 import de.csicar.ning.ScanViewModel
 import de.csicar.ning.ui.screen.DeviceDetailScreen
 import de.csicar.ning.ui.screen.DeviceListScreen
+import de.csicar.ning.ui.screen.ScanDetailScreen
+import de.csicar.ning.ui.screen.ScanHistoryScreen
 import de.csicar.ning.ui.screen.SettingsScreen
 import kotlinx.coroutines.launch
 
@@ -34,7 +36,9 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
-    val isTopLevel = currentRoute?.startsWith("deviceList") == true || currentRoute == null
+    val isTopLevel = currentRoute?.startsWith("deviceList") == true ||
+                     currentRoute == "scanHistory" ||
+                     currentRoute == null
 
     // Get device for detail screen title
     val deviceId = navBackStackEntry?.arguments?.getLong("deviceId")
@@ -108,6 +112,24 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
+                // Scan History
+                NavigationDrawerItem(
+                    icon = {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_network_check_black_48dp),
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    },
+                    label = { Text("Scan History") },
+                    selected = currentRoute == "scanHistory",
+                    onClick = {
+                        navController.navigate("scanHistory")
+                        scope.launch { drawerState.close() }
+                    },
+                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                )
+
                 // Settings
                 NavigationDrawerItem(
                     icon = {
@@ -136,6 +158,8 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
                                 val deviceIp = device?.ip?.hostAddress ?: ""
                                 stringResource(R.string.title_device_detail, deviceIp)
                             }
+                            currentRoute == "scanHistory" -> "Scan History"
+                            currentRoute?.startsWith("scanDetail") == true -> "Scan Details"
                             currentRoute == "settings" ->
                                 stringResource(R.string.preferences_submenu)
                             else -> {
@@ -194,6 +218,29 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
                     DeviceDetailScreen(
                         viewModel = viewModel,
                         deviceId = deviceId
+                    )
+                }
+
+                composable("scanHistory") {
+                    ScanHistoryScreen(
+                        viewModel = viewModel,
+                        onScanClick = { scan ->
+                            navController.navigate("scanDetail/${scan.scanId}")
+                        }
+                    )
+                }
+
+                composable(
+                    "scanDetail/{scanId}",
+                    arguments = listOf(navArgument("scanId") { type = NavType.LongType })
+                ) { backStackEntry ->
+                    val scanId = backStackEntry.arguments?.getLong("scanId") ?: return@composable
+                    ScanDetailScreen(
+                        viewModel = viewModel,
+                        scanId = scanId,
+                        onDeviceClick = { device ->
+                            navController.navigate("deviceDetail/${device.deviceId}")
+                        }
                     )
                 }
 

@@ -32,7 +32,7 @@ class ScanRepository(
         currentNetwork: MutableStateFlow<Long?>
     ) =
         withContext(Dispatchers.IO) {
-            val newScanId = scanDao.insert(Scan(0, 0))
+            val newScanId = scanDao.insert(Scan(0, System.currentTimeMillis()))
             val connectionInfo = getWifiConnectionInfo(application)
             val bssid = if (connectionInfo == null) null else MacAddress(connectionInfo.bssid)
 

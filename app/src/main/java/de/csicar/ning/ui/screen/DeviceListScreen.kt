@@ -92,10 +92,10 @@ fun DeviceListScreen(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun DeviceItem(
+fun DeviceItem(
     device: DeviceWithName,
     onClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val hideMac = remember { AppPreferences(context).hideMacDetails }
