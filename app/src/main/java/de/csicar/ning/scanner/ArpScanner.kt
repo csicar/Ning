@@ -1,6 +1,7 @@
 package de.csicar.ning.scanner
 
 import android.util.Log
+import it.alessangiorgi.ipneigh30.ArpNDK
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -42,7 +43,11 @@ object ArpScanner {
     private val TAG = ArpScanner.javaClass.name
 
     suspend fun getFromAllSources() = withContext(Dispatchers.Default) {
-        listOf(async { getArpTableFromFile() }, async { getArpTableFromIpCommand() })
+        listOf(
+            async { getArpTableFromFile() },
+            async { getArpTableFromIpCommand() },
+            async { getArpTableFromNDK() }
+        )
             .awaitAll()
             .asSequence()
             .flatten()
@@ -79,6 +84,30 @@ object ArpScanner {
                     .onEach { Log.d(TAG, "found entry in 'ip neight': $it") }
             } catch (exception: IOException) {
                 Log.e(TAG, "io error when running ip neigh $exception")
+                emptySequence<ArpEntry>()
+            }
+        }
+
+    private suspend fun getArpTableFromNDK(): Sequence<ArpEntry> =
+        withContext(Dispatchers.IO) {
+            try {
+                val arpOutput = ArpNDK.getARP()
+                Log.d(TAG, "NDK ARP output: $arpOutput")
+
+                arpOutput.lineSequence()
+                    .map { it.split(whiteSpacePattern) }
+                    .filter { it.size >= 5 }
+                    .mapNotNull {
+                        try {
+                            ArpEntry.from(it[0], it[4])
+                        } catch (e: Exception) {
+                            Log.w(TAG, "Failed to parse NDK ARP entry: ${it.joinToString(" ")}", e)
+                            null
+                        }
+                    }
+                    .onEach { Log.d(TAG, "found entry in NDK ARP: $it") }
+            } catch (exception: Exception) {
+                Log.e(TAG, "error when getting ARP from NDK: $exception")
                 emptySequence<ArpEntry>()
             }
         }
