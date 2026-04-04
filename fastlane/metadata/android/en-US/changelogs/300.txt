@@ -1,0 +1,6 @@
+- Add scan history view (#128)
+- Display version in side menu (#52)
+- Add sdk30 ip neigh fallback (#118)
+- Display useful information for history items (interface and SSID)
+- Fix location permission (SSID no longer empty)
+- Document license properly
