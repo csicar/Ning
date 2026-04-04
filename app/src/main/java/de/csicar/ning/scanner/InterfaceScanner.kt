@@ -1,7 +1,5 @@
 package de.csicar.ning.scanner
 
-import android.util.Log
-import de.csicar.ning.Network
 import java.net.Inet4Address
 import java.net.NetworkInterface
 import java.net.SocketException
@@ -11,9 +9,9 @@ object InterfaceScanner {
         return try {
             NetworkInterface.getNetworkInterfaces().asSequence().flatMap { networkInterface ->
                 networkInterface.interfaceAddresses.asSequence().map {
-                    val addr = it.address
-                    if (!addr.isLoopbackAddress && addr is Inet4Address) {
-                        NetworkResult(addr, it.networkPrefixLength, networkInterface.displayName, networkInterface.displayName)
+                    val address = it.address
+                    if (!address.isLoopbackAddress && address is Inet4Address) {
+                        NetworkResult(address, it.networkPrefixLength, networkInterface.displayName, networkInterface.displayName)
                     } else {
                         null
                     }

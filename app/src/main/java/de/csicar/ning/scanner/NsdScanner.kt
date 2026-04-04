@@ -71,7 +71,11 @@ class NsdScanner(application: Application, private val onUpdate: (ScanResult) ->
             val protocolType = when {
                 serviceInfo.serviceType.contains("_tcp") -> Protocol.TCP
                 serviceInfo.serviceType.contains("_udp") -> Protocol.UDP
-                else -> TODO()
+                else -> {
+                    Log.w(TAG, "Unknown protocol for service type: ${serviceInfo.serviceType}, defaulting to TCP")
+                    // TODO: fix this
+                    Protocol.TCP
+                }
             }
             onUpdate(
                 ScanResult(

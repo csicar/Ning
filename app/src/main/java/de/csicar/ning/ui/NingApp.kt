@@ -35,6 +35,10 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val interfaces = remember { viewModel.fetchAvailableInterfaces() }
+    val defaultInterface = remember(interfaces) {
+        val wlanInterface = interfaces.firstOrNull() { it.interfaceName.startsWith("wlan") }?.interfaceName
+        wlanInterface ?: interfaces.firstOrNull()?.interfaceName ?: "wlan0"
+    }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
@@ -192,8 +196,7 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
         ) { paddingValues ->
             NavHost(
                 navController = navController,
-                // TODO: fix this. get default interface name instead of wlan0
-                startDestination = "deviceList/wlan0",
+                startDestination = "deviceList/$defaultInterface",
                 modifier = Modifier.padding(paddingValues)
             ) {
                 composable(
@@ -202,8 +205,7 @@ fun NingApp(viewModel: ScanViewModel = viewModel()) {
                         type = NavType.StringType
                     })
                 ) { backStackEntry ->
-                    // TODO: this should not have any default value
-                    val interfaceName = backStackEntry.arguments?.getString("interfaceName") ?: "wlan0"
+                    val interfaceName = backStackEntry.arguments?.getString("interfaceName") ?: defaultInterface
                     DeviceListScreen(
                         viewModel = viewModel,
                         interfaceName = interfaceName,
