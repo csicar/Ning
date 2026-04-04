@@ -79,7 +79,11 @@ class LowLevelMDnsScanner(private val onUpdate: (ScanResult) -> Unit) {
             // no need to handle this: This is normal behaviour
         } catch(ex: IndexOutOfBoundsException) {
             Log.e(TAG, "Parsing failed for $serviceName!", ex)
-        }finally {
+        } catch(ex: SocketException) {
+            // This sometimes occurs.. https://github.com/csicar/Ning/issues/185
+            Log.e(TAG, "Socket Exception for $serviceName!", ex)
+        }
+        finally {
 
                 ds.close()
         }
