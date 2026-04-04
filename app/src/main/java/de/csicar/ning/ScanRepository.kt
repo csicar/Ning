@@ -35,6 +35,7 @@ class ScanRepository(
             val newScanId = scanDao.insert(Scan(0, System.currentTimeMillis()))
             val connectionInfo = getWifiConnectionInfo(application)
             val bssid = if (connectionInfo == null) null else MacAddress(connectionInfo.bssid)
+            val ssid = cleanSsid(connectionInfo?.ssid)
 
             val networkData =
                 InterfaceScanner.getNetworkInterfaces()
@@ -48,7 +49,7 @@ class ScanRepository(
                     newScanId,
                     networkData.interfaceName,
                     bssid,
-                    connectionInfo?.ssid
+                    ssid
                 )
             )
             scanProgress.value = ScanProgress.ScanNotStarted
@@ -111,6 +112,20 @@ class ScanRepository(
         val mWifiManager = (context.applicationContext
             .getSystemService(Context.WIFI_SERVICE) as WifiManager)
         return mWifiManager?.connectionInfo
+    }
+
+    private fun cleanSsid(rawSsid: String?): String? {
+        if (rawSsid == null) return null
+
+        // Remove surrounding quotes
+        var cleaned = rawSsid.trim().removeSurrounding("\"")
+
+        // Return null if it's the unknown SSID placeholder
+        if (cleaned == "<unknown ssid>" || cleaned.isEmpty()) {
+            return null
+        }
+
+        return cleaned
     }
 
 

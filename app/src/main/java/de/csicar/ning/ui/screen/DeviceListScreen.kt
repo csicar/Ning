@@ -1,9 +1,12 @@
 package de.csicar.ning.ui.screen
 
+import android.Manifest
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
@@ -34,6 +37,25 @@ fun DeviceListScreen(
     val devices by viewModel.devices.collectAsState()
     val scanProgress by viewModel.scanProgress.collectAsState()
     val context = LocalContext.current
+    var permissionsGranted by remember { mutableStateOf(false) }
+
+    // Request location permissions
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        permissionsGranted = permissions[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
+                            permissions[Manifest.permission.ACCESS_COARSE_LOCATION] == true
+    }
+
+    // Request permissions on first launch
+    LaunchedEffect(Unit) {
+        permissionLauncher.launch(
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            )
+        )
+    }
 
     // Trigger initial scan
     LaunchedEffect(interfaceName) {
