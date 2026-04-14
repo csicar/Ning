@@ -10,13 +10,12 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.net.Inet4Address
 
-
 class ScanRepository(
     private val networkDao: NetworkDao,
     private val scanDao: ScanDao,
     private val deviceDao: DeviceDao,
     private val portDao: PortDao,
-    private val application: Application
+    private val application: Application,
 ) {
     companion object {
         val TAG: String = ScanRepository::class.java.name
@@ -30,89 +29,103 @@ class ScanRepository(
     suspend fun startScan(
         interfaceName: String,
         scanProgress: MutableStateFlow<ScanProgress>,
-        currentNetwork: MutableStateFlow<NetworkId?>
-    ) =
-        withContext(Dispatchers.IO) {
-            val newScanId = scanDao.insert(Scan(ScanId(0), System.currentTimeMillis()))
-            val connectionInfo = getWifiConnectionInfo(application)
-            val bssid = if (connectionInfo == null) null else MacAddress(connectionInfo.bssid)
-            val ssid = cleanSsid(connectionInfo?.ssid)
+        currentNetwork: MutableStateFlow<NetworkId?>,
+    ) = withContext(Dispatchers.IO) {
+        val newScanId = scanDao.insert(Scan(ScanId(0), System.currentTimeMillis()))
+        val connectionInfo = getWifiConnectionInfo(application)
+        val bssid = if (connectionInfo == null) null else MacAddress(connectionInfo.bssid)
+        val ssid = cleanSsid(connectionInfo?.ssid)
 
-            val networkData =
-                InterfaceScanner.getNetworkInterfaces()
-                    .also { Log.d(TAG, "NetworkInterfaces: $it") }
-                    .find { it.interfaceName == interfaceName } ?: return@withContext null
+        val networkData =
+            InterfaceScanner
+                .getNetworkInterfaces()
+                .also { Log.d(TAG, "NetworkInterfaces: $it") }
+                .find { it.interfaceName == interfaceName } ?: return@withContext null
 
-            val networkId = networkDao.insert(
+        val networkId =
+            networkDao.insert(
                 Network.from(
                     networkData.address,
                     networkData.prefix,
                     newScanId,
                     networkData.interfaceName,
                     bssid,
-                    ssid
-                )
+                    ssid,
+                ),
             )
-            scanProgress.value = ScanProgress.ScanNotStarted
-            scanId.value = newScanId
-            this@ScanRepository.networkId.value = networkId
-            currentNetwork.value = networkId
+        scanProgress.value = ScanProgress.ScanNotStarted
+        scanId.value = newScanId
+        this@ScanRepository.networkId.value = networkId
+        currentNetwork.value = networkId
 
-            val network = networkDao.getByIdNow(networkId)
+        val network =
+            networkDao
+                .getByIdNow(networkId)
                 .also { Log.d(TAG, "new network scan added: $it") }
 
-            // Map from IpAddress to number of occurrences in old scans
-            val ipGuesses = deviceDao
+        // Map from IpAddress to number of occurrences in old scans
+        val ipGuesses =
+            deviceDao
                 .getDevicesInPreviousScans(network.ssid, network.bssid, network.baseIp)
                 .map {
                     it.ip
-                }
-                .groupBy { it }
+                }.groupBy { it }
                 .mapValues { it.value.size }
 
-            listOf(launch {
+        listOf(
+            launch {
                 PingScanner(network, ipGuesses) { newResult ->
                     if (newResult.isReachable) {
                         Log.d(TAG, "isReachable ${newResult.ipAddress}")
                         deviceDao.insertIfNew(networkId, newResult.ipAddress)
                         launch { updateFromArp() }
                     }
-                    scanProgress.value = scanProgress.value + newResult.progressIncrease
+                    scanProgress.value += newResult.progressIncrease
                 }.pingIpAddresses()
-            }, launch {
+            },
+            launch {
                 LowLevelMDnsScanner { newResult ->
                     Log.d(TAG, "res: $newResult")
                 }.probeCommon()
-            }, launch {
+            },
+            launch {
                 updateFromArp()
-            }, launch {
+            },
+            launch {
                 val userDevice = LocalMacScanner.asDevice(network) ?: return@launch
                 deviceDao.upsert(userDevice)
-            }).joinAll()
-            updateFromArp()
-            delay(500)
-            updateFromArp()
-            scanProgress.value = ScanProgress.ScanFinished
-            network
-        }
+            },
+        ).joinAll()
+        updateFromArp()
+        delay(500)
+        updateFromArp()
+        scanProgress.value = ScanProgress.ScanFinished
+        network
+    }
 
     private suspend fun updateFromArp() {
         ArpScanner.getFromAllSources().forEach {
             val ip = it.key
+            val entry = it.value
             if (ip is Inet4Address) {
+                // A valid MAC address is confirmation the device is present on the network.
+                // Stale ARP entries with no MAC ("FAILED") are not sufficient to add a new device.
+                val allowNew = entry.hwAddress.address != "FAILED"
                 deviceDao.upsertHwAddress(
                     networkId.value ?: return@forEach,
                     ip,
-                    it.value.hwAddress,
-                    false
+                    entry.hwAddress,
+                    allowNew,
                 )
             }
         }
     }
 
     private fun getWifiConnectionInfo(context: Context): WifiInfo? {
-        val mWifiManager = (context.applicationContext
-            .getSystemService(Context.WIFI_SERVICE) as WifiManager)
+        val mWifiManager = (
+            context.applicationContext
+                .getSystemService(Context.WIFI_SERVICE) as WifiManager
+        )
         return mWifiManager?.connectionInfo
     }
 
@@ -130,23 +143,27 @@ class ScanRepository(
         return cleaned
     }
 
-
     sealed class ScanProgress {
         object ScanNotStarted : ScanProgress()
-        data class ScanRunning(val progress: Double) : ScanProgress()
+
+        data class ScanRunning(
+            val progress: Double,
+        ) : ScanProgress()
+
         object ScanFinished : ScanProgress()
 
-
-        operator fun plus(progress: Double) = when (this) {
-            is ScanNotStarted -> ScanRunning(
-                progress
-            )
-            is ScanRunning -> ScanRunning(
-                this.progress + progress
-            )
-            is ScanFinished -> ScanFinished
-        }
-
+        operator fun plus(progress: Double) =
+            when (this) {
+                is ScanNotStarted ->
+                    ScanRunning(
+                        progress,
+                    )
+                is ScanRunning ->
+                    ScanRunning(
+                        this.progress + progress,
+                    )
+                is ScanFinished -> ScanFinished
+            }
     }
 }
 

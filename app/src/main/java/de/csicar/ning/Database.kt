@@ -10,13 +10,16 @@ import java.util.*
 @Database(
     entities = [Network::class, Device::class, Port::class, MacVendor::class, Scan::class],
     views = [DeviceWithName::class],
-    version = 22
+    version = 22,
 )
 @TypeConverters(Converter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun networkDao(): NetworkDao
+
     abstract fun deviceDao(): DeviceDao
+
     abstract fun portDao(): PortDao
+
     abstract fun scanDao(): ScanDao
 
     companion object {
@@ -34,19 +37,19 @@ abstract class AppDatabase : RoomDatabase() {
 }
 
 class Converter {
+    @TypeConverter
+    fun toInet4Address(value: Int?): Inet4Address? =
+        if (value != null) {
+            inet4AddressFromInt(
+                "",
+                value,
+            )
+        } else {
+            null
+        }
 
     @TypeConverter
-    fun toInet4Address(value: Int?): Inet4Address? {
-        return if (value != null) inet4AddressFromInt(
-            "",
-            value
-        ) else null
-    }
-
-    @TypeConverter
-    fun fromInet4Address(value: Inet4Address?): Int? {
-        return value?.hashCode()
-    }
+    fun fromInet4Address(value: Inet4Address?): Int? = value?.hashCode()
 
     @TypeConverter
     fun toProtocol(value: String?): Protocol? {
@@ -61,24 +64,24 @@ class Converter {
     }
 
     @TypeConverter
-    fun toMacAddress(value: String?): MacAddress? {
-        return if (value != null) MacAddress(value.uppercase(Locale.getDefault())) else null
-    }
+    fun toMacAddress(value: String?): MacAddress? = if (value != null) MacAddress(value.uppercase(Locale.getDefault())) else null
 
     @TypeConverter
-    fun fromMacAddress(value: MacAddress?): String? {
-        return value?.address?.uppercase(Locale.getDefault())
-    }
+    fun fromMacAddress(value: MacAddress?): String? = value?.address?.uppercase(Locale.getDefault())
 
     @TypeConverter fun fromScanId(id: ScanId) = id.value
+
     @TypeConverter fun toScanId(value: Long) = ScanId(value)
 
     @TypeConverter fun fromNetworkId(id: NetworkId) = id.value
+
     @TypeConverter fun toNetworkId(value: Long) = NetworkId(value)
 
     @TypeConverter fun fromDeviceId(id: DeviceId) = id.value
+
     @TypeConverter fun toDeviceId(value: Long) = DeviceId(value)
 
     @TypeConverter fun fromPortId(id: PortId) = id.value
+
     @TypeConverter fun toPortId(value: Long) = PortId(value)
 }

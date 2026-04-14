@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
 class ScanService : Service() {
-
     companion object {
         const val EXTRA_INTERFACE_NAME = "interface_name"
         private const val NOTIFICATION_ID = 1
@@ -38,62 +37,73 @@ class ScanService : Service() {
         createNotificationChannel()
     }
 
-    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+    override fun onStartCommand(
+        intent: Intent?,
+        flags: Int,
+        startId: Int,
+    ): Int {
         val interfaceName = intent?.getStringExtra(EXTRA_INTERFACE_NAME)
         if (interfaceName == null) {
             stopSelf()
             return START_NOT_STICKY
         }
 
-        val contentIntent = PendingIntent.getActivity(
-            this, 0,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        val contentIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                Intent(this, MainActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE,
+            )
 
-        val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle(getString(R.string.scan_notification_title))
-            .setContentText(getString(R.string.scan_notification_progress, 0))
-            .setSmallIcon(R.drawable.ic_baseline_router_48)
-            .setOngoing(true)
-            .setProgress(100, 0, false)
-            .setContentIntent(contentIntent)
-            .build()
+        val notification =
+            NotificationCompat
+                .Builder(this, CHANNEL_ID)
+                .setContentTitle(getString(R.string.scan_notification_title))
+                .setContentText(getString(R.string.scan_notification_progress, 0))
+                .setSmallIcon(R.drawable.ic_baseline_router_48)
+                .setOngoing(true)
+                .setProgress(100, 0, false)
+                .setContentIntent(contentIntent)
+                .build()
 
         startForeground(NOTIFICATION_ID, notification)
         _isRunning.value = true
 
         scanJob?.cancel()
-        scanJob = serviceScope.launch {
-            try {
-                runScan(interfaceName)
-            } finally {
-                _isRunning.value = false
-                stopForeground(STOP_FOREGROUND_DETACH)
-                stopSelf()
+        scanJob =
+            serviceScope.launch {
+                try {
+                    runScan(interfaceName)
+                } finally {
+                    _isRunning.value = false
+                    stopForeground(STOP_FOREGROUND_DETACH)
+                    stopSelf()
+                }
             }
-        }
 
         return START_NOT_STICKY
     }
 
     private suspend fun runScan(interfaceName: String) {
-        val db = AppDatabase.createInstance(application)
-        val repository = ScanRepository(
-            db.networkDao(),
-            db.scanDao(),
-            db.deviceDao(),
-            db.portDao(),
-            application
-        )
+        val db = (application as NingApplication).database
+        val repository =
+            ScanRepository(
+                db.networkDao(),
+                db.scanDao(),
+                db.deviceDao(),
+                db.portDao(),
+                application,
+            )
 
         scanProgress.value = ScanRepository.ScanProgress.ScanNotStarted
 
-        val progressCollector = serviceScope.launch {
-            scanProgress.collect { progress ->
-                updateNotification(progress)
+        val progressCollector =
+            serviceScope.launch {
+                scanProgress.collect { progress ->
+                    updateNotification(progress)
+                }
             }
-        }
 
         try {
             val network = repository.startScan(interfaceName, scanProgress, currentNetworkId)
@@ -107,33 +117,39 @@ class ScanService : Service() {
 
     private fun updateNotification(progress: ScanRepository.ScanProgress) {
         val notificationManager = getSystemService(NotificationManager::class.java)
-        val contentIntent = PendingIntent.getActivity(
-            this, 0,
-            Intent(this, MainActivity::class.java),
-            PendingIntent.FLAG_IMMUTABLE
-        )
+        val contentIntent =
+            PendingIntent.getActivity(
+                this,
+                0,
+                Intent(this, MainActivity::class.java),
+                PendingIntent.FLAG_IMMUTABLE,
+            )
         when (progress) {
             is ScanRepository.ScanProgress.ScanRunning -> {
                 val percent = (progress.progress * 100).toInt().coerceIn(0, 100)
-                val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle(getString(R.string.scan_notification_title))
-                    .setContentText(getString(R.string.scan_notification_progress, percent))
-                    .setSmallIcon(R.drawable.ic_baseline_router_48)
-                    .setOngoing(true)
-                    .setProgress(100, percent, false)
-                    .setContentIntent(contentIntent)
-                    .build()
+                val notification =
+                    NotificationCompat
+                        .Builder(this, CHANNEL_ID)
+                        .setContentTitle(getString(R.string.scan_notification_title))
+                        .setContentText(getString(R.string.scan_notification_progress, percent))
+                        .setSmallIcon(R.drawable.ic_baseline_router_48)
+                        .setOngoing(true)
+                        .setProgress(100, percent, false)
+                        .setContentIntent(contentIntent)
+                        .build()
                 notificationManager.notify(NOTIFICATION_ID, notification)
             }
             is ScanRepository.ScanProgress.ScanFinished -> {
-                val notification = NotificationCompat.Builder(this, CHANNEL_ID)
-                    .setContentTitle(getString(R.string.scan_notification_title))
-                    .setContentText(getString(R.string.scan_notification_complete))
-                    .setSmallIcon(R.drawable.ic_baseline_router_48)
-                    .setOngoing(false)
-                    .setContentIntent(contentIntent)
-                    .setAutoCancel(true)
-                    .build()
+                val notification =
+                    NotificationCompat
+                        .Builder(this, CHANNEL_ID)
+                        .setContentTitle(getString(R.string.scan_notification_title))
+                        .setContentText(getString(R.string.scan_notification_complete))
+                        .setSmallIcon(R.drawable.ic_baseline_router_48)
+                        .setOngoing(false)
+                        .setContentIntent(contentIntent)
+                        .setAutoCancel(true)
+                        .build()
                 notificationManager.notify(NOTIFICATION_ID, notification)
             }
             is ScanRepository.ScanProgress.ScanNotStarted -> {}
@@ -142,11 +158,12 @@ class ScanService : Service() {
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                getString(R.string.scan_notification_channel),
-                NotificationManager.IMPORTANCE_LOW
-            )
+            val channel =
+                NotificationChannel(
+                    CHANNEL_ID,
+                    getString(R.string.scan_notification_channel),
+                    NotificationManager.IMPORTANCE_LOW,
+                )
             val notificationManager = getSystemService(NotificationManager::class.java)
             notificationManager.createNotificationChannel(channel)
         }

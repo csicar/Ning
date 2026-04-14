@@ -55,7 +55,12 @@ interface DeviceDao {
     }
 
     @Transaction
-    fun upsertName(networkId: NetworkId, ip: Inet4Address, name: String, allowNew: Boolean = true): DeviceId? {
+    fun upsertName(
+        networkId: NetworkId,
+        ip: Inet4Address,
+        name: String,
+        allowNew: Boolean = true,
+    ): DeviceId? {
         val existingDevice = getByAddressInNetwork(ip, networkId)
         if (existingDevice != null) {
             updateServiceName(existingDevice.deviceId, name)
@@ -67,11 +72,16 @@ interface DeviceDao {
     }
 
     @Transaction
-    fun upsertHwAddress(networkId: NetworkId, ip: Inet4Address, hwAddress: MacAddress, allowNew: Boolean) {
+    fun upsertHwAddress(
+        networkId: NetworkId,
+        ip: Inet4Address,
+        hwAddress: MacAddress,
+        allowNew: Boolean,
+    ) {
         val existingDevice = getByAddressInNetwork(ip, networkId)
-        if(existingDevice != null) {
+        if (existingDevice != null) {
             updateHwAddress(existingDevice.deviceId, hwAddress)
-        } else if(allowNew) {
+        } else if (allowNew) {
             insert(Device(DeviceId(0), networkId, ip, null, hwAddress))
         }
     }
@@ -86,24 +96,52 @@ interface DeviceDao {
     fun getByIdNow(id: DeviceId): Device
 
     @Query("SELECT * FROM Device WHERE ip = :ip AND networkId = :networkId")
-    fun getByAddressInNetwork(ip: Inet4Address, networkId: NetworkId): Device?
+    fun getByAddressInNetwork(
+        ip: Inet4Address,
+        networkId: NetworkId,
+    ): Device?
 
     @Query("SELECT * FROM Device WHERE ip = :ip AND networkId IN (SELECT networkId FROM Network WHERE scanId = :scanId)")
-    fun getByAddress(ip: Inet4Address, scanId: ScanId): Device?
+    fun getByAddress(
+        ip: Inet4Address,
+        scanId: ScanId,
+    ): Device?
 
-    @Query("SELECT * FROM device WHERE networkId IN (SELECT networkId FROM Network WHERE ssid=:ssid and bssid= :bssid and baseIp = :baseIp)")
-    fun getDevicesInPreviousScans(ssid: String?, bssid: MacAddress?, baseIp: Inet4Address): List<Device>
+    @Query(
+        "SELECT * FROM device WHERE networkId IN (SELECT networkId FROM Network WHERE ssid=:ssid and bssid= :bssid and baseIp = :baseIp)",
+    )
+    fun getDevicesInPreviousScans(
+        ssid: String?,
+        bssid: MacAddress?,
+        baseIp: Inet4Address,
+    ): List<Device>
 
     @Query("UPDATE Device SET hwAddress = :hwAddress WHERE deviceId = :deviceId")
-    fun updateHwAddress(deviceId: DeviceId, hwAddress: MacAddress)
+    fun updateHwAddress(
+        deviceId: DeviceId,
+        hwAddress: MacAddress,
+    )
 
     @Query("UPDATE Device SET deviceName = :deviceName WHERE deviceId = :deviceId")
-    fun updateServiceName(deviceId: DeviceId, deviceName: String?)
+    fun updateServiceName(
+        deviceId: DeviceId,
+        deviceName: String?,
+    )
 
     @Transaction
-    fun insertIfNew(networkId: NetworkId, ip: Inet4Address): DeviceId {
-        val existingAddress = getByAddressInNetwork(ip, networkId)
-            ?: return insert(Device(DeviceId(0), networkId, ip, null, null))
+    fun insertIfNew(
+        networkId: NetworkId,
+        ip: Inet4Address,
+    ): DeviceId {
+        val existingAddress =
+            getByAddressInNetwork(ip, networkId)
+                ?: return insert(Device(
+                    deviceId = DeviceId(0),
+                    networkId = networkId,
+                    ip = ip,
+                    deviceName = null,
+                    hwAddress = null
+                ))
         return existingAddress.deviceId
     }
 }
@@ -128,7 +166,10 @@ interface PortDao {
     fun update(port: Port)
 
     @Query("SELECT * FROM Port WHERE deviceId = :deviceId AND port = :port")
-    fun getPortFromNumber(deviceId: DeviceId, port: Int): Port?
+    fun getPortFromNumber(
+        deviceId: DeviceId,
+        port: Int,
+    ): Port?
 
     @Query("SELECT * FROM Port WHERE deviceId = :deviceId")
     fun getAllForDevice(deviceId: DeviceId): Flow<List<Port>>

@@ -14,9 +14,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class ScanViewModel(application: Application) : AndroidViewModel(application) {
-
-    private val db = AppDatabase.createInstance(application)
+class ScanViewModel(
+    application: Application,
+) : AndroidViewModel(application) {
+    private val db = (application as NingApplication).database
 
     val deviceDao = db.deviceDao()
     private val networkDao = db.networkDao()
@@ -27,15 +28,17 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
     private val currentNetworkId: StateFlow<NetworkId?> = ScanService.currentNetworkId
     val currentScanId: StateFlow<ScanId?> = ScanService.currentScanId
 
-    val devices: StateFlow<List<DeviceWithName>> = currentNetworkId
-        .filterNotNull()
-        .flatMapLatest { deviceDao.getAll(it) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val devices: StateFlow<List<DeviceWithName>> =
+        currentNetworkId
+            .filterNotNull()
+            .flatMapLatest { deviceDao.getAll(it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val currentNetworks: StateFlow<List<Network>> = currentScanId
-        .filterNotNull()
-        .flatMapLatest { networkDao.getAll(it) }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val currentNetworks: StateFlow<List<Network>> =
+        currentScanId
+            .filterNotNull()
+            .flatMapLatest { networkDao.getAll(it) }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun fetchAvailableInterfaces() = InterfaceScanner.getNetworkInterfaces()
 
@@ -61,8 +64,8 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
                                     PortId(0),
                                     result.port,
                                     result.protocol,
-                                    device.deviceId
-                                )
+                                    device.deviceId,
+                                ),
                             )
                         }
                     }
@@ -73,9 +76,10 @@ class ScanViewModel(application: Application) : AndroidViewModel(application) {
 
     fun startScan(interfaceName: String) {
         val context = getApplication<Application>()
-        val intent = Intent(context, ScanService::class.java).apply {
-            putExtra(ScanService.EXTRA_INTERFACE_NAME, interfaceName)
-        }
+        val intent =
+            Intent(context, ScanService::class.java).apply {
+                putExtra(ScanService.EXTRA_INTERFACE_NAME, interfaceName)
+            }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             context.startForegroundService(intent)
         } else {
