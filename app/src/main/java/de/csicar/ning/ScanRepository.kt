@@ -86,6 +86,14 @@ class ScanRepository(
             launch {
                 LowLevelMDnsScanner { newResult ->
                     Log.d(TAG, "res: $newResult")
+                    val ip = newResult.ip
+                    if (ip is Inet4Address) {
+                        val nId = this@ScanRepository.networkId.value ?: return@LowLevelMDnsScanner
+                        val name = newResult.hostname
+                        if (name != null) {
+                            deviceDao.upsertName(nId, ip, name, allowNew = false)
+                        }
+                    }
                 }.probeCommon()
             },
             launch {
@@ -99,6 +107,11 @@ class ScanRepository(
         updateFromArp()
         delay(500)
         updateFromArp()
+        // Reverse DNS fallback for devices without mDNS names
+        val unnamed = deviceDao.getAllNow(networkId).filter { it.deviceName == null }
+        HostnameScanner(unnamed).resolve().forEach { result ->
+            deviceDao.upsertName(networkId, result.ip, result.hostname, allowNew = false)
+        }
         scanProgress.value = ScanProgress.ScanFinished
         network
     }
