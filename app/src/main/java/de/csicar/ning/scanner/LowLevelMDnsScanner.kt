@@ -99,10 +99,17 @@ class LowLevelMDnsScanner(
         }
 
     fun parse(byteArray: ByteArray): List<DnsAnswer> {
+        val noQuestionRecords = byteArray.rangeToInt(4, 5)
         val noAnswerRecords = byteArray.rangeToInt(6, 7)
         val noAuthorityRecords = byteArray.rangeToInt(8, 9)
         val noAdditionalRecords = byteArray.rangeToInt(10, 11)
         var index = 12
+        // Skip past question entries: each has a variable-length name + 4 bytes (QTYPE + QCLASS)
+        repeat(noQuestionRecords) {
+            val (nameEnd, _) = parseString(index, byteArray)
+            // nameEnd points to the null terminator or last pointer byte; skip past it + QTYPE (2) + QCLASS (2)
+            index = nameEnd + 1 + 4
+        }
         val answers = mutableListOf<DnsAnswer>()
         repeat(noAnswerRecords) {
             val (newIndex, answer) = parseAnswer(index, byteArray)
@@ -128,7 +135,7 @@ class LowLevelMDnsScanner(
     ): Int {
         var value = 0
         for (i in start..end) {
-            value = value * 0xFF + this[i]
+            value = (value shl 8) or (this[i].toInt() and 0xFF)
         }
         return value
     }
@@ -150,7 +157,7 @@ class LowLevelMDnsScanner(
             val referenceMask = 0b11000000
             if (partLength.toInt().and(referenceMask) != 0) {
                 val referenceIndex =
-                    partLength.toInt().and(referenceMask.inv()) * 0xFF + byteArray[i + 1]
+                    (partLength.toInt().and(referenceMask.inv()) shl 8) or (byteArray[i + 1].toInt() and 0xFF)
                 // println("$depthStr  goto reference -> $referenceIndex (0b${referenceIndex.toString(2)})")
                 val referenceValue =
                     references.getOrPut(referenceIndex) {
@@ -199,7 +206,8 @@ class LowLevelMDnsScanner(
                 RecordType.POINTER ->
                     DnsAnswer(combinedName, parseString(dataIndex, byteArray).second, "")
                 RecordType.SRV ->
-                    DnsAnswer(combinedName, parseString(dataIndex, byteArray).second, "")
+                    // SRV RDATA: 2 bytes priority + 2 bytes weight + 2 bytes port, then target name
+                    DnsAnswer(combinedName, parseString(dataIndex + 6, byteArray).second, "")
                 RecordType.TXT ->
                     DnsAnswer(combinedName, listOf(), parseString(dataIndex, byteArray).second.joinToString("."))
                 RecordType.A ->
